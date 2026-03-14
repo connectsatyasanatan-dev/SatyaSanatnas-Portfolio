@@ -1,0 +1,376 @@
+'use client'
+
+import { Play, Github, Linkedin, Download, Terminal, X, CheckCircle2, Cpu, Zap, Globe } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import portfolioAPI, { PersonalInfo, PortfolioStats, Achievements } from '@/lib/api'
+
+const HeroSection = () => {
+    const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null)
+    const [stats, setStats] = useState<PortfolioStats | null>(null)
+    const [achievements, setAchievements] = useState<Achievements | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [isExecuting, setIsExecuting] = useState(false)
+    const [terminalLogs, setTerminalLogs] = useState<string[]>([])
+    const [executionStep, setExecutionStep] = useState(0) // 0: Idle, 1: Terminal, 2: Success Card
+    const terminalRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        const fetch = async () => {
+            try {
+                const [infoData, statsData, achievementsData] = await Promise.all([
+                    portfolioAPI.getPersonalInfo(),
+                    portfolioAPI.getStats(),
+                    portfolioAPI.getAchievements()
+                ])
+                setPersonalInfo(infoData)
+                setStats(statsData)
+                setAchievements(achievementsData)
+            } catch (e) {
+                console.error('Failed to load hero data', e)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetch()
+    }, [])
+
+    const codeLines = [
+        { text: "// Welcome to my digital workspace", type: "comment" },
+        { text: "", type: "empty" },
+        { text: `import { Human, Developer } from '@universe/core';`, type: "import" },
+        { text: "", type: "empty" },
+        { text: `const ${personalInfo?.name?.replace(/\s+/g, '') || 'Developer'} = new Developer  ;`, type: "const" },
+        { text: "", type: "empty" },
+        { text: `${personalInfo?.name?.replace(/\s+/g, '') || 'Developer'}.configure({`, type: "configure" },
+        { text: `  role: '${personalInfo?.role || ''}',`, type: "role" },
+        { text: `  experience: '${personalInfo?.experience || ''}',`, type: "experience" },
+        { text: `  location: '${personalInfo?.location || ''}',`, type: "location" },
+        { text: `  status: '${personalInfo?.status || ''}',`, type: "status" },
+        { text: `  email: '${personalInfo?.email || ''}'`, type: "email" },
+        { text: "});", type: "closing" },
+    ]
+
+    const handleExecuteClick = () => {
+        setIsExecuting(true)
+        setExecutionStep(1)
+        setTerminalLogs([])
+        
+        const logs = [
+            `> Initializing ${personalInfo?.name || 'Developer'} environment...`,
+            `> Loading core modules: React, Next.js, Node.js...`,
+            `> Injecting experience: ${personalInfo?.experience || '2+ Years'}`,
+            `> Calibrating location: ${personalInfo?.location || 'Bhubaneswar, Odisha'}...`,
+            `> Setting status to: ${personalInfo?.status || 'Open to Work'}`,
+            `> Analyzing GitHub repositories...`,
+            `> Syncing with production servers...`,
+            `> Finalizing neural connections...`,
+            `> -----------------------------------------`,
+            `> SUCCESS: ${personalInfo?.name || 'Developer'} is fully instantiated!`
+        ]
+
+        let currentLog = 0
+        const interval = setInterval(() => {
+            if (currentLog < logs.length) {
+                setTerminalLogs(prev => [...prev, logs[currentLog]])
+                currentLog++
+                // Auto-scroll terminal
+                if (terminalRef.current) {
+                    terminalRef.current.scrollTop = terminalRef.current.scrollHeight
+                }
+            } else {
+                clearInterval(interval)
+                setTimeout(() => setExecutionStep(2), 800)
+            }
+        }, 300)
+    }
+
+    const closeExecutionModal = () => {
+        setIsExecuting(false)
+        setExecutionStep(0)
+        setTerminalLogs([])
+    }
+
+    const handleEmailClick = () => {
+        if (!personalInfo?.email) return
+        window.open(`mailto:${personalInfo.email}`, '_blank')
+    }
+
+    const handleGithubClick = () => {
+        if (!personalInfo?.github) return
+        window.open(personalInfo.github, '_blank', 'noopener,noreferrer')
+    }
+
+    const handleLinkedinClick = () => {
+        if (!personalInfo?.linkedin) return
+        window.open(personalInfo.linkedin, '_blank', 'noopener,noreferrer')
+    }
+
+    const handleResumeClick = () => {
+        if (!personalInfo?.resume) return
+        window.open(personalInfo.resume, '_blank', 'noopener,noreferrer')
+    }
+
+    const renderCodeLine = (line: any, index: number) => {
+        switch (line.type) {
+            case 'comment':
+                return <span style={{ color: 'var(--text-dim)', fontStyle: 'italic' }}>{line.text}</span>
+            case 'import':
+                return (
+                    <>
+                        <span style={{ color: 'var(--secondary)' }}>import</span>
+                        <span style={{ color: 'white' }}> {`{ `}</span>
+                        <span style={{ color: '#fbbf24' }}>Human</span>
+                        <span style={{ color: 'white' }}>, </span>
+                        <span style={{ color: '#fbbf24' }}>Developer</span>
+                        <span style={{ color: 'white' }}> {`} `}</span>
+                        <span style={{ color: 'var(--secondary)' }}>from</span>
+                        <span style={{ color: '#ce9178' }}> '@universe/core'</span>
+                        <span style={{ color: 'white' }}>;</span>
+                    </>
+                )
+            case 'const':
+                return (
+                    <>
+                        <span style={{ color: 'var(--secondary)' }}>const</span>
+                        <span style={{ color: 'var(--accent)' }}>{'\u00A0'}{personalInfo?.name?.replace(/\s+/g, '') || 'Developer'}</span>
+                        <span style={{ color: 'white' }}>{'\u00A0'}={'\u00A0'}</span>
+                        <span style={{ color: 'var(--secondary)' }}>new</span>
+                        <span style={{ color: '#fbbf24' }}>Developer</span>
+                        <span style={{ color: 'white' }}>{'\u00A0\u00A0'}</span>
+                        <span style={{ color: 'var(--primary)' }}>;</span>
+                    </>
+                )
+            case 'configure':
+                return (
+                    <>
+                        <span style={{ color: 'var(--accent)' }}>{personalInfo?.name?.replace(/\s+/g, '') || 'Developer'}</span>
+                        <span style={{ color: 'white' }}>.</span>
+                        <span style={{ color: '#3b82f6' }}>configure</span>
+                        <span style={{ color: 'var(--primary)' }}>({`{`}</span>
+                    </>
+                )
+            case 'role':
+                return (
+                    <>
+                        <span style={{ color: 'white', marginLeft: '25px' }}>  role: </span>
+                        <span style={{ color: '#ce9178' }}>'{personalInfo?.role || ''}'</span>
+                        <span style={{ color: 'white' }}>,</span>
+                    </>
+                )
+            case 'experience':
+                return (
+                    <>
+                        <span style={{ color: 'white', marginLeft: '25px' }}>  experience: </span>
+                        <span style={{ color: '#ce9178' }}>'{personalInfo?.experience || ''}'</span>
+                        <span style={{ color: 'white' }}>,</span>
+                    </>
+                )
+            case 'location':
+                return (
+                    <>
+                        <span style={{ color: 'white', marginLeft: '25px' }}>  location: </span>
+                        <span style={{ color: '#ce9178' }}>'{personalInfo?.location || ''}'</span>
+                        <span style={{ color: 'white' }}>,</span>
+                    </>
+                )
+            case 'status':
+                return (
+                    <>
+                        <span style={{ color: 'white', marginLeft: '25px' }}>  status: </span>
+                        <span style={{ color: '#22c55e' }}>'{personalInfo?.status || ''}'</span>
+                        <span style={{ color: 'white' }}>,</span>
+                    </>
+                )
+            case 'email':
+                return (
+                    <>
+                        <span style={{ color: 'white', marginLeft: '25px' }}>  email: </span>
+                        <span style={{ color: '#ce9178' }}>'{personalInfo?.email || ''}'</span>
+                    </>
+                )
+            case 'closing':
+                return (
+                    <>
+                        <span style={{ color: 'var(--primary)'  }}>&#125;);</span>
+                        <span className="blinking-cursor" style={{ color: 'var(--primary)' }}></span>
+                    </>
+                )
+            default:
+                return line.text
+        }
+    }
+
+    // Derived stats
+    const yearsExp = stats?.experience_years ?? achievements?.stats.yearsOfExperience ?? 0
+    const projectsCount = stats?.projects_count ?? achievements?.stats.projectsCompleted ?? 0
+    const clientsCount = achievements?.stats.clientsSatisfied ?? 0
+    // Satisfaction rate not typically tracked in simple stats, defaulting to 100% or hiding if 0 clients
+    const satisfactionRate = clientsCount > 0 ? 100 : 0
+
+    return (
+        <section id="hero-section">
+            <div className="hero-container">
+                {/* Window controls */}
+                <div className="window-controls">
+                    <div className="window-dots">
+                        <div className="window-dot red"></div>
+                        <div className="window-dot yellow"></div>
+                        <div className="window-dot green"></div>
+                    </div>
+                    <div className="window-status">Read-Only</div>
+                </div>
+
+                {/* Code content */}
+                <div className="code-content code-block">
+                    {codeLines.map((line, index) => (
+                        <div key={index} className="code-line">
+                            {renderCodeLine(line, index)}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Execute button */}
+                <div className="execute-bar">
+                    <button className="execute-btn" onClick={handleExecuteClick}>
+                        <Play />
+                        <span className="btn-text-full">Execute Code</span>
+                        <span className="btn-text-short">Run</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Execution Modal */}
+            {isExecuting && (
+                <div className="execution-modal-overlay">
+                    <div className="execution-modal-content glass-panel animate-delay-1">
+                        <div className="execution-modal-header">
+                            <div className="header-left">
+                                <Terminal size={18} />
+                                <span>Execution Terminal</span>
+                            </div>
+                            <button className="close-btn" onClick={closeExecutionModal}>
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="execution-modal-body">
+                            {executionStep === 1 && (
+                                <div className="terminal-wrapper" ref={terminalRef}>
+                                    {terminalLogs.map((log, idx) => (
+                                        <div key={idx} className={`terminal-line ${log && typeof log === 'string' && log.includes('SUCCESS') ? 'text-primary' : 'text-white'}`}>
+                                            {log}
+                                        </div>
+                                    ))}
+                                    <div className="blinking-cursor"></div>
+                                </div>
+                            )}
+
+                            {executionStep === 2 && (
+                                <div className="success-profile-card">
+                                    <div className="profile-badge">
+                                        <CheckCircle2 size={48} className="text-primary" />
+                                        <h2>Compilation Successful</h2>
+                                    </div>
+                                    
+                                    <div className="profile-content">
+                                        <div className="profile-main-info">
+                                            <h3>{personalInfo?.name}</h3>
+                                            <p className="text-primary">{personalInfo?.role}</p>
+                                        </div>
+
+                                        <div className="profile-grid">
+                                            <div className="profile-grid-item">
+                                                <Cpu size={16} className="text-accent" />
+                                                <div>
+                                                    <span className="label">Stack</span>
+                                                    <span className="value">Full Stack</span>
+                                                </div>
+                                            </div>
+                                            <div className="profile-grid-item">
+                                                <Zap size={16} className="text-secondary" />
+                                                <div>
+                                                    <span className="label">Performance</span>
+                                                    <span className="value">Optimal</span>
+                                                </div>
+                                            </div>
+                                            <div className="profile-grid-item">
+                                                <Globe size={16} className="text-primary" />
+                                                <div>
+                                                    <span className="label">Availability</span>
+                                                    <span className="value">Remote / On-site</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="profile-actions">
+                                            <button className="hero-btn primary" onClick={handleEmailClick}>
+                                                <Play size={16} /> Hire Now
+                                            </button>
+                                            <button className="hero-btn secondary" onClick={handleResumeClick}>
+                                                <Download size={16} /> Profile.pdf
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Personal Info & Action buttons */}
+            <div className="hero-info">
+                {/* Bio */}
+                <div className="hero-bio">
+                    <h1 className="hero-name">{personalInfo?.name || (loading ? 'Loading...' : 'No name')}</h1>
+                    <p className="hero-title">{personalInfo?.title || ''}</p>
+                    <p className="hero-description">{personalInfo?.bio || ''}</p>
+                </div>
+
+                {/* Action buttons */}
+                <div className="hero-actions">
+                    <button className="hero-btn primary" onClick={handleGithubClick}>
+                        <Github />
+                        <span className="btn-text-full">Browse Repo</span>
+                        <span className="btn-text-short">GitHub</span>
+                    </button>
+
+                    <button className="hero-btn secondary" onClick={handleResumeClick}>
+                        <Download />
+                        <span className="btn-text-full">Download CV</span>
+                        <span className="btn-text-short">Resume</span>
+                    </button>
+
+                    <button className="hero-btn accent" onClick={handleLinkedinClick}>
+                        <Linkedin />
+                        <span className="btn-text-full">Connect</span>
+                        <span className="btn-text-short">LinkedIn</span>
+                    </button>
+                </div>
+
+                {/* Quick stats */}
+                <div className="hero-stats">
+                    <div className="stat-item">
+                        <div className="stat-value primary">{yearsExp}+</div>
+                        <div className="stat-label">Years Exp</div>
+                    </div>
+                    <div className="stat-item">
+                        <div className="stat-value secondary">{projectsCount}+</div>
+                        <div className="stat-label">Projects</div>
+                    </div>
+                    <div className="stat-item">
+                        <div className="stat-value accent">{clientsCount}+</div>
+                        <div className="stat-label">Clients</div>
+                    </div>
+                    <div className="stat-item">
+                        <div className="stat-value green">{satisfactionRate}%</div>
+                        <div className="stat-label">Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    )
+}
+
+export default HeroSection

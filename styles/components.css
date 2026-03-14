@@ -1,0 +1,663 @@
+/* Header Component Styles */
+#portfolio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--sidebar-bg);
+  padding: 8px 8px;
+  font-size: 12px;
+  z-index: 50;
+  position: relative;
+}
+
+#portfolio-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+#portfolio-header .header-logo {
+  width: 16px;
+  height: 16px;
+  color: var(--primary);
+}
+
+#portfolio-header .header-title {
+  color: white;
+  font-weight: bold;
+  letter-spacing: -0.025em;
+  font-size: 14px;
+}
+
+#portfolio-header .header-nav {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  color: var(--text-dim);
+}
+
+#portfolio-header .header-nav a {
+  color: var(--text-dim);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+  font-size: 12px;
+}
+
+#portfolio-header .header-nav a:hover {
+  color: white;
+}
+
+#portfolio-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#portfolio-header .run-build-btn {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background-color: #1e2929;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+#portfolio-header .run-build-btn:hover {
+  border-color: rgba(6, 249, 249, 0.5);
+}
+
+#portfolio-header .run-build-btn .play-icon {
+  width: 12px;
+  height: 12px;
+  color: var(--primary);
+  transition: text-shadow 0.2s;
+}
+
+#portfolio-header .run-build-btn:hover .play-icon {
+  text-shadow: 0 0 5px rgba(6, 249, 249, 0.5);
+}
+
+#portfolio-header .run-build-btn span {
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  transition: color 0.2s;
+}
+
+#portfolio-header .run-build-btn:hover span {
+  color: white;
+}
+
+#portfolio-header .header-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+#portfolio-header .header-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#portfolio-header .header-btn:hover {
+  background-color: var(--border-color);
+  color: white;
+}
+
+#portfolio-header .header-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Responsive Header */
+@media (min-width: 640px) {
+  #portfolio-header {
+    padding: 8px 16px;
+  }
+  
+  #portfolio-header .header-left {
+    gap: 16px;
+  }
+  
+  #portfolio-header .header-title {
+    font-size: 16px;
+  }
+  
+  #portfolio-header .run-build-btn {
+    display: flex;
+    padding: 4px 12px;
+  }
+  
+  #portfolio-header .run-build-btn .play-icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  #portfolio-header .header-right {
+    gap: 12px;
+  }
+  
+  #portfolio-header .header-buttons {
+    gap: 8px;
+  }
+  
+  #portfolio-header .header-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  #portfolio-header .header-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  #portfolio-header {
+    font-size: 14px;
+  }
+  
+  #portfolio-header .header-nav {
+    display: flex;
+    gap: 8px;
+    margin-left: 8px;
+  }
+  
+  #portfolio-header .header-nav a {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  #portfolio-header .header-nav {
+    gap: 16px;
+    margin-left: 16px;
+  }
+  
+  #portfolio-header .header-nav a {
+    font-size: 14px;
+  }
+  
+  #portfolio-header .run-build-btn .play-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Resizable Sidebar Container */
+.resizable-sidebar-container {
+  display: none;
+  flex-direction: row;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+/* Sidebar Component Styles */
+#portfolio-sidebar {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  background-color: var(--sidebar-bg);
+  height: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+#portfolio-sidebar .sidebar-content-wrapper {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+#portfolio-sidebar .sidebar-content {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  height: 100%;
+}
+
+#portfolio-sidebar .sidebar-icons {
+  width: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  gap: 16px;
+  border-right: 1px solid var(--border-color);
+  height: 100%;
+  background-color: #080d0d;
+}
+
+#portfolio-sidebar .sidebar-icons svg {
+  width: 20px;
+  height: 20px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+#portfolio-sidebar .sidebar-icons svg:hover {
+  color: white;
+}
+
+#portfolio-sidebar .sidebar-icons svg.active {
+  color: white;
+  border-left: 2px solid var(--primary);
+  padding-left: 12px;
+  margin-left: -12px;
+}
+
+#portfolio-sidebar .sidebar-icons .icons-bottom {
+  margin-top: auto;
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+}
+
+#portfolio-sidebar .sidebar-explorer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+#portfolio-sidebar .explorer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px;
+  background-color: var(--sidebar-bg);
+}
+
+#portfolio-sidebar .explorer-header svg {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+#portfolio-sidebar .explorer-header svg:hover {
+  color: white;
+}
+
+#portfolio-sidebar .file-tree {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  user-select: none;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#portfolio-sidebar .file-tree .folder-root {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  color: white;
+  cursor: pointer;
+  background-color: rgba(39, 58, 58, 0.2);
+}
+
+#portfolio-sidebar .file-tree .folder-root svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-dim);
+}
+
+#portfolio-sidebar .file-tree .folder-root .folder-name {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+#portfolio-sidebar .file-tree .file-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 16px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 12px;
+}
+
+#portfolio-sidebar .file-tree .file-item:hover {
+  color: white;
+  background-color: var(--hover-bg);
+}
+
+#portfolio-sidebar .file-tree .file-item svg {
+  width: 16px;
+  height: 16px;
+}
+
+#portfolio-sidebar .file-tree .file-item.active {
+  background-color: rgba(39, 58, 58, 0.5);
+  color: white;
+  border-radius: 0 4px 4px 0;
+  border-left: 2px solid var(--primary);
+}
+
+#portfolio-sidebar .file-tree .folder-contents {
+  display: flex;
+  flex-direction: column;
+  padding-left: 16px;
+  border-left: 1px solid var(--border-color);
+  margin-left: 20px;
+}
+
+#portfolio-sidebar .file-tree .nested-folder {
+  display: flex;
+  flex-direction: column;
+  padding-left: 24px;
+  border-left: 1px solid var(--border-color);
+  margin-left: 20px;
+}
+
+/* Responsive Sidebar */
+@media (min-width: 1024px) {
+  .resizable-sidebar-container {
+    display: flex;
+  }
+  
+  #portfolio-sidebar .sidebar-icons {
+    gap: 24px;
+  }
+  
+  #portfolio-sidebar .sidebar-icons svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  #portfolio-sidebar .file-tree .folder-name {
+    font-size: 14px;
+  }
+  
+  #portfolio-sidebar .file-tree .file-item {
+    font-size: 14px;
+  }
+}
+
+/* TabBar Component Styles */
+#portfolio-tabbar .tab-container {
+  display: flex;
+  align-items: center;
+  background-color: var(--sidebar-bg);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+  z-index: 10;
+}
+
+#portfolio-tabbar .tab-container::-webkit-scrollbar {
+  display: none;
+}
+
+#portfolio-tabbar .tab-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 8px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  min-width: fit-content;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-top: 2px solid transparent;
+}
+
+#portfolio-tabbar .tab-item.active {
+  background-color: var(--editor-bg);
+  border-top-color: var(--primary);
+  color: white;
+}
+
+#portfolio-tabbar .tab-item:not(.active) {
+  color: var(--text-dim);
+  border-top-color: transparent;
+}
+
+#portfolio-tabbar .tab-item:not(.active):hover {
+  background-color: #1e2929;
+  color: white;
+}
+
+#portfolio-tabbar .tab-item .tab-icon {
+  font-size: 14px;
+}
+
+#portfolio-tabbar .tab-item .tab-name {
+  display: none;
+}
+
+#portfolio-tabbar .tab-item .tab-close {
+  width: 12px;
+  height: 12px;
+  margin-left: 4px;
+  padding: 2px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+#portfolio-tabbar .tab-item .tab-close:hover {
+  background-color: var(--border-color);
+}
+
+#portfolio-tabbar .breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--editor-bg);
+  z-index: 10;
+}
+
+#portfolio-tabbar .breadcrumb-path {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+#portfolio-tabbar .breadcrumb-path::-webkit-scrollbar {
+  display: none;
+}
+
+#portfolio-tabbar .breadcrumb-path span {
+  white-space: nowrap;
+}
+
+#portfolio-tabbar .breadcrumb-path .current-file {
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+#portfolio-tabbar .breadcrumb-path .current-file .file-icon {
+  font-size: 14px;
+}
+
+#portfolio-tabbar .breadcrumb-path svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+#portfolio-tabbar .breadcrumb-info {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+#portfolio-tabbar .breadcrumb-info span {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* Responsive TabBar */
+@media (min-width: 475px) {
+  #portfolio-tabbar .tab-item .tab-name {
+    display: inline;
+  }
+}
+
+@media (min-width: 640px) {
+  #portfolio-tabbar .tab-item {
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  
+  #portfolio-tabbar .tab-item .tab-icon {
+    font-size: 16px;
+  }
+  
+  #portfolio-tabbar .tab-item .tab-close {
+    width: 14px;
+    height: 14px;
+    margin-left: 8px;
+  }
+  
+  #portfolio-tabbar .breadcrumb {
+    padding: 6px 16px;
+  }
+  
+  #portfolio-tabbar .breadcrumb-info {
+    display: flex;
+  }
+}
+
+/* Sidebar Resize Handle Styles */
+.sidebar-resize-handle {
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-resize-handle:hover {
+  background-color: var(--primary) !important;
+}
+
+.sidebar-resize-handle:active {
+  background-color: var(--primary) !important;
+}
+
+/* Global cursor styles for resizing */
+body.resizing {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+body.resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+/* Smooth transitions for sidebar width changes */
+#portfolio-sidebar {
+  transition: width 0.1s ease-out;
+}
+
+/* Prevent text selection during resize */
+.resizable-sidebar-container.resizing {
+  user-select: none;
+}
+
+.resizable-sidebar-container.resizing * {
+  user-select: none;
+}
+/* Custom scrollbar for sidebar file tree */
+#portfolio-sidebar .file-tree::-webkit-scrollbar {
+  width: 6px;
+}
+
+#portfolio-sidebar .file-tree::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#portfolio-sidebar .file-tree::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+#portfolio-sidebar .file-tree::-webkit-scrollbar-thumb:hover {
+  background: #3a5555;
+}
+
+/* Ensure proper height for sidebar content */
+#portfolio-sidebar .sidebar-content {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* VS Code-like layout fixes */
+.resizable-sidebar-container,
+#portfolio-sidebar,
+#portfolio-sidebar .sidebar-content-wrapper,
+#portfolio-sidebar .sidebar-content {
+  height: 100%;
+}
+
+/* Prevent any unwanted scrolling in sidebar container */
+.resizable-sidebar-container {
+  overflow: hidden;
+}
+
+/* Mobile sidebar adjustments */
+@media (max-width: 1023px) {
+  body {
+    overflow: auto;
+  }
+  
+  html, body {
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  #portfolio-app {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+  
+  #portfolio-app main {
+    overflow: visible;
+    height: auto;
+  }
+  
+  #portfolio-app main .main-content {
+    overflow: visible;
+  }
+}

@@ -1,0 +1,891 @@
+/* Git History Section Styles */
+#git-history-section {
+  max-width: 1536px;
+  margin: 0 auto 48px auto;
+  padding: 0 16px;
+}
+
+#git-history-section .section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+#git-history-section .section-header svg {
+  width: 20px;
+  height: 20px;
+  color: var(--secondary);
+}
+
+#git-history-section .section-title {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.025em;
+  color: white;
+}
+
+#git-history-section .timeline-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+#git-history-section .timeline-main {
+  position: relative;
+  padding-left: 32px;
+}
+
+#git-history-section .timeline-line {
+  position: absolute;
+  left: 19px;
+  top: 8px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--secondary), transparent);
+}
+
+#git-history-section .timeline-item {
+  position: relative;
+  display: flex;
+  gap: 24px;
+  margin-bottom: 48px;
+  cursor: pointer;
+  animation: fadeInLeft 0.5s ease forwards;
+  opacity: 0;
+}
+
+#git-history-section .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+#git-history-section .timeline-item:nth-child(2) { animation-delay: 0.3s; }
+#git-history-section .timeline-item:nth-child(3) { animation-delay: 0.5s; }
+#git-history-section .timeline-item:nth-child(4) { animation-delay: 0.7s; }
+
+#git-history-section .timeline-dot {
+  position: absolute;
+  left: -32px;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+#git-history-section .timeline-dot-inner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--editor-bg);
+  border: 3px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0 4px var(--editor-bg);
+}
+
+#git-history-section .timeline-dot-inner:hover {
+  transform: scale(1.1);
+}
+
+#git-history-section .timeline-dot-inner.primary {
+  border-color: var(--primary);
+}
+
+#git-history-section .timeline-dot-inner.secondary {
+  border-color: var(--secondary);
+}
+
+#git-history-section .timeline-dot-inner.accent {
+  border-color: var(--accent);
+}
+
+#git-history-section .timeline-dot-inner.primary:hover {
+  box-shadow: 0 0 0 4px var(--editor-bg), 0 0 20px rgba(6, 249, 249, 0.4);
+}
+
+#git-history-section .timeline-dot-inner.secondary:hover {
+  box-shadow: 0 0 0 4px var(--editor-bg), 0 0 20px rgba(255, 0, 255, 0.4);
+}
+
+#git-history-section .timeline-dot-inner.accent:hover {
+  box-shadow: 0 0 0 4px var(--editor-bg), 0 0 20px rgba(45, 226, 230, 0.4);
+}
+
+#git-history-section .timeline-dot svg {
+  width: 18px;
+  height: 18px;
+}
+
+#git-history-section .timeline-dot svg.primary {
+  color: var(--primary);
+}
+
+#git-history-section .timeline-dot svg.secondary {
+  color: var(--secondary);
+}
+
+#git-history-section .timeline-dot svg.accent {
+  color: var(--accent);
+}
+
+#git-history-section .timeline-content {
+  flex: 1;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(39, 58, 58, 0.6);
+  padding: 24px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  margin-left: 0;
+}
+
+#git-history-section .timeline-content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+#git-history-section .timeline-content.primary:hover {
+  border-color: rgba(6, 249, 249, 0.5);
+}
+
+#git-history-section .timeline-content.secondary:hover {
+  border-color: rgba(255, 0, 255, 0.5);
+}
+
+#git-history-section .timeline-content.accent:hover {
+  border-color: rgba(45, 226, 230, 0.5);
+}
+
+#git-history-section .timeline-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#git-history-section .timeline-title-group {
+  flex: 1;
+}
+
+#git-history-section .timeline-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+#git-history-section .timeline-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+}
+
+#git-history-section .timeline-badge {
+  padding: 4px 8px;
+  font-size: 10px;
+  border-radius: 12px;
+  border: 1px solid;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#git-history-section .timeline-badge.primary {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: rgba(6, 249, 249, 0.1);
+}
+
+#git-history-section .timeline-badge.secondary {
+  border-color: var(--secondary);
+  color: var(--secondary);
+  background-color: rgba(255, 0, 255, 0.1);
+}
+
+#git-history-section .timeline-badge.accent {
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: rgba(45, 226, 230, 0.1);
+}
+
+#git-history-section .timeline-company {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#git-history-section .timeline-company.primary {
+  color: var(--primary);
+}
+
+#git-history-section .timeline-company.secondary {
+  color: var(--secondary);
+}
+
+#git-history-section .timeline-company.accent {
+  color: var(--accent);
+}
+
+#git-history-section .timeline-meta {
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#git-history-section .timeline-period {
+  background-color: rgba(39, 58, 58, 0.6);
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: inline-block;
+  border: 1px solid var(--border-color);
+}
+
+#git-history-section .timeline-commit {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+#git-history-section .timeline-description {
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+#git-history-section .timeline-achievements {
+  margin-bottom: 16px;
+}
+
+#git-history-section .timeline-achievements ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#git-history-section .timeline-achievements li {
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 6px;
+  padding-left: 20px;
+  position: relative;
+}
+
+#git-history-section .timeline-achievements li::before {
+  content: '▸';
+  color: var(--primary);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+#git-history-section .timeline-technologies {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#git-history-section .tech-tag {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+  font-weight: 500;
+}
+
+#git-history-section .tech-tag.primary {
+  color: var(--primary);
+  border-color: rgba(6, 249, 249, 0.2);
+  background-color: rgba(6, 249, 249, 0.05);
+}
+
+#git-history-section .tech-tag.secondary {
+  color: var(--secondary);
+  border-color: rgba(255, 0, 255, 0.2);
+  background-color: rgba(255, 0, 255, 0.05);
+}
+
+#git-history-section .tech-tag.accent {
+  color: var(--accent);
+  border-color: rgba(45, 226, 230, 0.2);
+  background-color: rgba(45, 226, 230, 0.05);
+}
+
+#git-history-section .changed-files-sidebar {
+  display: none;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(39, 58, 58, 0.6);
+  border-radius: 8px;
+  padding: 16px;
+  height: fit-content;
+  position: sticky;
+  top: 16px;
+  animation: fadeInRight 0.5s ease 0.3s forwards;
+  opacity: 0;
+}
+
+#git-history-section .changed-files-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#git-history-section .changed-files-header svg {
+  width: 16px;
+  height: 16px;
+}
+
+#git-history-section .changed-files-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+}
+
+#git-history-section .changed-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#git-history-section .changed-file-item {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  animation: fadeInRight 0.3s ease forwards;
+  opacity: 0;
+}
+
+#git-history-section .changed-file-item:nth-child(1) { animation-delay: 0.1s; }
+#git-history-section .changed-file-item:nth-child(2) { animation-delay: 0.2s; }
+#git-history-section .changed-file-item:nth-child(3) { animation-delay: 0.3s; }
+#git-history-section .changed-file-item:nth-child(4) { animation-delay: 0.4s; }
+
+#git-history-section .changed-file-item:hover {
+  color: white;
+}
+
+#git-history-section .file-status {
+  font-weight: bold;
+}
+
+#git-history-section .file-status.added {
+  color: #22c55e;
+}
+
+#git-history-section .file-status.modified {
+  color: #eab308;
+}
+
+#git-history-section .file-status.deleted {
+  color: #ef4444;
+}
+
+#git-history-section .changed-files-stats {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+#git-history-section .stats-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+#git-history-section .stats-additions {
+  color: #22c55e;
+}
+
+#git-history-section .stats-deletions {
+  color: #ef4444;
+}
+
+/* Responsive Git History */
+@media (min-width: 640px) {
+  #git-history-section {
+    padding: 0 24px;
+  }
+  
+  #git-history-section .timeline-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  
+  #git-history-section .timeline-meta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  #git-history-section {
+    margin-bottom: 64px;
+    padding: 0 32px;
+  }
+  
+  #git-history-section .timeline-main {
+    padding-left: 48px;
+  }
+  
+  #git-history-section .timeline-dot {
+    left: -48px;
+  }
+}
+
+@media (min-width: 1024px) {
+  #git-history-section {
+    margin-bottom: 80px;
+    padding: 0;
+  }
+  
+  #git-history-section .timeline-container {
+    grid-template-columns: 1fr 300px;
+  }
+  
+  #git-history-section .changed-files-sidebar {
+    display: block;
+  }
+}
+
+/* Education Section Styles */
+#education-section {
+  max-width: 1536px;
+  margin: 0 auto 48px auto;
+  padding: 0 16px;
+}
+
+#education-section .section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+#education-section .section-header svg {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+}
+
+#education-section .section-title {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.025em;
+  color: white;
+}
+
+#education-section .education-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+#education-section .education-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+#education-section .column-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+#education-section .column-header svg {
+  width: 20px;
+  height: 20px;
+}
+
+#education-section .column-header svg.primary {
+  color: var(--primary);
+}
+
+#education-section .column-header svg.secondary {
+  color: var(--secondary);
+}
+
+#education-section .column-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+}
+
+#education-section .education-item,
+#education-section .certification-item {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(39, 58, 58, 0.6);
+  border-radius: 8px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+
+#education-section .education-item:nth-child(1) { animation-delay: 0.1s; }
+#education-section .education-item:nth-child(2) { animation-delay: 0.3s; }
+#education-section .certification-item:nth-child(1) { animation-delay: 0.2s; }
+#education-section .certification-item:nth-child(2) { animation-delay: 0.4s; }
+#education-section .certification-item:nth-child(3) { animation-delay: 0.6s; }
+#education-section .certification-item:nth-child(4) { animation-delay: 0.8s; }
+
+#education-section .education-item:hover {
+  border-color: rgba(6, 249, 249, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(6, 249, 249, 0.1);
+}
+
+#education-section .certification-item:hover {
+  border-color: rgba(255, 0, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 0, 255, 0.1);
+}
+
+#education-section .education-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+#education-section .education-degree {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 4px;
+}
+
+#education-section .education-school {
+  color: var(--primary);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+#education-section .education-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+#education-section .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#education-section .meta-item svg {
+  width: 16px;
+  height: 16px;
+}
+
+#education-section .education-courses {
+  margin-bottom: 16px;
+}
+
+#education-section .courses-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+}
+
+#education-section .courses-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#education-section .course-tag {
+  font-size: 12px;
+  background-color: rgba(6, 249, 249, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(6, 249, 249, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+#education-section .education-achievements {
+  margin-bottom: 12px;
+}
+
+#education-section .achievements-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+}
+
+#education-section .achievements-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#education-section .achievements-list li {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 4px;
+  padding-left: 16px;
+  position: relative;
+}
+
+#education-section .achievements-list li::before {
+  content: '•';
+  color: #22c55e;
+  position: absolute;
+  left: 0;
+}
+
+#education-section .education-focus {
+  margin-top: 12px;
+}
+
+#education-section .focus-tag {
+  font-size: 12px;
+  background-color: rgba(45, 226, 230, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(45, 226, 230, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+#education-section .certification-item {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(39, 58, 58, 0.6);
+  border-radius: 8px;
+  padding: 24px;
+  transition: border-color 0.3s ease;
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+
+#education-section .certification-item:nth-child(1) { animation-delay: 0.2s; }
+#education-section .certification-item:nth-child(2) { animation-delay: 0.4s; }
+#education-section .certification-item:nth-child(3) { animation-delay: 0.6s; }
+#education-section .certification-item:nth-child(4) { animation-delay: 0.8s; }
+
+#education-section .certification-item:hover {
+  border-color: rgba(255, 0, 255, 0.3);
+}
+
+#education-section .certification-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+#education-section .certification-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(39, 58, 58, 0.5);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+#education-section .certification-item:hover .certification-icon {
+  background-color: var(--border-color);
+}
+
+#education-section .certification-icon svg {
+  width: 24px;
+  height: 24px;
+  color: var(--secondary);
+}
+
+#education-section .certification-details {
+  flex: 1;
+  min-width: 0;
+}
+
+#education-section .certification-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+#education-section .certification-item:hover .certification-name {
+  color: var(--secondary);
+}
+
+#education-section .certification-issuer {
+  color: var(--secondary);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+#education-section .certification-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+#education-section .certification-credential {
+  background-color: rgba(39, 58, 58, 0.3);
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 12px;
+}
+
+#education-section .credential-text {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-dim);
+}
+
+#education-section .certification-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#education-section .verification-badge {
+  font-size: 12px;
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+#education-section .view-certificate {
+  font-size: 12px;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+#education-section .view-certificate:hover {
+  color: white;
+}
+
+#education-section .certification-summary {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(39, 58, 58, 0.6);
+  border-radius: 8px;
+  padding: 24px;
+  background-image: linear-gradient(to right, rgba(255, 0, 255, 0.05), rgba(6, 249, 249, 0.05));
+  animation: fadeInUp 0.5s ease 0.8s forwards;
+  opacity: 0;
+}
+
+#education-section .summary-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 16px;
+}
+
+#education-section .summary-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+#education-section .summary-stat {
+  text-align: center;
+}
+
+#education-section .stat-number {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+#education-section .stat-number.secondary {
+  color: var(--secondary);
+}
+
+#education-section .stat-number.primary {
+  color: var(--primary);
+}
+
+#education-section .stat-label {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+#education-section .summary-note {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+#education-section .note-text {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+/* Responsive Education Section */
+@media (min-width: 640px) {
+  #education-section {
+    padding: 0 24px;
+  }
+  
+  #education-section .education-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  
+  #education-section .certification-footer {
+    flex-wrap: nowrap;
+  }
+}
+
+@media (min-width: 768px) {
+  #education-section {
+    margin-bottom: 64px;
+    padding: 0 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  #education-section {
+    margin-bottom: 80px;
+    padding: 0;
+  }
+  
+  #education-section .education-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

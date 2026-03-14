@@ -1,0 +1,179 @@
+'use client'
+
+import { BookOpen, Clock, Tag, ArrowRight, TrendingUp } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import portfolioAPI, { BlogPost } from '@/lib/api'
+
+const BlogSection = () => {
+    const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchBlogPosts = async () => {
+            try {
+                const data = await portfolioAPI.getBlogPosts()
+                setBlogPosts(data)
+            } catch (error) {
+                console.error('Failed to fetch blog posts:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchBlogPosts()
+    }, [])
+
+    return (
+        <section id="blog-section">
+            <div className="section-header">
+                <BookOpen className="w-5 h-5 text-green-400" />
+                <h3 className="section-title">Latest Articles & Insights</h3>
+            </div>
+
+            {loading ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                    Loading blog posts...
+                </div>
+            ) : (
+                <div className="articles-grid">
+                    {blogPosts.map((post, index) => (
+                        <motion.article
+                            key={post.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: index * 0.2 }}
+                            className={`article-card ${post.featured ? 'featured' : ''}`}
+                        >
+                            {/* Featured Badge */}
+                            {post.featured && (
+                                <div className="featured-badge">
+                                    <div className="badge-content">
+                                        <TrendingUp className="w-3 h-3" />
+                                        FEATURED
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Content */}
+                            <div className="article-content">
+                                {/* Date and Read Time */}
+                                <div className="article-meta">
+                                    <time dateTime={post.date}>
+                                        {new Date(post.date).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}
+                                    </time>
+                                    <div className="read-time">
+                                        <Clock className="w-3 h-3" />
+                                        {post.readTime}
+                                    </div>
+                                </div>
+
+                                {/* Title */}
+                                <h4 className="article-title">
+                                    {post.title}
+                                </h4>
+
+                                {/* Excerpt */}
+                                <p className="article-excerpt">
+                                    {post.excerpt}
+                                </p>
+
+                                {/* Tags */}
+                                <div className="article-tags">
+                                    {post.tags.map((tag, tagIndex) => (
+                                        <span
+                                            key={tagIndex}
+                                            className="article-tag"
+                                        >
+                                            <Tag className="w-3 h-3" />
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+
+                                {/* Read More */}
+                                <div className="article-footer">
+                                    <button className="read-more-btn">
+                                        Read Article
+                                        <ArrowRight className="w-4 h-4" />
+                                    </button>
+                                    <div className="article-number">
+                                        #{post.id.toString().padStart(2, '0')}
+                                    </div>
+                                </div>
+
+                                {/* Hover Effect */}
+                                <div className="article-hover-effect"></div>
+                            </div>
+                        </motion.article>
+                    ))}
+                </div>
+            )}
+
+            {/* Blog Stats & CTA */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                className="blog-footer-grid"
+            >
+                {/* Stats */}
+                <div className="blog-stats-card">
+                    <h5 className="stats-title">
+                        <TrendingUp className="w-5 h-5 text-green-400" />
+                        Writing Stats
+                    </h5>
+                    <div className="stats-grid">
+                        <div className="stat-item">
+                            <div className="stat-value">25+</div>
+                            <div className="stat-label">Articles Published</div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-value primary">50K+</div>
+                            <div className="stat-label">Total Reads</div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-value secondary">15+</div>
+                            <div className="stat-label">Topics Covered</div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-value accent">4.8</div>
+                            <div className="stat-label">Avg Rating</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Newsletter Signup */}
+                <div className="newsletter-card">
+                    <h5 className="newsletter-title">Stay Updated</h5>
+                    <p className="newsletter-description">
+                        Get the latest articles on web development, best practices, and industry insights delivered to your inbox.
+                    </p>
+                    <div className="newsletter-form">
+                        <input
+                            type="email"
+                            placeholder="Enter your email"
+                            className="newsletter-input"
+                        />
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="newsletter-btn"
+                        >
+                            Subscribe
+                        </motion.button>
+                    </div>
+                    <p className="newsletter-disclaimer">
+                        No spam, unsubscribe anytime. Join 500+ developers.
+                    </p>
+                </div>
+            </motion.div>
+        </section>
+    )
+}
+
+export default BlogSection
