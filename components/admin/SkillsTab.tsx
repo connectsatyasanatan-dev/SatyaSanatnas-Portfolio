@@ -32,6 +32,21 @@ const SkillsTab = ({ skills, onUpdateCategory, onAddSkill }: SkillsTabProps) => 
         years: 1
     })
 
+    // State for adding new category
+    const [showAddCategory, setShowAddCategory] = useState(false)
+    const [newCategory, setNewCategory] = useState({ key: '', title: '' })
+
+    const handleAddCategory = () => {
+        if (newCategory.key && newCategory.title) {
+            onUpdateCategory(newCategory.key, {
+                title: newCategory.title,
+                skills: []
+            })
+            setNewCategory({ key: '', title: '' })
+            setShowAddCategory(false)
+        }
+    }
+
     const handleEditCategory = (category: string) => {
         setEditingCategory(category)
         setEditData({ ...skills[category] })
@@ -93,17 +108,73 @@ const SkillsTab = ({ skills, onUpdateCategory, onAddSkill }: SkillsTabProps) => 
                     <Settings />
                     <h2 className="admin-section-title">Skills Management</h2>
                 </div>
-                    <ConfirmDialog
-                        isOpen={deleteConfirm.isOpen}
-                        onClose={() => setDeleteConfirm({ isOpen: false, category: null, index: null })}
-                        title="Delete Skill"
-                        message="Are you sure you want to delete this skill? This action cannot be undone."
-                        confirmText="Delete"
-                        cancelText="Cancel"
-                        onConfirm={confirmDelete}
-                        type="delete"
-                    />
+                <div className="admin-section-actions">
+                    <button
+                        onClick={() => setShowAddCategory(!showAddCategory)}
+                        className="admin-btn admin-btn-green"
+                    >
+                        <Plus />
+                        Add Category
+                    </button>
+                </div>
             </div>
+
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                onClose={() => setDeleteConfirm({ isOpen: false, category: null, index: null })}
+                title="Delete Skill"
+                message="Are you sure you want to delete this skill? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Cancel"
+                onConfirm={confirmDelete}
+                type="delete"
+            />
+
+            {/* Add Category Form */}
+            {showAddCategory && (
+                <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="admin-card admin-add-category-card"
+                >
+                    <h3 className="admin-card-title">Add New Skill Category</h3>
+                    <div className="admin-form-group">
+                        <label className="admin-form-label">Category Key (e.g., "tools", "frontend")</label>
+                        <input
+                            type="text"
+                            value={newCategory.key}
+                            onChange={(e) => setNewCategory({ ...newCategory, key: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                            className="admin-form-input"
+                            placeholder="category-key"
+                        />
+                    </div>
+                    <div className="admin-form-group">
+                        <label className="admin-form-label">Display Title</label>
+                        <input
+                            type="text"
+                            value={newCategory.title}
+                            onChange={(e) => setNewCategory({ ...newCategory, title: e.target.value })}
+                            className="admin-form-input"
+                            placeholder="Tools & Others"
+                        />
+                    </div>
+                    <div className="admin-add-skill-actions">
+                        <button
+                            onClick={handleAddCategory}
+                            className="admin-btn admin-btn-green"
+                            disabled={!newCategory.key || !newCategory.title}
+                        >
+                            Create Category
+                        </button>
+                        <button
+                            onClick={() => setShowAddCategory(false)}
+                            className="admin-btn admin-btn-gray"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </motion.div>
+            )}
 
             <div className="admin-skills-grid">
                 {Object.entries(skills).map(([category, categoryData]) => (

@@ -164,7 +164,7 @@ def get_stats():
     stats_data = achievements.get("stats", {})
 
     stats = {
-        "projects_count": len(projects),
+        "projects_count": stats_data.get("projectsCompleted", len(projects)),
         "featured_projects": len([p for p in projects if p.get("featured", False)]),
         "total_stars": sum(p.get("stars", 0) for p in projects),
         "total_forks": sum(p.get("forks", 0) for p in projects),

@@ -21,7 +21,28 @@ PERSONAL_INFO = {
     "languages": []
 }
 
-SKILLS = {}
+SKILLS = {
+    "frontend": {
+        "title": "Frontend Development",
+        "skills": []
+    },
+    "backend": {
+        "title": "Backend Development",
+        "skills": []
+    },
+    "database": {
+        "title": "Database Management",
+        "skills": []
+    },
+    "cloud": {
+        "title": "Cloud & DevOps",
+        "skills": []
+    },
+    "tools": {
+        "title": "Tools & Others",
+        "skills": []
+    }
+}
 
 PROJECTS = []
 

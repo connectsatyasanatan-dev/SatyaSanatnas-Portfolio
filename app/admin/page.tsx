@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
     User, Settings, FileText, Briefcase,
-    MessageSquare, Star, BarChart3, LogOut, Eye, Mail
+    MessageSquare, Star, BarChart3, LogOut, Eye, Mail, Award
 } from 'lucide-react'
 import adminApiClient from '@/lib/admin-api'
 import type { AdminData, PersonalInfo, SkillCategory, Project, Experience, Testimonial, BlogPost } from '@/lib/admin-types'
@@ -21,6 +21,7 @@ import ExperienceTab from '@/components/admin/ExperienceTab'
 import TestimonialsTab from '@/components/admin/TestimonialsTab'
 import BlogTab from '@/components/admin/BlogTab'
 import MessagesTab from '@/components/admin/MessagesTab'
+import AchievementsTab from '@/components/admin/AchievementsTab'
 
 const AdminPanel = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -72,7 +73,7 @@ const AdminPanel = () => {
     const loadAdminData = async () => {
         setLoading(true)
         try {
-            const [dashboard, personalInfo, skills, projects, experience, testimonials, blog, contactMessages] = await Promise.all([
+            const [dashboard, personalInfo, skills, projects, experience, testimonials, blog, contactMessages, achievements] = await Promise.all([
                 adminApiClient.getDashboard(),
                 adminApiClient.getPersonalInfo(),
                 adminApiClient.getSkills(),
@@ -80,7 +81,8 @@ const AdminPanel = () => {
                 adminApiClient.getExperience(),
                 adminApiClient.getTestimonials(),
                 adminApiClient.getBlogPosts(),
-                adminApiClient.getContactMessages()
+                adminApiClient.getContactMessages(),
+                adminApiClient.getAchievements()
             ])
 
             setAdminData({
@@ -91,6 +93,7 @@ const AdminPanel = () => {
                 testimonials,
                 blogPosts: blog,
                 contactMessages,
+                achievements,
                 stats: dashboard.stats
             })
         } catch (error: any) {
@@ -314,6 +317,18 @@ const AdminPanel = () => {
         }
     }
 
+    const handleUpdateAchievements = async (category: string, data: any) => {
+        try {
+            const response = await adminApiClient.updateAchievements(category, data)
+            if (response.success) {
+                toast.success('Achievements updated successfully!')
+                loadAdminData()
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Update failed')
+        }
+    }
+
     if (!isAuthenticated) {
         return (
             <div className="admin-login-wrapper">
@@ -396,7 +411,8 @@ const AdminPanel = () => {
         { id: 'experience', label: 'Experience', icon: Briefcase },
         { id: 'testimonials', label: 'Testimonials', icon: MessageSquare },
         { id: 'messages', label: 'Messages', icon: Mail },
-        { id: 'blog', label: 'Blog Posts', icon: Star }
+        { id: 'blog', label: 'Blog Posts', icon: Star },
+        { id: 'achievements', label: 'Achievements & Stats', icon: Award }
     ]
 
     return (
@@ -521,6 +537,13 @@ const AdminPanel = () => {
                                     onAddBlogPost={handleAddBlogPost}
                                     onUpdateBlogPost={handleUpdateBlogPost}
                                     onDeleteBlogPost={handleDeleteBlogPost}
+                                />
+                            )}
+
+                            {activeTab === 'achievements' && adminData.achievements && (
+                                <AchievementsTab
+                                    data={adminData.achievements}
+                                    onUpdate={handleUpdateAchievements}
                                 />
                             )}
                         </>

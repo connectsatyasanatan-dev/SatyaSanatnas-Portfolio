@@ -231,6 +231,7 @@ class Database:
             EXPERIENCE,
             TESTIMONIALS,
             BLOG_POSTS,
+            ACHIEVEMENTS,
         )
 
         conn = self.get_connection()
@@ -358,6 +359,19 @@ class Database:
                     ),
                 )
 
+        # Check if achievements exist
+        cursor.execute("SELECT COUNT(*) FROM achievements")
+        if cursor.fetchone()[0] == 0:
+            # Insert achievements
+            for category, data in ACHIEVEMENTS.items():
+                cursor.execute(
+                    """
+                    INSERT INTO achievements (category, data)
+                    VALUES (?, ?)
+                """,
+                    (category, json.dumps(data))
+                )
+
         # Check if blog posts exist
         cursor.execute("SELECT COUNT(*) FROM blog_posts")
         if cursor.fetchone()[0] == 0:
@@ -470,18 +484,31 @@ class Database:
         return skills
 
     def update_skills_category(self, category: str, data: Dict[str, Any]) -> bool:
-        """Update skills category"""
+        """Update or create skills category"""
         conn = self.get_connection()
         cursor = conn.cursor()
 
-        cursor.execute(
-            """
-            UPDATE skills SET
-                title = ?, skills_data = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE category = ?
-        """,
-            (data["title"], json.dumps(data["skills"]), category),
-        )
+        # Check if category exists
+        cursor.execute("SELECT id FROM skills WHERE category = ?", (category,))
+        row = cursor.fetchone()
+
+        if row:
+            cursor.execute(
+                """
+                UPDATE skills SET
+                    title = ?, skills_data = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE category = ?
+            """,
+                (data["title"], json.dumps(data["skills"]), category),
+            )
+        else:
+            cursor.execute(
+                """
+                INSERT INTO skills (category, title, skills_data)
+                VALUES (?, ?, ?)
+            """,
+                (category, data["title"], json.dumps(data["skills"])),
+            )
 
         conn.commit()
         conn.close()

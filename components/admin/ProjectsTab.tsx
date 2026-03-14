@@ -147,6 +147,18 @@ const ProjectsTab = ({ projects, onAddProject, onUpdateProject, onDeleteProject 
                 </button>
             </div>
 
+            <div className="admin-card admin-info-card" style={{ marginBottom: '24px', borderLeftColor: '#3b82f6', background: 'rgba(59, 130, 246, 0.05)' }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                    <div style={{ color: '#3b82f6', marginTop: '2px' }}><Star size={20} /></div>
+                    <div>
+                        <h4 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '4px', color: '#fff' }}>Portfolio Stats Tip</h4>
+                        <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: '1.5' }}>
+                            Working with actual projects here? Great! Note that the <strong>"Projects Delivered"</strong> counter shown on your public site (e.g. "10+") is a marketing number managed in the <strong>Achievements & Stats</strong> tab.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             {error && (
                 <ErrorAlert
                     message={error}
