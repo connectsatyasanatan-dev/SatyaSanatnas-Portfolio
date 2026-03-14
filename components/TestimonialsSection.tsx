@@ -4,6 +4,7 @@ import { Quote, Star, User, Building } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import portfolioAPI, { Testimonial } from '@/lib/api'
+import { TestimonialsSectionSkeleton } from './AppSkeletons'
 
 const TestimonialsSection = () => {
     const [testimonials, setTestimonials] = useState<Testimonial[]>([])
@@ -31,9 +32,7 @@ const TestimonialsSection = () => {
             </div>
 
             {loading ? (
-                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                    Loading testimonials...
-                </div>
+                <TestimonialsSectionSkeleton />
             ) : (
                 <div className="testimonials-grid">
                     {testimonials.map((testimonial, index) => (

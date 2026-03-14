@@ -4,6 +4,7 @@ import { GitCommit, GitMerge, Play, Diff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import portfolioAPI, { Experience } from '@/lib/api'
+import { ExperienceSectionSkeleton } from './AppSkeletons'
 
 const GitHistory = () => {
     const [experiences, setExperiences] = useState<Experience[]>([])
@@ -23,6 +24,10 @@ const GitHistory = () => {
 
         fetch()
     }, [])
+
+    if (loading) {
+        return <ExperienceSectionSkeleton />
+    }
 
     const changedFiles = [
         { status: "A", file: "src/components/Header.tsx", statusClass: "added" },

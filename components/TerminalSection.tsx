@@ -3,6 +3,7 @@
 import { Terminal, Minimize2, Maximize2, X } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import { TerminalSectionSkeleton } from './AppSkeletons'
 
 const TerminalSection = () => {
     const [currentCommand, setCurrentCommand] = useState('')
@@ -89,6 +90,18 @@ const TerminalSection = () => {
         const timer = setTimeout(typeCommand, 2000)
         return () => clearTimeout(timer)
     }, [])
+
+    // Simulate an initial loading state for the terminal
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 800)
+        return () => clearTimeout(timer)
+    }, [])
+
+    if (isLoading) {
+        return <TerminalSectionSkeleton />
+    }
 
     return (
         <section id="terminal-section">

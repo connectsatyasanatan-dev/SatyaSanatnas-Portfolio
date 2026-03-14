@@ -4,6 +4,7 @@ import { Terminal, Download, Star, GitFork, ExternalLink, Grid3X3, List, Eye } f
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import portfolioAPI, { Project } from '@/lib/api'
+import { ProjectsSectionSkeleton } from './AppSkeletons'
 
 const ProjectsSection = () => {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -61,9 +62,7 @@ const ProjectsSection = () => {
             </div>
 
             {loading ? (
-                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                    Loading projects...
-                </div>
+                <ProjectsSectionSkeleton />
             ) : (
                 <div className={`projects-grid ${viewMode}-view`}>
                     {projects.map((project, index) => (

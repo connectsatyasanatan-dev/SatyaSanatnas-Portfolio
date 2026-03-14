@@ -4,6 +4,7 @@ import { BookOpen, Clock, Tag, ArrowRight, TrendingUp } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import portfolioAPI, { BlogPost } from '@/lib/api'
+import { BlogSectionSkeleton } from './AppSkeletons'
 
 const BlogSection = () => {
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
@@ -32,9 +33,7 @@ const BlogSection = () => {
             </div>
 
             {loading ? (
-                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                    Loading blog posts...
-                </div>
+                <BlogSectionSkeleton />
             ) : (
                 <div className="articles-grid">
                     {blogPosts.map((post, index) => (

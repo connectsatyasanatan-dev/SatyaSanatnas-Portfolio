@@ -18,6 +18,7 @@ import {
     Pause
 } from 'lucide-react'
 import portfolioAPI, { SkillCategory, Achievements, PortfolioStats } from '@/lib/api'
+import { SkillsSectionSkeleton } from './AppSkeletons'
 
 const SkillsSection = () => {
     const [activeCategory, setActiveCategory] = useState('frontend')
@@ -117,13 +118,7 @@ const SkillsSection = () => {
     }, [isAnimating, skillCategories])
 
     if (loading) {
-        return (
-            <section id="skills-section" className="skills-modern-section">
-                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                    Loading skills...
-                </div>
-            </section>
-        )
+        return <SkillsSectionSkeleton />
     }
 
     const activeSkillData = skills[activeCategory as keyof typeof skills]

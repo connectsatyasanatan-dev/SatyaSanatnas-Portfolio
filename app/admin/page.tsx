@@ -11,7 +11,7 @@ import type { AdminData, PersonalInfo, SkillCategory, Project, Experience, Testi
 import { toast } from '@/lib/toast'
 
 // Import components
-import LoadingSpinner from '@/components/admin/LoadingSpinner'
+import { AdminSkeleton, AdminSidebarSkeleton } from '@/components/admin/AdminSkeleton'
 import ToastContainer from '@/components/admin/ToastContainer'
 import DashboardTab from '@/components/admin/DashboardTab'
 import PersonalInfoTab from '@/components/admin/PersonalInfoTab'
@@ -434,27 +434,31 @@ const AdminPanel = () => {
 
             <div className="admin-layout-main">
                 <nav className="admin-sidebar">
-                    <ul className="admin-nav-list">
-                        {tabs.map((tab) => {
-                            const IconComponent = tab.icon
-                            return (
-                                <li key={tab.id}>
-                                    <button
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`admin-nav-item ${activeTab === tab.id ? 'active' : ''}`}
-                                    >
-                                        <IconComponent />
-                                        <span>{tab.label}</span>
-                                    </button>
-                                </li>
-                            )
-                        })}
-                    </ul>
+                    {loading && !adminData ? (
+                        <AdminSidebarSkeleton />
+                    ) : (
+                        <ul className="admin-nav-list">
+                            {tabs.map((tab) => {
+                                const IconComponent = tab.icon
+                                return (
+                                    <li key={tab.id}>
+                                        <button
+                                            onClick={() => setActiveTab(tab.id)}
+                                            className={`admin-nav-item ${activeTab === tab.id ? 'active' : ''}`}
+                                        >
+                                            <IconComponent />
+                                            <span>{tab.label}</span>
+                                        </button>
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    )}
                 </nav>
 
                 <main className="admin-content">
                     {loading ? (
-                        <LoadingSpinner size="lg" text="Loading admin data..." />
+                        <AdminSkeleton activeTab={activeTab} />
                     ) : adminData ? (
                         <>
                             {activeTab === 'dashboard' && (

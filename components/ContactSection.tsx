@@ -4,6 +4,7 @@ import { Mail, Github, Linkedin, Twitter, MapPin, Calendar, Coffee, Send } from 
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import portfolioAPI, { PersonalInfo } from '@/lib/api'
+import { ContactSectionSkeleton } from './AppSkeletons'
 
 const ContactSection = () => {
     const [formData, setFormData] = useState({
@@ -53,6 +54,10 @@ const ContactSection = () => {
 
         fetch()
     }, [])
+    if (loadingInfo) {
+        return <ContactSectionSkeleton />
+    }
+
     const contactMethods = [
         {
             icon: Mail,

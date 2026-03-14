@@ -3,6 +3,7 @@
 import { Play, Github, Linkedin, Download, Terminal, X, CheckCircle2, Cpu, Zap, Globe } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import portfolioAPI, { PersonalInfo, PortfolioStats, Achievements } from '@/lib/api'
+import { HeroSectionSkeleton } from './AppSkeletons'
 
 const HeroSection = () => {
     const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null)
@@ -34,6 +35,10 @@ const HeroSection = () => {
 
         fetch()
     }, [])
+
+    if (loading) {
+        return <HeroSectionSkeleton />
+    }
 
     const codeLines = [
         { text: "// Welcome to my digital workspace", type: "comment" },

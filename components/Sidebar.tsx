@@ -14,8 +14,17 @@ import {
     Folder,
     FileText
 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { SidebarSkeleton } from './AppSkeletons'
 
 const Sidebar = () => {
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 1200)
+        return () => clearTimeout(timer)
+    }, [])
+
     const SidebarContent = () => (
         <div className="sidebar-content">
             {/* Icon sidebar */}
@@ -135,6 +144,10 @@ const Sidebar = () => {
             </div>
         </div>
     )
+
+    if (isLoading) {
+        return <SidebarSkeleton />
+    }
 
     return (
         <div className="sidebar-content-wrapper">

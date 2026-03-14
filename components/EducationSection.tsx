@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { GraduationCap, Award, Calendar, MapPin, School, BookOpen, Star, FileCheck, Lightbulb } from 'lucide-react'
 import portfolioAPI, { Education, Certification } from '@/lib/api'
+import { EducationSectionSkeleton } from './AppSkeletons'
 
 const EducationSection = () => {
     const [education, setEducation] = useState<Education[]>([])
@@ -29,13 +30,7 @@ const EducationSection = () => {
     }, [])
 
     if (loading) {
-        return (
-            <section id="education-section" className="section-padding">
-                <div className="section-container">
-                    <div className="text-center">Loading education...</div>
-                </div>
-            </section>
-        )
+        return <EducationSectionSkeleton />
     }
 
     return (

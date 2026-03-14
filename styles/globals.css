@@ -24,6 +24,7 @@ body {
 /* CSS Variables */
 :root {
   --primary: #06f9f9;
+  --primary-rgb: 6, 249, 249;
   --secondary: #ff00ff;
   --accent: #2de2e6;
   --background-light: #f5f8f8;
@@ -350,30 +351,105 @@ textarea:focus {
   outline-offset: 2px;
 }
 
-/* Loading states */
-.loading {
-  opacity: 0.6;
-  pointer-events: none;
+/* Professional Skeleton Loading */
+@keyframes skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
 }
 
-.loading::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid var(--primary);
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+@keyframes skeleton-pulse-subtle {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes skeleton-glow-pulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(var(--primary-rgb), 0.05); }
+    50% { box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.15); }
+}
+
+@keyframes skeleton-scan {
+    0% { transform: translateY(-100%); opacity: 0; }
+    10% { opacity: 0.5; }
+    90% { opacity: 0.5; }
+    100% { transform: translateY(300%); opacity: 0; }
+}
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(39, 58, 58, 0.2) 25%,
+        rgba(39, 58, 58, 0.4) 37%,
+        rgba(39, 58, 58, 0.2) 63%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 3s infinite ease-in-out;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(var(--primary-rgb), 0.08),
+        rgba(var(--primary-rgb), 0.15),
+        rgba(var(--primary-rgb), 0.08),
+        transparent
+    );
+    animation: skeleton-scan 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.skeleton-glass {
+    backdrop-filter: blur(12px);
+    background: linear-gradient(
+        135deg,
+        rgba(var(--primary-rgb), 0.05),
+        rgba(0, 0, 0, 0.1)
+    );
+    border: 1px solid rgba(var(--primary-rgb), 0.1) !important;
+}
+
+.skeleton-glow {
+    animation: skeleton-glow-pulse 3s infinite ease-in-out;
+}
+
+.skeleton-text {
+    height: 0.875rem;
+    width: 100%;
+    margin-bottom: 0.75rem;
+}
+
+.skeleton-title {
+    height: 2.25rem;
+    width: 70%;
+    margin-bottom: 1.25rem;
+    background: linear-gradient(
+        90deg,
+        rgba(var(--primary-rgb), 0.08) 25%,
+        rgba(var(--primary-rgb), 0.15) 37%,
+        rgba(var(--primary-rgb), 0.08) 63%
+    );
+    background-size: 200% 100%;
+}
+
+.skeleton-circle {
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.skeleton-rect {
+    width: 100%;
+    border-radius: 12px;
 }
 
 /* Print styles */
