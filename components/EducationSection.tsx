@@ -33,6 +33,10 @@ const EducationSection = () => {
         return <EducationSectionSkeleton />
     }
 
+    if (!loading && education.length === 0 && certifications.length === 0) {
+        return null
+    }
+
     return (
         <section id="education-section">
             <div className="section-header">

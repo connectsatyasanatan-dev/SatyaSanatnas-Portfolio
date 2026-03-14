@@ -38,6 +38,13 @@ const SkillsSection = () => {
                     portfolioAPI.getStats()
                 ])
                 setSkills(skillsData)
+                
+                // Set first category with skills as active
+                const firstValidCategory = skillCategories.find(cat => skillsData[cat.key]?.skills.length > 0)
+                if (firstValidCategory) {
+                    setActiveCategory(firstValidCategory.key)
+                }
+
                 setAchievements(achievementsData)
                 setPortfolioStats(statsData)
             } catch (error) {
@@ -220,31 +227,33 @@ const SkillsSection = () => {
             <div className="skills-explorer">
                 {/* Category Navigation */}
                 <div className="category-nav">
-                    {skillCategories.map((category) => {
-                        const IconComponent = category.icon
-                        const isActive = activeCategory === category.key
+                    {skillCategories
+                        .filter(category => skills[category.key as keyof typeof skills]?.skills.length > 0)
+                        .map((category) => {
+                            const IconComponent = category.icon
+                            const isActive = activeCategory === category.key
 
-                        return (
-                            <button
-                                key={category.key}
-                                className={`category-btn ${isActive ? 'active' : ''}`}
-                                onClick={() => setActiveCategory(category.key)}
-                                style={{
-                                    '--category-color': category.color,
-                                    '--category-gradient': `linear-gradient(135deg, ${category.color}20, ${category.color}10)`
-                                } as React.CSSProperties}
-                            >
-                                <div className="category-btn-icon">
-                                    <IconComponent size={20} />
-                                </div>
-                                <div className="category-btn-content">
-                                    <div className="category-btn-title">{category.title}</div>
-                                    <div className="category-btn-desc">{category.description}</div>
-                                </div>
-                                <ChevronRight className="category-btn-arrow" size={16} />
-                            </button>
-                        )
-                    })}
+                            return (
+                                <button
+                                    key={category.key}
+                                    className={`category-btn ${isActive ? 'active' : ''}`}
+                                    onClick={() => setActiveCategory(category.key)}
+                                    style={{
+                                        '--category-color': category.color,
+                                        '--category-gradient': `linear-gradient(135deg, ${category.color}20, ${category.color}10)`
+                                    } as React.CSSProperties}
+                                >
+                                    <div className="category-btn-icon">
+                                        <IconComponent size={20} />
+                                    </div>
+                                    <div className="category-btn-content">
+                                        <div className="category-btn-title">{category.title}</div>
+                                        <div className="category-btn-desc">{category.description}</div>
+                                    </div>
+                                    <ChevronRight className="category-btn-arrow" size={16} />
+                                </button>
+                            )
+                        })}
                 </div>
 
                 {/* Skills Display */}
@@ -340,38 +349,40 @@ const SkillsSection = () => {
             </div>
 
             {/* Achievements Showcase */}
-            <div className="achievements-showcase">
-                <div className="achievements-header-modern">
-                    <div className="achievements-icon-container">
-                        <Award className="achievements-icon" />
-                        <div className="achievements-icon-glow"></div>
-                    </div>
-                    <div className="achievements-text">
-                        <h4 className="achievements-title">Key Achievements</h4>
-                        <p className="achievements-subtitle">Milestones & Recognition</p>
-                    </div>
-                </div>
-
-                <div className="achievements-grid-modern">
-                    {achievements?.highlights.slice(0, 6).map((achievement, index) => (
-                        <div
-                            key={index}
-                            className="achievement-card-modern"
-                            style={{ '--animation-delay': `${index * 0.1}s` } as React.CSSProperties}
-                        >
-                            <div className="achievement-emoji">
-                                {achievement.split(' ')[0]}
-                            </div>
-                            <div className="achievement-content">
-                                <p className="achievement-text">
-                                    {achievement.substring(achievement.indexOf(' ') + 1)}
-                                </p>
-                            </div>
-                            <div className="achievement-glow"></div>
+            {achievements && achievements.highlights && achievements.highlights.length > 0 && (
+                <div className="achievements-showcase">
+                    <div className="achievements-header-modern">
+                        <div className="achievements-icon-container">
+                            <Award className="achievements-icon" />
+                            <div className="achievements-icon-glow"></div>
                         </div>
-                    ))}
+                        <div className="achievements-text">
+                            <h4 className="achievements-title">Key Achievements</h4>
+                            <p className="achievements-subtitle">Milestones & Recognition</p>
+                        </div>
+                    </div>
+
+                    <div className="achievements-grid-modern">
+                        {achievements.highlights.slice(0, 6).map((achievement, index) => (
+                            <div
+                                key={index}
+                                className="achievement-card-modern"
+                                style={{ '--animation-delay': `${index * 0.1}s` } as React.CSSProperties}
+                            >
+                                <div className="achievement-emoji">
+                                    {achievement.split(' ')[0]}
+                                </div>
+                                <div className="achievement-content">
+                                    <p className="achievement-text">
+                                        {achievement.substring(achievement.indexOf(' ') + 1)}
+                                    </p>
+                                </div>
+                                <div className="achievement-glow"></div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </section>
     )
 }

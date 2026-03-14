@@ -24,6 +24,10 @@ const TestimonialsSection = () => {
 
         fetchTestimonials()
     }, [])
+    if (!loading && testimonials.length === 0) {
+        return null
+    }
+
     return (
         <section id="testimonials-section">
             <div className="section-header">

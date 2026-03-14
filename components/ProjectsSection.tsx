@@ -38,6 +38,10 @@ const ProjectsSection = () => {
         return 'info'
     }
 
+    if (!loading && projects.length === 0) {
+        return null
+    }
+
     return (
         <section id="projects-section">
             <div className="section-header">

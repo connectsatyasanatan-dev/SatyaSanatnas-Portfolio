@@ -25,6 +25,10 @@ const BlogSection = () => {
         fetchBlogPosts()
     }, [])
 
+    if (!loading && blogPosts.length === 0) {
+        return null
+    }
+
     return (
         <section id="blog-section">
             <div className="section-header">
