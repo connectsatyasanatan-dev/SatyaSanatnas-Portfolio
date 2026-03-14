@@ -155,57 +155,65 @@ const SkillsSection = () => {
 
             {/* Stats Dashboard */}
             <div className="stats-dashboard">
-                <div className="stat-card-modern">
-                    <div className="stat-icon">
-                        <Rocket />
+                {yearsExp > 0 && (
+                    <div className="stat-card-modern">
+                        <div className="stat-icon">
+                            <Rocket />
+                        </div>
+                        <div className="stat-content">
+                            <div className="stat-number">{yearsExp}+</div>
+                            <div className="stat-label">Years Experience</div>
+                        </div>
+                        <div className="stat-progress">
+                            <div className="progress-bar" style={{ width: '85%' }}></div>
+                        </div>
                     </div>
-                    <div className="stat-content">
-                        <div className="stat-number">{yearsExp}+</div>
-                        <div className="stat-label">Years Experience</div>
-                    </div>
-                    <div className="stat-progress">
-                        <div className="progress-bar" style={{ width: '85%' }}></div>
-                    </div>
-                </div>
+                )}
 
-                <div className="stat-card-modern">
-                    <div className="stat-icon">
-                        <Target />
+                {projectsCount > 0 && (
+                    <div className="stat-card-modern">
+                        <div className="stat-icon">
+                            <Target />
+                        </div>
+                        <div className="stat-content">
+                            <div className="stat-number">{projectsCount}+</div>
+                            <div className="stat-label">Projects Delivered</div>
+                        </div>
+                        <div className="stat-progress">
+                            <div className="progress-bar" style={{ width: '92%' }}></div>
+                        </div>
                     </div>
-                    <div className="stat-content">
-                        <div className="stat-number">{projectsCount}+</div>
-                        <div className="stat-label">Projects Delivered</div>
-                    </div>
-                    <div className="stat-progress">
-                        <div className="progress-bar" style={{ width: '92%' }}></div>
-                    </div>
-                </div>
+                )}
 
-                <div className="stat-card-modern">
-                    <div className="stat-icon">
-                        <Zap />
+                {codeCommits > 0 && (
+                    <div className="stat-card-modern">
+                        <div className="stat-icon">
+                            <Zap />
+                        </div>
+                        <div className="stat-content">
+                            <div className="stat-number">{Math.floor(codeCommits / 1000)}K+</div>
+                            <div className="stat-label">Code Commits</div>
+                        </div>
+                        <div className="stat-progress">
+                            <div className="progress-bar" style={{ width: '78%' }}></div>
+                        </div>
                     </div>
-                    <div className="stat-content">
-                        <div className="stat-number">{Math.floor(codeCommits / 1000)}K+</div>
-                        <div className="stat-label">Code Commits</div>
-                    </div>
-                    <div className="stat-progress">
-                        <div className="progress-bar" style={{ width: '78%' }}></div>
-                    </div>
-                </div>
+                )}
 
-                <div className="stat-card-modern">
-                    <div className="stat-icon">
-                        <Award />
+                {hackathonsWon > 0 && (
+                    <div className="stat-card-modern">
+                        <div className="stat-icon">
+                            <Award />
+                        </div>
+                        <div className="stat-content">
+                            <div className="stat-number">{hackathonsWon}</div>
+                            <div className="stat-label">Hackathons Won</div>
+                        </div>
+                        <div className="stat-progress">
+                            <div className="progress-bar" style={{ width: '100%' }}></div>
+                        </div>
                     </div>
-                    <div className="stat-content">
-                        <div className="stat-number">{hackathonsWon}</div>
-                        <div className="stat-label">Hackathons Won</div>
-                    </div>
-                    <div className="stat-progress">
-                        <div className="progress-bar" style={{ width: '100%' }}></div>
-                    </div>
-                </div>
+                )}
             </div>
 
             {/* Interactive Skills Explorer */}
