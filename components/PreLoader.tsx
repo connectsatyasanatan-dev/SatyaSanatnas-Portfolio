@@ -7,56 +7,120 @@ interface PreLoaderProps {
     onLoadingComplete: () => void;
 }
 
+const languageSequences = [
+    {
+        text: "Satya Sanatan's Portfolio",
+        lang: 'en',
+        fontFamily: 'var(--font-display)',
+    },
+    {
+        text: 'सत्य सनातनस्य कृतिसञ्चिका',
+        lang: 'sa',
+        fontFamily: '"Noto Serif Devanagari", serif',
+    },
+    {
+        text: 'ସତ୍ୟ ସନାତନଙ୍କ କୃତି ସଂଚିକା',
+        lang: 'or',
+        fontFamily: '"Noto Sans Oriya", serif',
+    },
+]
+
+const typingSpeed = 70
+
+const logs = [
+    "BOOTING_CORE_ENGINE",
+    "LOADING_REACT_COMPONENTS",
+    "INJECTING_NEURAL_STREAMS",
+    "CALIBRATING_UX_INTERFACE",
+    "SYNCING_DATABASE_STATE",
+    "PREPARING_WORKSPACE",
+    "READY_TO_LAUNCH"
+]
+
 const PreLoader: React.FC<PreLoaderProps> = ({ onLoadingComplete }) => {
-    const [text, setText] = useState('')
     const [showContent, setShowContent] = useState(true)
     const [currentLog, setCurrentLog] = useState('SYSTEM_INIT')
-    const fullText = "Satya Sanatan's Portfolio"
-    const typingSpeed = 80
+    const [seqIndex, setSeqIndex] = useState(0)
+    const [displayText, setDisplayText] = useState('')
+    const [phase, setPhase] = useState<'typing' | 'erasing' | 'done'>('typing')
 
-    const logs = [
-        "BOOTING_CORE_ENGINE",
-        "LOADING_REACT_COMPONENTS",
-        "INJECTING_NEURAL_STREAMS",
-        "CALIBRATING_UX_INTERFACE",
-        "SYNCING_DATABASE_STATE",
-        "PREPARING_WORKSPACE",
-        "READY_TO_LAUNCH"
-    ]
+    const current = languageSequences[seqIndex]
+    const isLastSeq = seqIndex === languageSequences.length - 1
+
+    // Cycle through system log messages smoothly
+    useEffect(() => {
+        let elapsed = 0
+        const totalMs = languageSequences.reduce(
+            (acc, seq) => acc + seq.text.length * typingSpeed + seq.text.length * typingSpeed * 0.5 + 1100 + 350,
+            0
+        )
+        const logInterval = setInterval(() => {
+            elapsed += 600
+            const logIdx = Math.min(
+                Math.floor((elapsed / totalMs) * logs.length),
+                logs.length - 1
+            )
+            setCurrentLog(logs[logIdx])
+        }, 600)
+        return () => clearInterval(logInterval)
+    }, [])
 
     useEffect(() => {
-        let currentIdx = 0
-        const interval = setInterval(() => {
-            if (currentIdx <= fullText.length) {
-                setText(fullText.slice(0, currentIdx))
-                currentIdx++
-                
-                // Update logs periodically
-                if (currentIdx % 4 === 0) {
-                    setCurrentLog(logs[Math.floor((currentIdx / fullText.length) * (logs.length - 1))])
-                }
-            } else {
-                clearInterval(interval)
-                setCurrentLog("ACCESS_GRANTED")
-                setTimeout(() => {
-                    setShowContent(false)
-                    setTimeout(onLoadingComplete, 800)
-                }, 1200)
-            }
-        }, typingSpeed)
+        let timeout: ReturnType<typeof setTimeout>
+        let interval: ReturnType<typeof setInterval>
 
-        return () => clearInterval(interval)
-    }, [onLoadingComplete])
+        if (phase === 'typing') {
+            let idx = 0
+            setDisplayText('')
+            interval = setInterval(() => {
+                idx++
+                setDisplayText(current.text.slice(0, idx))
+                if (idx >= current.text.length) {
+                    clearInterval(interval)
+                    timeout = setTimeout(() => {
+                        setPhase(isLastSeq ? 'done' : 'erasing')
+                    }, 1100)
+                }
+            }, typingSpeed)
+        }
+
+        if (phase === 'erasing') {
+            let idx = current.text.length
+            interval = setInterval(() => {
+                idx--
+                setDisplayText(current.text.slice(0, idx))
+                if (idx <= 0) {
+                    clearInterval(interval)
+                    timeout = setTimeout(() => {
+                        setSeqIndex(i => i + 1)
+                        setPhase('typing')
+                    }, 300)
+                }
+            }, typingSpeed * 0.45)
+        }
+
+        if (phase === 'done') {
+            setCurrentLog('ACCESS_GRANTED')
+            timeout = setTimeout(() => {
+                setShowContent(false)
+                setTimeout(onLoadingComplete, 800)
+            }, 1200)
+        }
+
+        return () => {
+            clearInterval(interval)
+            clearTimeout(timeout)
+        }
+    }, [phase, seqIndex])
 
     return (
         <AnimatePresence>
             {showContent && (
                 <motion.div
-                    className="preloader-overlay"
                     initial={{ opacity: 1 }}
-                    exit={{ 
+                    exit={{
                         opacity: 0,
-                        transition: { duration: 0.8, ease: "easeInOut" }
+                        transition: { duration: 0.9, ease: 'easeInOut' }
                     }}
                     style={{
                         position: 'fixed',
@@ -67,102 +131,134 @@ const PreLoader: React.FC<PreLoaderProps> = ({ onLoadingComplete }) => {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
                     }}
                 >
-                    {/* Animated Background Elements */}
+                    {/* Pulsing radial glow */}
                     <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1.5, opacity: 0.1 }}
-                        transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1.6, opacity: 0.12 }}
+                        transition={{ duration: 2.5, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
                         style={{
                             position: 'absolute',
-                            width: '400px',
-                            height: '400px',
+                            width: '480px',
+                            height: '480px',
                             borderRadius: '50%',
-                            background: 'radial-gradient(circle, var(--primary) 0%, transparent 70%)',
-                            filter: 'blur(60px)',
-                            zIndex: 0
+                            background: 'radial-gradient(circle, goldenrod 0%, transparent 70%)',
+                            filter: 'blur(72px)',
+                            zIndex: 0,
                         }}
                     />
 
-                    <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {/* Center content */}
+                    <div style={{
+                        position: 'relative',
+                        zIndex: 1,
+                        textAlign: 'center',
+                        width: '100%',
+                        maxWidth: '780px',
+                        padding: '0 32px',
+                    }}>
+
+                        {/* Title with typewriter — consistent size for all languages */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minHeight: '4rem',
+                        }}>
                             <motion.h2
-                                layoutId="shared-title"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                key={`font-${seqIndex}`}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.2 }}
+                                lang={current.lang}
                                 style={{
                                     color: 'goldenrod',
-                                    fontSize: '2.5rem',
-                                    fontWeight: 'bold',
-                                    fontFamily: 'var(--font-display)',
-                                    letterSpacing: '2px',
-                                    textShadow: '0 0 20px rgba(218, 165, 32, 0.4)',
-                                    margin: 0
+                                    fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+                                    fontWeight: 700,
+                                    fontFamily: current.fontFamily,
+                                    letterSpacing: current.lang === 'en' ? '2px' : '0.5px',
+                                    textShadow: '0 0 28px rgba(218, 165, 32, 0.5), 0 0 60px rgba(218, 165, 32, 0.15)',
+                                    margin: 0,
+                                    lineHeight: 1.4,
+                                    whiteSpace: 'normal',
+                                    wordBreak: 'keep-all',
                                 }}
                             >
-                                {text}
+                                {displayText}
                             </motion.h2>
+
+                            {/* Blinking cursor */}
                             <motion.span
                                 animate={{ opacity: [0, 1, 0] }}
-                                transition={{ duration: 0.8, repeat: Infinity }}
+                                transition={{ duration: 0.75, repeat: Infinity, ease: 'easeInOut' }}
                                 style={{
                                     display: 'inline-block',
-                                    marginLeft: '10px',
-                                    width: '4px',
-                                    height: '2.5rem',
+                                    marginLeft: '6px',
+                                    width: '3px',
+                                    height: 'clamp(1.8rem, 4vw, 2.5rem)',
                                     background: 'goldenrod',
-                                    verticalAlign: 'middle'
+                                    verticalAlign: 'middle',
+                                    flexShrink: 0,
+                                    borderRadius: '2px',
+                                    boxShadow: '0 0 10px rgba(218,165,32,0.8)',
                                 }}
                             />
                         </div>
 
+                        {/* Animated golden divider */}
                         <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: '100%' }}
-                            transition={{ duration: fullText.length * (typingSpeed / 1000) }}
+                            initial={{ scaleX: 0, opacity: 0 }}
+                            animate={{ scaleX: 1, opacity: 1 }}
+                            transition={{ duration: 1.2, delay: 0.3, ease: 'easeOut' }}
                             style={{
-                                height: '2px',
-                                background: 'linear-gradient(90deg, transparent, goldenrod, transparent)',
-                                marginTop: '20px',
-                                boxShadow: '0 0 10px goldenrod'
+                                height: '1px',
+                                background: 'linear-gradient(90deg, transparent 0%, rgba(218,165,32,0.8) 35%, goldenrod 50%, rgba(218,165,32,0.8) 65%, transparent 100%)',
+                                marginTop: '24px',
+                                boxShadow: '0 0 12px rgba(218,165,32,0.6)',
+                                transformOrigin: 'center',
                             }}
                         />
 
+                        {/* Initializing text */}
                         <motion.p
                             initial={{ opacity: 0 }}
-                            animate={{ opacity: 0.5 }}
-                            transition={{ delay: 0.5 }}
+                            animate={{ opacity: 0.45 }}
+                            transition={{ delay: 0.7, duration: 0.8 }}
                             style={{
                                 color: 'white',
-                                marginTop: '15px',
-                                fontSize: '0.9rem',
-                                letterSpacing: '4px',
-                                textTransform: 'uppercase'
+                                marginTop: '18px',
+                                fontSize: '0.8rem',
+                                letterSpacing: '5px',
+                                textTransform: 'uppercase',
+                                fontFamily: 'var(--font-mono)',
                             }}
                         >
                             Initializing Environment...
                         </motion.p>
                     </div>
 
-                    {/* Progress Bar in corner */}
+                    {/* Bottom-left system status */}
                     <div style={{
                         position: 'absolute',
-                        bottom: '40px',
-                        left: '40px',
+                        bottom: '36px',
+                        left: '36px',
                         fontFamily: 'var(--font-mono)',
-                        fontSize: '12px',
-                        color: 'rgba(255,255,255,0.3)',
-                        textAlign: 'left'
+                        fontSize: '11px',
+                        color: 'rgba(255,255,255,0.25)',
+                        textAlign: 'left',
                     }}>
-                        <div style={{ marginBottom: '5px' }}>SYSTEM_STATUS: <span style={{ color: 'var(--primary)' }}>{currentLog}</span></div>
-                        <div style={{ width: '200px', height: '2px', background: 'rgba(255,255,255,0.1)' }}>
+                        <div style={{ marginBottom: '6px' }}>
+                            SYSTEM_STATUS:{' '}
+                            <span style={{ color: 'var(--primary)', opacity: 0.8 }}>{currentLog}</span>
+                        </div>
+                        <div style={{ width: '180px', height: '2px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: '100%' }}
-                                transition={{ duration: 4 }}
-                                style={{ height: '100%', background: 'var(--primary)' }}
+                                transition={{ duration: languageSequences.length * 4.5, ease: 'linear' }}
+                                style={{ height: '100%', background: 'var(--primary)', borderRadius: '2px' }}
                             />
                         </div>
                     </div>
