@@ -71,7 +71,11 @@ const GitHistory = () => {
                                 {/* Content card */}
                                 <motion.div
                                     whileHover={{ y: -2 }}
-                                    className={`timeline-content ${exp.color}`}
+                                    className={`timeline-content ${exp.color} ${exp.period.includes('Present') ? 'active' : ''}`}
+                                    style={exp.period.includes('Present') ? {
+                                        borderColor: 'var(--primary)',
+                                        boxShadow: '0 0 15px rgba(6, 249, 249, 0.15), inset 0 0 20px rgba(6, 249, 249, 0.05)'
+                                    } : {}}
                                 >
                                     <div className="timeline-header">
                                         <div className="timeline-title-group">
@@ -86,7 +90,12 @@ const GitHistory = () => {
                                             <p className={`timeline-company ${exp.color}`}>@ {exp.company}</p>
                                         </div>
                                         <div className="timeline-meta">
-                                            <div className="timeline-period">{exp.period}</div>
+                                            <div className={`timeline-period ${exp.period.includes('Present') ? 'active' : ''}`}>
+                                                {exp.period.includes('Present') && (
+                                                    <span className="live-indicator"></span>
+                                                )}
+                                                {exp.period}
+                                            </div>
                                             <div className="timeline-commit">{exp.commit}</div>
                                         </div>
                                     </div>
