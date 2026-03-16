@@ -160,71 +160,9 @@ const CertificationsSection = () => {
                     opacity: 0.8;
                 }
                 
-                .cert-summary-board {
-                    background: linear-gradient(135deg, rgba(218, 165, 32, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
-                    border: 1px solid rgba(218, 165, 32, 0.2);
-                    border-radius: 16px;
-                    padding: 32px;
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 32px;
-                    align-items: center;
-                    justify-content: space-between;
-                }
-                .cert-summary-text h4 {
-                    font-size: 24px;
-                    color: white;
-                    margin: 0 0 8px 0;
-                    font-weight: 700;
-                }
-                .cert-summary-text p {
-                    color: rgba(255, 255, 255, 0.7);
-                    margin: 0;
-                    font-size: 15px;
-                    max-width: 400px;
-                    line-height: 1.5;
-                }
-                .cert-stats {
-                    display: flex;
-                    gap: 40px;
-                    background: rgba(0, 0, 0, 0.3);
-                    padding: 20px 32px;
-                    border-radius: 12px;
-                    border: 1px solid rgba(255, 255, 255, 0.05);
-                }
-                .cert-stat-box {
-                    text-align: center;
-                }
-                .cert-stat-val {
-                    font-size: 32px;
-                    font-weight: 800;
-                    color: goldenrod;
-                    line-height: 1;
-                    margin-bottom: 8px;
-                    text-shadow: 0 0 20px rgba(218, 165, 32, 0.3);
-                }
-                .cert-stat-lbl {
-                    font-size: 12px;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    color: rgba(255, 255, 255, 0.6);
-                    font-weight: 600;
-                }
-                
                 @media (max-width: 768px) {
                     .certifications-grid {
                         grid-template-columns: 1fr;
-                    }
-                    .cert-summary-board {
-                        flex-direction: column;
-                        text-align: center;
-                    }
-                    .cert-summary-text p {
-                        margin: 0 auto;
-                    }
-                    .cert-stats {
-                        width: 100%;
-                        justify-content: space-around;
                     }
                 }
             `}</style>
@@ -285,30 +223,6 @@ const CertificationsSection = () => {
                     );
                 })}
             </div>
-
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="cert-summary-board"
-            >
-                <div className="cert-summary-text">
-                    <h4>Professional Endorsements</h4>
-                    <p>Continuously expanding my skill set through industry-recognized certifications to deliver cutting-edge solutions.</p>
-                </div>
-                
-                <div className="cert-stats">
-                    <div className="cert-stat-box">
-                        <div className="cert-stat-val">{certifications.length}</div>
-                        <div className="cert-stat-lbl">Active Certs</div>
-                    </div>
-                    <div className="cert-stat-box">
-                        <div className="cert-stat-val">100%</div>
-                        <div className="cert-stat-lbl">Verified</div>
-                    </div>
-                </div>
-            </motion.div>
         </section>
     )
 }
