@@ -7,6 +7,7 @@ import HeroSection from '@/components/HeroSection'
 import SkillsSection from '@/components/SkillsSection'
 import GitHistory from '@/components/GitHistory'
 import EducationSection from '@/components/EducationSection'
+import CertificationsSection from '@/components/CertificationsSection'
 import ProjectsSection from '@/components/ProjectsSection'
 import TestimonialsSection from '@/components/TestimonialsSection'
 import BlogSection from '@/components/BlogSection'
@@ -89,6 +90,7 @@ export default function Home() {
                         <SkillsSection />
                         <GitHistory />
                         <EducationSection />
+                        <CertificationsSection />
                         <ProjectsSection />
                         <TestimonialsSection />
                         <BlogSection />

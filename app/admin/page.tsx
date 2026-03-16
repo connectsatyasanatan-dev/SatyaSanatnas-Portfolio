@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
     User, Settings, FileText, Briefcase,
-    MessageSquare, Star, BarChart3, LogOut, Eye, Mail, Award
+    MessageSquare, Star, BarChart3, LogOut, Eye, Mail, Award, BookOpen, GraduationCap
 } from 'lucide-react'
 import adminApiClient from '@/lib/admin-api'
-import type { AdminData, PersonalInfo, SkillCategory, Project, Experience, Testimonial, BlogPost } from '@/lib/admin-types'
+import type { AdminData, PersonalInfo, SkillCategory, Project, Experience, Testimonial, BlogPost, Education, Certification } from '@/lib/admin-types'
 import { toast } from '@/lib/toast'
 
 // Import components
@@ -22,6 +22,8 @@ import TestimonialsTab from '@/components/admin/TestimonialsTab'
 import BlogTab from '@/components/admin/BlogTab'
 import MessagesTab from '@/components/admin/MessagesTab'
 import AchievementsTab from '@/components/admin/AchievementsTab'
+import EducationTab from '@/components/admin/EducationTab'
+import CertificationsTab from '@/components/admin/CertificationsTab'
 
 const AdminPanel = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -73,7 +75,7 @@ const AdminPanel = () => {
     const loadAdminData = async () => {
         setLoading(true)
         try {
-            const [dashboard, personalInfo, skills, projects, experience, testimonials, blog, contactMessages, achievements] = await Promise.all([
+            const [dashboard, personalInfo, skills, projects, experience, testimonials, blog, contactMessages, achievements, education, certifications] = await Promise.all([
                 adminApiClient.getDashboard(),
                 adminApiClient.getPersonalInfo(),
                 adminApiClient.getSkills(),
@@ -82,7 +84,9 @@ const AdminPanel = () => {
                 adminApiClient.getTestimonials(),
                 adminApiClient.getBlogPosts(),
                 adminApiClient.getContactMessages(),
-                adminApiClient.getAchievements()
+                adminApiClient.getAchievements(),
+                adminApiClient.getEducation(),
+                adminApiClient.getCertifications()
             ])
 
             setAdminData({
@@ -94,7 +98,9 @@ const AdminPanel = () => {
                 blogPosts: blog,
                 contactMessages,
                 achievements,
-                stats: dashboard.stats
+                stats: dashboard.stats,
+                education,
+                certifications
             })
         } catch (error: any) {
             toast.error('Failed to load data. Please try again.')
@@ -222,6 +228,84 @@ const AdminPanel = () => {
             }
         } catch (error: any) {
             toast.error(error.message || 'Failed to delete experience')
+            throw error
+        }
+    }
+
+    const handleAddEducation = async (education: Omit<Education, 'id'>) => {
+        try {
+            const response = await adminApiClient.addEducation(education)
+            if (response.success) {
+                toast.success('Education added successfully!')
+                loadAdminData()
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to add education')
+            throw error
+        }
+    }
+
+    const handleUpdateEducation = async (id: number, education: Partial<Education>) => {
+        try {
+            const response = await adminApiClient.updateEducation(id, education)
+            if (response.success) {
+                toast.success('Education saved!')
+                loadAdminData()
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to update education')
+            throw error
+        }
+    }
+
+    const handleDeleteEducation = async (id: number) => {
+        try {
+            const response = await adminApiClient.deleteEducation(id)
+            if (response.success) {
+                toast.success('Education deleted successfully!')
+                loadAdminData()
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to delete education')
+            throw error
+        }
+    }
+
+    const handleAddCertification = async (certification: Omit<Certification, 'id'>) => {
+        try {
+            const response = await adminApiClient.addCertification(certification)
+            if (response.success) {
+                toast.success('Certification added successfully!')
+                loadAdminData()
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to add certification')
+            throw error
+        }
+    }
+
+    const handleUpdateCertification = async (id: number, certification: Partial<Certification>) => {
+        try {
+            const response = await adminApiClient.updateCertification(id, certification)
+            if (response.success) {
+                toast.success('Certification saved!')
+                loadAdminData()
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to update certification')
+            throw error
+        }
+    }
+
+    const handleDeleteCertification = async (id: number) => {
+        try {
+            const response = await adminApiClient.deleteCertification(id)
+            if (response.success) {
+                toast.success('Certification deleted successfully!')
+                loadAdminData()
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to delete certification')
             throw error
         }
     }
@@ -409,6 +493,8 @@ const AdminPanel = () => {
         { id: 'skills', label: 'Skills', icon: Settings },
         { id: 'projects', label: 'Projects', icon: FileText },
         { id: 'experience', label: 'Experience', icon: Briefcase },
+        { id: 'education', label: 'Education', icon: GraduationCap },
+        { id: 'certifications', label: 'Certifications', icon: Award },
         { id: 'testimonials', label: 'Testimonials', icon: MessageSquare },
         { id: 'messages', label: 'Messages', icon: Mail },
         { id: 'blog', label: 'Blog Posts', icon: Star },
@@ -511,6 +597,24 @@ const AdminPanel = () => {
                                     onAddExperience={handleAddExperience}
                                     onUpdateExperience={handleUpdateExperience}
                                     onDeleteExperience={handleDeleteExperience}
+                                />
+                            )}
+
+                            {activeTab === 'education' && adminData.education && (
+                                <EducationTab
+                                    education={adminData.education}
+                                    onAddEducation={handleAddEducation}
+                                    onUpdateEducation={handleUpdateEducation}
+                                    onDeleteEducation={handleDeleteEducation}
+                                />
+                            )}
+
+                            {activeTab === 'certifications' && adminData.certifications && (
+                                <CertificationsTab
+                                    certifications={adminData.certifications}
+                                    onAddCertification={handleAddCertification}
+                                    onUpdateCertification={handleUpdateCertification}
+                                    onDeleteCertification={handleDeleteCertification}
                                 />
                             )}
 

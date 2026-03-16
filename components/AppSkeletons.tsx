@@ -185,6 +185,13 @@ export const EducationSectionSkeleton = () => {
                     </div>
                 ))}
             </div>
+        </div>
+    )
+}
+
+export const CertificationsSectionSkeleton = () => {
+    return (
+        <div className="education-grid p-6">
             <div className="education-column">
                 <div className="flex gap-4 mb-8">
                     <Skeleton variant="circle" width={30} height={30} />
