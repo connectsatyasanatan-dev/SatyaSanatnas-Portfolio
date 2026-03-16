@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
     User, Settings, FileText, Briefcase,
-    MessageSquare, Star, BarChart3, LogOut, Eye, Mail, Award, BookOpen, GraduationCap
+    MessageSquare, Star, BarChart3, LogOut, Eye, EyeOff, Mail, Award, BookOpen, GraduationCap
 } from 'lucide-react'
 import adminApiClient from '@/lib/admin-api'
 import type { AdminData, PersonalInfo, SkillCategory, Project, Experience, Testimonial, BlogPost, Education, Certification } from '@/lib/admin-types'
@@ -32,6 +32,7 @@ const AdminPanel = () => {
     const [loading, setLoading] = useState(false)
     const [loginForm, setLoginForm] = useState({ username: '', password: '' })
     const [loginError, setLoginError] = useState<string | null>(null)
+    const [showPassword, setShowPassword] = useState(false)
 
     useEffect(() => {
         const savedToken = localStorage.getItem('admin_token')
@@ -455,15 +456,38 @@ const AdminPanel = () => {
                             <label className="admin-form-label">
                                 Password
                             </label>
-                            <input
-                                type="password"
-                                value={loginForm.password}
-                                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                                className="admin-form-input"
-                                placeholder="Enter password"
-                                required
-                                disabled={loading}
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={loginForm.password}
+                                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                                    className="admin-form-input"
+                                    placeholder="Enter password"
+                                    required
+                                    disabled={loading}
+                                    style={{ paddingRight: '2.5rem' }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '0.75rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: '#9ca3af',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        padding: 0
+                                    }}
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
                         </div>
 
                         <button
