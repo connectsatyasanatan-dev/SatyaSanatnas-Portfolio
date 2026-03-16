@@ -213,13 +213,13 @@ const EducationTab = ({ education, onAddEducation, onUpdateEducation, onDeleteEd
                             />
                         </div>
                         <div className="admin-form-group">
-                            <label className="admin-form-label">Focus</label>
+                            <label className="admin-form-label">Stream</label>
                             <input
                                 type="text"
                                 value={newEducation.focus}
                                 onChange={(e) => setNewEducation({ ...newEducation, focus: e.target.value })}
                                 className="admin-form-input"
-                                placeholder="Software Engineering"
+                                placeholder="e.g. Science, Computer Science"
                             />
                         </div>
                         <div className="admin-form-group">
@@ -264,7 +264,7 @@ const EducationTab = ({ education, onAddEducation, onUpdateEducation, onDeleteEd
 
             {/* Education List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                {education.map((edu, index) => (
+                {[...education].reverse().map((edu, index) => (
                     <motion.div
                         key={edu.id ?? index}
                         initial={{ opacity: 0, y: 20 }}
@@ -390,13 +390,13 @@ const EducationTab = ({ education, onAddEducation, onUpdateEducation, onDeleteEd
                                         />
                                     </div>
                                     <div className="admin-form-group">
-                                        <label className="admin-form-label">Focus</label>
+                                        <label className="admin-form-label">Stream</label>
                                         <input
                                             type="text"
                                             value={editData.focus ?? ''}
                                             onChange={(e) => setEditData({ ...editData, focus: e.target.value })}
                                             className="admin-form-input"
-                                            placeholder="Software Engineering"
+                                            placeholder="e.g. Science, Computer Science"
                                         />
                                     </div>
                                     <div className="admin-form-group">
@@ -443,7 +443,7 @@ const EducationTab = ({ education, onAddEducation, onUpdateEducation, onDeleteEd
                                     <p className="admin-item-content" style={{ marginTop: '0', fontSize: '14px' }}>GPA: {edu.gpa}</p>
                                 )}
                                 {edu.focus && (
-                                    <p className="admin-item-content" style={{ marginTop: '0', fontSize: '14px' }}>Focus: {edu.focus}</p>
+                                    <p className="admin-item-content" style={{ marginTop: '0', fontSize: '14px' }}>Stream: {edu.focus}</p>
                                 )}
                                 {edu.relevant_courses && edu.relevant_courses.length > 0 && (
                                     <div className="admin-experience-block">
