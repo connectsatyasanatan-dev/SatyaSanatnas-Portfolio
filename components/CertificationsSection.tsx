@@ -71,17 +71,33 @@ const CertificationsSection = () => {
                             left: 0;
                             right: 0;
                             height: 2px;
-                            background: linear-gradient(90deg, transparent, var(--secondary), transparent);
-                            transform: scaleX(0);
-                            transition: transform 0.5s ease;
+                            background: linear-gradient(90deg, transparent, #9333ea, #db2777, transparent);
+                            opacity: 0.7;
+                            transition: opacity 0.5s ease;
+                        }
+                        .cert-card::after {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            height: 150px;
+                            background: radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.15), transparent 70%);
+                            pointer-events: none;
+                            z-index: 0;
                         }
                         .cert-card:hover {
                             transform: translateY(-6px);
                             border-color: rgba(218, 165, 32, 0.4);
-                            box-shadow: 0 12px 30px rgba(218, 165, 32, 0.15);
+                            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
                         }
                         .cert-card:hover::before {
-                            transform: scaleX(1);
+                            opacity: 1;
+                            background: linear-gradient(90deg, transparent, #db2777, #f59e0b, transparent);
+                        }
+                        .cert-header, .cert-meta-list, .cert-credential-id {
+                            position: relative;
+                            z-index: 1;
                         }
                         .cert-header {
                             display: flex;
@@ -90,8 +106,8 @@ const CertificationsSection = () => {
                             margin-bottom: 20px;
                         }
                         .cert-icon-wrapper {
-                            width: 48px;
-                            height: 48px;
+                            width: 56px;
+                            height: 56px;
                             border-radius: 12px;
                             background: rgba(218, 165, 32, 0.1);
                             display: flex;
@@ -100,11 +116,24 @@ const CertificationsSection = () => {
                             color: goldenrod;
                             flex-shrink: 0;
                             transition: all 0.3s ease;
+                            border: 1px solid rgba(218, 165, 32, 0.2);
                         }
-                        .cert-card:hover .cert-icon-wrapper {
+                        .cert-icon-wrapper.has-image {
+                            background: transparent;
+                            border: none;
+                        }
+                        .cert-icon-wrapper.has-image img {
+                            border-radius: 10px;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                        }
+                        .cert-card:hover .cert-icon-wrapper:not(.has-image) {
                             background: goldenrod;
                             color: #fff;
                             transform: rotate(5deg) scale(1.05);
+                        }
+                        .cert-card:hover .cert-icon-wrapper.has-image img {
+                            transform: scale(1.05);
+                            transition: transform 0.3s ease;
                         }
                         .cert-title-area {
                             flex: 1;
@@ -185,6 +214,7 @@ const CertificationsSection = () => {
                     <div className="certifications-grid">
                         {certifications.map((cert, index) => {
                             const isValid = cert.validity?.includes('2025') || cert.validity?.includes('2026') || cert.validity?.toLowerCase().includes('no expiration');
+                            const isOracle = cert.name.toLowerCase().includes('oracle') || cert.issuer.toLowerCase().includes('oracle');
                             
                             return (
                                 <motion.div
@@ -196,8 +226,16 @@ const CertificationsSection = () => {
                                     className="cert-card"
                                 >
                                     <div className="cert-header">
-                                        <div className="cert-icon-wrapper">
-                                            <Award size={24} />
+                                        <div className={`cert-icon-wrapper ${isOracle ? 'has-image' : ''}`}>
+                                            {isOracle ? (
+                                                <img 
+                                                    src="/images/oci_badge.jpeg" 
+                                                    alt="Oracle Certification Badge" 
+                                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                                />
+                                            ) : (
+                                                <Award size={28} />
+                                            )}
                                         </div>
                                         <div className="cert-title-area">
                                             <h4 className="cert-name">{cert.name}</h4>
