@@ -17,8 +17,22 @@ import {
     Play,
     Pause
 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import portfolioAPI, { SkillCategory, Achievements, PortfolioStats } from '@/lib/api'
 import { SkillsSectionSkeleton } from './AppSkeletons'
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+        opacity: 1,
+        transition: { staggerChildren: 0.05 }
+    }
+}
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+}
 
 const SkillsSection = () => {
     const [activeCategory, setActiveCategory] = useState('frontend')
@@ -138,252 +152,304 @@ const SkillsSection = () => {
     const hackathonsWon = achievements?.stats.hackathonsWon ?? 0
 
     return (
-        <section id="skills-section" className="skills-modern-section">
-            {/* Header with Animation Control */}
-            <div className="section-header-modern">
-                <div className="header-content">
-                    <div className="header-icon">
-                        <Brain className="icon-brain" />
-                        <div className="icon-glow"></div>
-                    </div>
-                    <div className="header-text">
-                        <h3 className="section-title-modern">Technical Expertise</h3>
-                        <p className="section-subtitle">Interactive Skills Showcase</p>
-                    </div>
-                </div>
-                <button
-                    className="animation-toggle"
-                    onClick={toggleAnimation}
-                    title={isAnimating ? 'Pause Animation' : 'Play Animation'}
+        <AnimatePresence mode="wait">
+            {loading ? (
+                <motion.div 
+                    key="skeleton-skills"
+                    initial={{ opacity: 1 }}
+                    exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                    transition={{ duration: 0.5 }}
                 >
-                    {isAnimating ? <Pause size={16} /> : <Play size={16} />}
-                </button>
-            </div>
-
-            {/* Stats Dashboard */}
-            <div className="stats-dashboard">
-                {yearsExp > 0 && (
-                    <div className="stat-card-modern">
-                        <div className="stat-icon">
-                            <Rocket />
-                        </div>
-                        <div className="stat-content">
-                            <div className="stat-number">{yearsExp}+</div>
-                            <div className="stat-label">Years Experience</div>
-                        </div>
-                        <div className="stat-progress">
-                            <div className="progress-bar" style={{ width: '85%' }}></div>
-                        </div>
-                    </div>
-                )}
-
-                {projectsCount > 0 && (
-                    <div className="stat-card-modern">
-                        <div className="stat-icon">
-                            <Target />
-                        </div>
-                        <div className="stat-content">
-                            <div className="stat-number">{projectsCount}+</div>
-                            <div className="stat-label">Projects Delivered</div>
-                        </div>
-                        <div className="stat-progress">
-                            <div className="progress-bar" style={{ width: '92%' }}></div>
-                        </div>
-                    </div>
-                )}
-
-                {codeCommits > 0 && (
-                    <div className="stat-card-modern">
-                        <div className="stat-icon">
-                            <Zap />
-                        </div>
-                        <div className="stat-content">
-                            <div className="stat-number">{Math.floor(codeCommits / 1000)}K+</div>
-                            <div className="stat-label">Code Commits</div>
-                        </div>
-                        <div className="stat-progress">
-                            <div className="progress-bar" style={{ width: '78%' }}></div>
-                        </div>
-                    </div>
-                )}
-
-                {hackathonsWon > 0 && (
-                    <div className="stat-card-modern">
-                        <div className="stat-icon">
-                            <Award />
-                        </div>
-                        <div className="stat-content">
-                            <div className="stat-number">{hackathonsWon}</div>
-                            <div className="stat-label">Hackathons Won</div>
-                        </div>
-                        <div className="stat-progress">
-                            <div className="progress-bar" style={{ width: '100%' }}></div>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Interactive Skills Explorer */}
-            <div className="skills-explorer">
-                {/* Category Navigation */}
-                <div className="category-nav">
-                    {skillCategories
-                        .filter(category => skills[category.key as keyof typeof skills]?.skills.length > 0)
-                        .map((category) => {
-                            const IconComponent = category.icon
-                            const isActive = activeCategory === category.key
-
-                            return (
-                                <button
-                                    key={category.key}
-                                    className={`category-btn ${isActive ? 'active' : ''}`}
-                                    onClick={() => setActiveCategory(category.key)}
-                                    style={{
-                                        '--category-color': category.color,
-                                        '--category-gradient': `linear-gradient(135deg, ${category.color}20, ${category.color}10)`
-                                    } as React.CSSProperties}
-                                >
-                                    <div className="category-btn-icon">
-                                        <IconComponent size={20} />
-                                    </div>
-                                    <div className="category-btn-content">
-                                        <div className="category-btn-title">{category.title}</div>
-                                        <div className="category-btn-desc">{category.description}</div>
-                                    </div>
-                                    <ChevronRight className="category-btn-arrow" size={16} />
-                                </button>
-                            )
-                        })}
-                </div>
-
-                {/* Skills Display */}
-                <div className="skills-display">
-                    {activeSkillData && (
-                        <>
-                            <div className="skills-header">
-                                <div className="skills-category-info">
-                                    <div
-                                        className="category-icon-large"
-                                        style={{ '--category-color': activeCategoryData?.color } as React.CSSProperties}
-                                    >
-                                        {activeCategoryData && <activeCategoryData.icon size={32} />}
-                                    </div>
-                                    <div className="category-details">
-                                        <h4 className="category-title-large">{activeSkillData.title}</h4>
-                                        <p className="category-description">{activeCategoryData?.description}</p>
-                                    </div>
-                                </div>
-                                <div className="skills-count">
-                                    {activeSkillData.skills.length} Skills
-                                </div>
+                    <SkillsSectionSkeleton />
+                </motion.div>
+            ) : (
+                <motion.section 
+                    key="skills-content"
+                    id="skills-section" 
+                    className="skills-modern-section"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                    {/* Header with Animation Control */}
+                    <div className="section-header-modern">
+                        <div className="header-content">
+                            <div className="header-icon">
+                                <Brain className="icon-brain" />
+                                <div className="icon-glow"></div>
                             </div>
+                            <div className="header-text">
+                                <h3 className="section-title-modern">Technical Expertise</h3>
+                                <p className="section-subtitle">Interactive Skills Showcase</p>
+                            </div>
+                        </div>
+                        <button
+                            className="animation-toggle"
+                            onClick={toggleAnimation}
+                            title={isAnimating ? 'Pause Animation' : 'Play Animation'}
+                        >
+                            {isAnimating ? <Pause size={16} /> : <Play size={16} />}
+                        </button>
+                    </div>
 
-                            <div className="skills-grid-modern">
-                                {activeSkillData.skills.map((skill, index) => {
-                                    const skillLevel = getSkillLevel(skill.level)
-                                    const isHovered = hoveredSkill === skill.name
+                    {/* Stats Dashboard */}
+                    <motion.div 
+                        className="stats-dashboard"
+                        variants={containerVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                    >
+                        {yearsExp > 0 && (
+                            <motion.div className="stat-card-modern" variants={itemVariants}>
+                                <div className="stat-icon">
+                                    <Rocket />
+                                </div>
+                                <div className="stat-content">
+                                    <div className="stat-number">{yearsExp}+</div>
+                                    <div className="stat-label">Years Experience</div>
+                                </div>
+                                <div className="stat-progress">
+                                    <motion.div 
+                                        className="progress-bar" 
+                                        initial={{ width: 0 }}
+                                        whileInView={{ width: '85%' }}
+                                        transition={{ duration: 1, delay: 0.5 }}
+                                    ></motion.div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {projectsCount > 0 && (
+                            <motion.div className="stat-card-modern" variants={itemVariants}>
+                                <div className="stat-icon">
+                                    <Target />
+                                </div>
+                                <div className="stat-content">
+                                    <div className="stat-number">{projectsCount}+</div>
+                                    <div className="stat-label">Projects Delivered</div>
+                                </div>
+                                <div className="stat-progress">
+                                    <motion.div 
+                                        className="progress-bar" 
+                                        initial={{ width: 0 }}
+                                        whileInView={{ width: '92%' }}
+                                        transition={{ duration: 1, delay: 0.6 }}
+                                    ></motion.div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {codeCommits > 0 && (
+                            <motion.div className="stat-card-modern" variants={itemVariants}>
+                                <div className="stat-icon">
+                                    <Zap />
+                                </div>
+                                <div className="stat-content">
+                                    <div className="stat-number">{Math.floor(codeCommits / 1000)}K+</div>
+                                    <div className="stat-label">Code Commits</div>
+                                </div>
+                                <div className="stat-progress">
+                                    <motion.div 
+                                        className="progress-bar" 
+                                        initial={{ width: 0 }}
+                                        whileInView={{ width: '78%' }}
+                                        transition={{ duration: 1, delay: 0.7 }}
+                                    ></motion.div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {hackathonsWon > 0 && (
+                            <motion.div className="stat-card-modern" variants={itemVariants}>
+                                <div className="stat-icon">
+                                    <Award />
+                                </div>
+                                <div className="stat-content">
+                                    <div className="stat-number">{hackathonsWon}</div>
+                                    <div className="stat-label">Hackathons Won</div>
+                                </div>
+                                <div className="stat-progress">
+                                    <motion.div 
+                                        className="progress-bar" 
+                                        initial={{ width: 0 }}
+                                        whileInView={{ width: '100%' }}
+                                        transition={{ duration: 1, delay: 0.8 }}
+                                    ></motion.div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </motion.div>
+
+                    {/* Interactive Skills Explorer */}
+                    <div className="skills-explorer">
+                        {/* Category Navigation */}
+                        <div className="category-nav">
+                            {skillCategories
+                                .filter(category => skills[category.key as keyof typeof skills]?.skills.length > 0)
+                                .map((category) => {
+                                    const IconComponent = category.icon
+                                    const isActive = activeCategory === category.key
 
                                     return (
-                                        <div
-                                            key={skill.name}
-                                            className={`skill-card-modern ${isHovered ? 'hovered' : ''}`}
-                                            onMouseEnter={() => setHoveredSkill(skill.name)}
-                                            onMouseLeave={() => setHoveredSkill(null)}
+                                        <button
+                                            key={category.key}
+                                            className={`category-btn ${isActive ? 'active' : ''}`}
+                                            onClick={() => setActiveCategory(category.key)}
                                             style={{
-                                                '--skill-color': skillLevel.color,
-                                                '--animation-delay': `${index * 0.1}s`
+                                                '--category-color': category.color,
+                                                '--category-gradient': `linear-gradient(135deg, ${category.color}20, ${category.color}10)`
                                             } as React.CSSProperties}
                                         >
-                                            <div className="skill-card-header">
-                                                <div className="skill-name">{skill.name}</div>
-                                                <div className="skill-level-badge" style={{ backgroundColor: skillLevel.color }}>
-                                                    {skillLevel.label}
-                                                </div>
+                                            <div className="category-btn-icon">
+                                                <IconComponent size={20} />
                                             </div>
-
-                                            <div className="skill-metrics">
-                                                <div className="skill-metric">
-                                                    <span className="metric-label">Experience</span>
-                                                    <span className="metric-value">{skill.years} years</span>
-                                                </div>
-                                                <div className="skill-metric">
-                                                    <span className="metric-label">Proficiency</span>
-                                                    <span className="metric-value">{skill.level}%</span>
-                                                </div>
+                                            <div className="category-btn-content">
+                                                <div className="category-btn-title">{category.title}</div>
+                                                <div className="category-btn-desc">{category.description}</div>
                                             </div>
-
-                                            <div className="skill-progress-container">
-                                                <div className="skill-progress-track">
-                                                    <div
-                                                        className="skill-progress-fill"
-                                                        style={{
-                                                            width: `${skill.level}%`,
-                                                            backgroundColor: skillLevel.color,
-                                                            animationDelay: `${index * 0.1}s`
-                                                        }}
-                                                    ></div>
-                                                </div>
-                                                <div className="skill-stars">
-                                                    {[...Array(5)].map((_, starIndex) => (
-                                                        <Star
-                                                            key={starIndex}
-                                                            size={12}
-                                                            className={`skill-star ${starIndex < Math.floor(skill.level / 20) ? 'filled' : ''}`}
-                                                            style={{
-                                                                color: starIndex < Math.floor(skill.level / 20) ? skillLevel.color : '#273a3a',
-                                                                animationDelay: `${index * 0.1 + starIndex * 0.05}s`
-                                                            }}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <div className="skill-card-glow" style={{ backgroundColor: skillLevel.color }}></div>
-                                        </div>
+                                            <ChevronRight className="category-btn-arrow" size={16} />
+                                        </button>
                                     )
                                 })}
+                        </div>
+
+                        {/* Skills Display */}
+                        <div className="skills-display">
+                            {activeSkillData && (
+                                <>
+                                    <div className="skills-header">
+                                        <div className="skills-category-info">
+                                            <div
+                                                className="category-icon-large"
+                                                style={{ '--category-color': activeCategoryData?.color } as React.CSSProperties}
+                                            >
+                                                {activeCategoryData && <activeCategoryData.icon size={32} />}
+                                            </div>
+                                            <div className="category-details">
+                                                <h4 className="category-title-large">{activeSkillData.title}</h4>
+                                                <p className="category-description">{activeCategoryData?.description}</p>
+                                            </div>
+                                        </div>
+                                        <div className="skills-count">
+                                            {activeSkillData.skills.length} Skills
+                                        </div>
+                                    </div>
+
+                                    <motion.div 
+                                        className="skills-grid-modern"
+                                        variants={containerVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        key={activeCategory} // Force re-animation on category change
+                                    >
+                                        {activeSkillData.skills.map((skill, index) => {
+                                            const skillLevel = getSkillLevel(skill.level)
+                                            const isHovered = hoveredSkill === skill.name
+
+                                            return (
+                                                <motion.div
+                                                    key={skill.name}
+                                                    variants={itemVariants}
+                                                    className={`skill-card-modern ${isHovered ? 'hovered' : ''}`}
+                                                    onMouseEnter={() => setHoveredSkill(skill.name)}
+                                                    onMouseLeave={() => setHoveredSkill(null)}
+                                                    style={{
+                                                        '--skill-color': skillLevel.color,
+                                                    } as React.CSSProperties}
+                                                >
+                                                    <div className="skill-card-header">
+                                                        <div className="skill-name">{skill.name}</div>
+                                                        <div className="skill-level-badge" style={{ backgroundColor: skillLevel.color }}>
+                                                            {skillLevel.label}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="skill-metrics">
+                                                        <div className="skill-metric">
+                                                            <span className="metric-label">Experience</span>
+                                                            <span className="metric-value">{skill.years} years</span>
+                                                        </div>
+                                                        <div className="skill-metric">
+                                                            <span className="metric-label">Proficiency</span>
+                                                            <span className="metric-value">{skill.level}%</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="skill-progress-container">
+                                                        <div className="skill-progress-track">
+                                                            <motion.div
+                                                                className="skill-progress-fill"
+                                                                initial={{ width: 0 }}
+                                                                animate={{ width: `${skill.level}%` }}
+                                                                transition={{ duration: 1, ease: "easeOut" }}
+                                                                style={{
+                                                                    backgroundColor: skillLevel.color,
+                                                                }}
+                                                            ></motion.div>
+                                                        </div>
+                                                        <div className="skill-stars">
+                                                            {[...Array(5)].map((_, starIndex) => (
+                                                                <Star
+                                                                    key={starIndex}
+                                                                    size={12}
+                                                                    className={`skill-star ${starIndex < Math.floor(skill.level / 20) ? 'filled' : ''}`}
+                                                                    style={{
+                                                                        color: starIndex < Math.floor(skill.level / 20) ? skillLevel.color : '#273a3a',
+                                                                    }}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="skill-card-glow" style={{ backgroundColor: skillLevel.color }}></div>
+                                                </motion.div>
+                                            )
+                                        })}
+                                    </motion.div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Achievements Showcase */}
+                    {achievements && achievements.highlights && achievements.highlights.length > 0 && (
+                        <div className="achievements-showcase">
+                            <div className="achievements-header-modern">
+                                <div className="achievements-icon-container">
+                                    <Award className="achievements-icon" />
+                                    <div className="achievements-icon-glow"></div>
+                                </div>
+                                <div className="achievements-text">
+                                    <h4 className="achievements-title">Key Achievements</h4>
+                                    <p className="achievements-subtitle">Milestones & Recognition</p>
+                                </div>
                             </div>
-                        </>
+
+                            <div className="achievements-grid-modern">
+                                {achievements.highlights.slice(0, 6).map((achievement, index) => (
+                                    <div
+                                        key={index}
+                                        className="achievement-card-modern"
+                                        style={{ '--animation-delay': `${index * 0.1}s` } as React.CSSProperties}
+                                    >
+                                        <div className="achievement-emoji">
+                                            {achievement.split(' ')[0]}
+                                        </div>
+                                        <div className="achievement-content">
+                                            <p className="achievement-text">
+                                                {achievement.substring(achievement.indexOf(' ') + 1)}
+                                            </p>
+                                        </div>
+                                        <div className="achievement-glow"></div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     )}
-                </div>
-            </div>
-
-            {/* Achievements Showcase */}
-            {achievements && achievements.highlights && achievements.highlights.length > 0 && (
-                <div className="achievements-showcase">
-                    <div className="achievements-header-modern">
-                        <div className="achievements-icon-container">
-                            <Award className="achievements-icon" />
-                            <div className="achievements-icon-glow"></div>
-                        </div>
-                        <div className="achievements-text">
-                            <h4 className="achievements-title">Key Achievements</h4>
-                            <p className="achievements-subtitle">Milestones & Recognition</p>
-                        </div>
-                    </div>
-
-                    <div className="achievements-grid-modern">
-                        {achievements.highlights.slice(0, 6).map((achievement, index) => (
-                            <div
-                                key={index}
-                                className="achievement-card-modern"
-                                style={{ '--animation-delay': `${index * 0.1}s` } as React.CSSProperties}
-                            >
-                                <div className="achievement-emoji">
-                                    {achievement.split(' ')[0]}
-                                </div>
-                                <div className="achievement-content">
-                                    <p className="achievement-text">
-                                        {achievement.substring(achievement.indexOf(' ') + 1)}
-                                    </p>
-                                </div>
-                                <div className="achievement-glow"></div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                </motion.section>
             )}
-        </section>
+        </AnimatePresence>
     )
 }
 

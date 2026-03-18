@@ -15,8 +15,7 @@
 #portfolio-header .header-left {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: white;
+  gap: var(--space-4);
 }
 
 #portfolio-header .header-logo {
@@ -25,19 +24,35 @@
   color: var(--primary);
 }
 
+#portfolio-header .header-title-container {
+  display: flex;
+  align-items: center;
+  min-width: 240px;
+}
+
 #portfolio-header .header-title {
-  color: white;
-  font-weight: bold;
-  letter-spacing: -0.025em;
-  font-size: 14px;
+  color: #daa522; /* goldenrod */
+  text-shadow: 0 0 10px rgba(218, 165, 32, 0.4);
+  margin: 0;
+  white-space: nowrap;
+  font-size: var(--text-sm);
+}
+
+#portfolio-header .header-cursor {
+  display: inline-block;
+  margin-left: var(--space-1);
+  width: 2px;
+  height: 1.2rem;
+  background: #daa522;
+  vertical-align: middle;
+  box-shadow: 0 0 6px rgba(218, 165, 32, 0.8);
 }
 
 #portfolio-header .header-nav {
-  display: none;
+  display: none; /* Hidden by default, shown on larger screens */
   align-items: center;
-  gap: 8px;
-  margin-left: 8px;
-  color: var(--text-dim);
+  gap: var(--space-4);
+  margin-left: var(--space-4);
 }
 
 #portfolio-header .header-nav a {
@@ -45,7 +60,7 @@
   text-decoration: none;
   cursor: pointer;
   transition: color 0.2s;
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 #portfolio-header .header-nav a:hover {
@@ -228,29 +243,26 @@
 
 #portfolio-sidebar .sidebar-content {
   display: flex;
-  flex: 1;
-  flex-direction: row;
   height: 100%;
 }
 
-#portfolio-sidebar .sidebar-icons {
-  width: 48px;
+.sidebar-icons {
+  width: var(--space-12);
+  background-color: var(--sidebar-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px 0;
-  gap: 16px;
+  padding: var(--space-3) 0;
+  gap: var(--space-5);
   border-right: 1px solid var(--border-color);
-  height: 100%;
-  background-color: #080d0d;
 }
 
-#portfolio-sidebar .sidebar-icons svg {
-  width: 20px;
-  height: 20px;
+.sidebar-icons svg {
+  width: 24px;
+  height: 24px;
   color: var(--text-dim);
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
 }
 
 #portfolio-sidebar .sidebar-icons svg:hover {

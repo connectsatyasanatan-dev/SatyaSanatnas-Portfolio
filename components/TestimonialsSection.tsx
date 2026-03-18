@@ -28,11 +28,13 @@ const TestimonialsSection = () => {
     }, [])
 
     const slideNext = useCallback(() => {
+        if (testimonials.length === 0) return
         setDirection(1)
         setActiveIndex((prev) => (prev + 1) % testimonials.length)
     }, [testimonials.length])
 
     const slidePrev = useCallback(() => {
+        if (testimonials.length === 0) return
         setDirection(-1)
         setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
     }, [testimonials.length])
@@ -43,11 +45,6 @@ const TestimonialsSection = () => {
             return () => clearInterval(timer)
         }
     }, [isAutoPlaying, testimonials.length, slideNext])
-
-    if (loading) return <TestimonialsSectionSkeleton />
-    if (!loading && testimonials.length === 0) return null
-
-    const active = testimonials[activeIndex]
 
     // Animation variants for the unique slider effect
     const variants = {
@@ -80,325 +77,285 @@ const TestimonialsSection = () => {
     }
 
     return (
-        <section id="testimonials-root">
-            <style>{`
-                #testimonials-root {
-                    max-width: 1200px;
-                    margin: 64px auto;
-                    padding: 0 16px;
-                    position: relative;
-                    perspective: 1500px;
-                }
-
-                .tm-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 40px;
-                    border-left: 3px solid var(--primary);
-                    padding-left: 20px;
-                }
-
-                .tm-title-wrap h3 {
-                    font-size: 24px;
-                    font-weight: 700;
-                    letter-spacing: -0.01em;
-                    color: #fff;
-                    margin-bottom: 4px;
-                }
-
-                .tm-subtitle {
-                    color: var(--primary);
-                    font-family: 'JetBrains Mono', monospace;
-                    font-size: 14px;
-                    opacity: 0.8;
-                }
-
-                /* ── Slider Container ── */
-                .tm-viewport {
-                    position: relative;
-                    min-height: 380px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .tm-card {
-                    position: absolute;
-                    width: 100%;
-                    max-width: 780px;
-                    background: rgba(17, 24, 24, 0.7);
-                    backdrop-filter: blur(16px);
-                    border: 1px solid rgba(255, 255, 255, 0.06);
-                    border-radius: 24px;
-                    padding: 40px 48px;
-                    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-                    transform-style: preserve-3d;
-                }
-
-                .tm-card-glow {
-                    position: absolute;
-                    top: 0; left: 0; right: 0; bottom: 0;
-                    background: radial-gradient(circle at 10% 10%, rgba(var(--primary-rgb), 0.03) 0%, transparent 40%);
-                    pointer-events: none;
-                    border-radius: inherit;
-                }
-
-                .tm-quote-icon {
-                    position: absolute;
-                    top: -18px; left: 40px;
-                    width: 44px; height: 44px;
-                    background: var(--primary);
-                    color: #000;
-                    display: flex; align-items: center; justify-content: center;
-                    border-radius: 12px;
-                    box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
-                }
-
-                .tm-content {
-                    position: relative;
-                    z-index: 2;
-                }
-
-                .tm-rating {
-                    display: flex;
-                    gap: 3px;
-                    margin-bottom: 20px;
-                }
-
-                .tm-star {
-                    color: var(--primary);
-                    fill: var(--primary);
-                    opacity: 0.2;
-                }
-                .tm-star.filled {
-                    opacity: 1;
-                }
-
-                .tm-text {
-                    font-size: 19px;
-                    line-height: 1.6;
-                    color: rgba(255, 255, 255, 0.85);
-                    font-weight: 500;
-                    margin-bottom: 32px;
-                    font-style: normal;
-                    letter-spacing: 0.01em;
-                }
-
-                .tm-footer {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    border-top: 1px solid rgba(255, 255, 255, 0.05);
-                    padding-top: 24px;
-                }
-
-                .tm-author {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                }
-
-                .tm-avatar {
-                    width: 44px; height: 44px;
-                    border-radius: 12px;
-                    background: rgba(255, 255, 255, 0.03);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    display: flex; align-items: center; justify-content: center;
-                    color: var(--primary);
-                }
-
-                .tm-author-name {
-                    font-size: 16px;
-                    font-weight: 600;
-                    color: #fff;
-                    margin-bottom: 1px;
-                }
-
-                .tm-author-meta {
-                    font-size: 12px;
-                    color: rgba(255, 255, 255, 0.4);
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                }
-
-                .tm-company {
-                    display: flex; align-items: center; gap: 4px;
-                    color: var(--primary);
-                }
-
-                /* ── Controls ── */
-                .tm-controls {
-                    display: flex;
-                    align-items: center;
-                    gap: 16px;
-                }
-
-                .tm-nav-btn {
-                    width: 36px; height: 36px;
-                    border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.03);
-                    border: 1px solid rgba(255, 255, 255, 0.05);
-                    color: #fff;
-                    display: flex; align-items: center; justify-content: center;
-                    cursor: pointer;
-                    transition: all 0.25s ease;
-                }
-
-                .tm-nav-btn:hover {
-                    background: var(--primary);
-                    color: #000;
-                    border-color: var(--primary);
-                }
-
-                .tm-progress {
-                    display: flex;
-                    gap: 6px;
-                }
-
-                .tm-dot {
-                    width: 6px; height: 6px;
-                    border-radius: 3px;
-                    background: rgba(255, 255, 255, 0.1);
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                }
-
-                .tm-dot.active {
-                    width: 20px;
-                    background: var(--primary);
-                }
-
-                .tm-autoplay-toggle {
-                    background: transparent;
-                    border: none;
-                    color: rgba(255, 255, 255, 0.4);
-                    cursor: pointer;
-                    transition: color 0.3s;
-                }
-
-                .tm-autoplay-toggle:hover {
-                    color: var(--primary);
-                }
-
-                @media (max-width: 768px) {
-                    .tm-card {
-                        padding: 32px 24px;
-                        max-width: 100%;
-                    }
-                    .tm-text {
-                        font-size: 16px;
-                    }
-                    .tm-header {
-                        padding-left: 14px;
-                        margin-bottom: 30px;
-                    }
-                    .tm-viewport {
-                        min-height: 400px;
-                    }
-                    .tm-quote-icon {
-                        left: 24px; width: 36px; height: 36px;
-                    }
-                    .tm-nav-btn { display: none; }
-                }
-            `}</style>
-
-            <div className="tm-header">
-                <div className="tm-title-wrap">
-                    <h3 className="tm-title">Success Stories</h3>
-                    <div className="tm-subtitle">
-                        <Sparkles size={12} style={{ display: 'inline', marginRight: '6px' }} />
-                        Trusted by industry leaders
-                    </div>
-                </div>
-
-                <div className="tm-controls">
-                    <button className="tm-autoplay-toggle" onClick={() => setIsAutoPlaying(!isAutoPlaying)}>
-                        {isAutoPlaying ? <Pause size={14} /> : <Play size={14} />}
-                    </button>
-                    <div className="tm-progress">
-                        {testimonials.map((_, i) => (
-                            <div 
-                                key={i}
-                                className={`tm-dot ${i === activeIndex ? 'active' : ''}`}
-                                onClick={() => {
-                                    setDirection(i > activeIndex ? 1 : -1)
-                                    setActiveIndex(i)
-                                }}
-                            />
-                        ))}
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        <button className="tm-nav-btn" onClick={slidePrev}><ChevronLeft size={16} /></button>
-                        <button className="tm-nav-btn" onClick={slideNext}><ChevronRight size={16} /></button>
-                    </div>
-                </div>
-            </div>
-
-            <div className="tm-viewport">
-                <AnimatePresence initial={false} custom={direction}>
-                    <motion.div
-                        key={activeIndex}
-                        custom={direction}
-                        variants={variants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        className="tm-card"
+        <AnimatePresence mode="wait">
+            {loading ? (
+                <motion.div 
+                    key="skeleton-testimonials"
+                    initial={{ opacity: 1 }}
+                    exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <TestimonialsSectionSkeleton />
+                </motion.div>
+            ) : testimonials.length === 0 ? null : (() => {
+                const active = testimonials[activeIndex]
+                return (
+                    <motion.section 
+                        key="testimonials-content"
+                        id="testimonials-root"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
                     >
-                        <div className="tm-card-glow" />
-                        <div className="tm-quote-icon">
-                            <Quote size={28} />
+                        <style>{`
+                            /* ── root container ── */
+                            #testimonials-root {
+                                position: relative;
+                                max-width: 1200px;
+                                margin: 100px auto 140px auto;
+                                padding: 0 24px;
+                                font-family: 'Space Grotesk', sans-serif;
+                                perspective: 1200px;
+                            }
+
+                            /* ── background glass ── */
+                            .testi-container {
+                                position: relative;
+                                width: 100%;
+                                background: rgba(15, 23, 42, 0.4);
+                                backdrop-filter: blur(28px);
+                                border: 1px solid rgba(255, 255, 255, 0.08);
+                                border-radius: 40px;
+                                overflow: hidden;
+                                box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.6),
+                                            inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+                            }
+
+                            /* ── section heading ── */
+                            .testi-header {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                margin-bottom: 50px;
+                                padding-left: 10px;
+                            }
+                            .testi-header-title {
+                                font-size: 32px; font-weight: 800; color: #fff;
+                                background: linear-gradient(135deg, #fff 40%, rgba(255,255,255,0.4));
+                                -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                            }
+                            .testi-header-badge {
+                                display: flex; align-items: center; gap: 8px;
+                                padding: 6px 14px; background: rgba(255, 255, 255, 0.05);
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                border-radius: 20px; font-size: 13px; color: rgba(255, 255, 255, 0.6);
+                                font-family: 'JetBrains Mono', monospace;
+                            }
+
+                            /* ── slider wrapper ── */
+                            .testi-slider {
+                                position: relative;
+                                min-height: 440px;
+                                display: grid;
+                                grid-template-columns: 1fr;
+                                align-items: center;
+                            }
+
+                            /* ── the active slide ── */
+                            .testi-slide {
+                                grid-area: 1 / 1;
+                                display: flex;
+                                flex-direction: column;
+                                padding: 60px 80px;
+                            }
+                            @media (max-width: 900px) { .testi-slide { padding: 40px 30px; } }
+
+                            /* ── decorative elements ── */
+                            .testi-quote-mark {
+                                position: absolute; top: -20px; left: -20px;
+                                width: 120px; height: 120px;
+                                color: rgba(255, 255, 255, 0.03);
+                                pointer-events: none;
+                            }
+
+                            /* ── content parts ── */
+                            .testi-meta-row {
+                                display: flex; align-items: center; gap: 20px; margin-bottom: 36px;
+                            }
+                            .testi-avatar-placeholder {
+                                width: 76px; height: 76px; border-radius: 20px;
+                                background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+                                display: flex; align-items: center; justify-content: center;
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                            }
+                            .testi-info {
+                                display: flex; flex-direction: column; gap: 4px;
+                            }
+                            .testi-name { font-size: 22px; font-weight: 700; color: #fff; margin: 0; }
+                            .testi-position {
+                                display: flex; align-items: center; gap: 8px;
+                                font-size: 14px; color: rgba(255, 255, 255, 0.4);
+                            }
+
+                            .testi-stars {
+                                display: flex; gap: 6px; margin-bottom: 24px;
+                            }
+                            .star-filled { color: #facc15; }
+                            .star-empty { color: rgba(255, 255, 255, 0.1); }
+
+                            .testi-quote-text {
+                                font-size: 26px; font-weight: 500; line-height: 1.5; color: #fff;
+                                letter-spacing: -0.01em; margin: 0 0 40px 0;
+                                max-width: 800px;
+                            }
+                            @media (max-width: 768px) { .testi-quote-text { font-size: 20px; } }
+
+                            /* ── navigation controls ── */
+                            .testi-nav {
+                                position: absolute; bottom: 50px; right: 80px;
+                                display: flex; align-items: center; gap: 16px;
+                                z-index: 10;
+                            }
+                            @media (max-width: 900px) { .testi-nav { right: 30px; bottom: 30px; } }
+
+                            .testi-btn {
+                                width: 52px; height: 52px; border-radius: 18px;
+                                background: rgba(255, 255, 255, 0.05);
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                color: #fff; cursor: pointer;
+                                display: flex; align-items: center; justify-content: center;
+                                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                            }
+                            .testi-btn:hover {
+                                background: rgba(255, 255, 255, 0.12);
+                                transform: translateY(-4px);
+                                border-color: rgba(255, 255, 255, 0.2);
+                            }
+                            .testi-btn:active { transform: scale(0.95); }
+
+                            .testi-btn.pause-btn { background: rgba(255, 255, 255, 0.03); }
+
+                            /* ── progress indicator ── */
+                            .testi-progress-bar {
+                                position: absolute; bottom: 0; left: 0; height: 4px;
+                                background: linear-gradient(90deg, #3b82f6, #3b82f6, #a78bfa);
+                                transition: width linear;
+                            }
+
+                            /* ── pagination dots ── */
+                            .testi-dots {
+                                position: absolute; bottom: 50px; left: 80px;
+                                display: flex; gap: 8px;
+                            }
+                            @media (max-width: 900px) { .testi-dots { left: 30px; bottom: 30px; } }
+                            .dot {
+                                width: 8px; height: 8px; border-radius: 50%;
+                                background: rgba(255, 255, 255, 0.1);
+                                transition: all 0.3s ease; cursor: pointer;
+                            }
+                            .dot.active { width: 32px; border-radius: 10px; background: #3b82f6; }
+
+                            /* ── ambient glow ── */
+                            .testi-glow {
+                                position: absolute; width: 600px; height: 600px;
+                                background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+                                top: 50%; left: 50%; transform: translate(-50%, -50%);
+                                pointer-events: none; z-index: -1;
+                            }
+                        `}</style>
+
+                        <div className="testi-header">
+                            <div className="testi-header-title">Endorsements</div>
+                            <div className="testi-header-badge">
+                                <Sparkles size={14} className="text-blue-400" />
+                                <span>Premium Collaborations</span>
+                            </div>
                         </div>
 
-                        <div className="tm-content">
-                            <div className="tm-rating">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star 
-                                        key={i} 
-                                        size={18} 
-                                        className={`tm-star ${i < active.rating ? 'filled' : ''}`} 
-                                    />
-                                ))}
-                            </div>
-
-                            <blockquote className="tm-text">
-                                "{active.text}"
-                            </blockquote>
-
-                            <div className="tm-footer">
-                                <div className="tm-author">
-                                    <div className="tm-avatar">
-                                        <User size={20} />
-                                    </div>
-                                    <div>
-                                        <h5 className="tm-author-name">{active.name}</h5>
-                                        <div className="tm-author-meta">
-                                            <span>{active.role}</span>
-                                            <span>•</span>
-                                            <div className="tm-company">
-                                                <Building size={11} />
-                                                <span>{active.company}</span>
+                        <div className="testi-container">
+                            <div className="testi-slider">
+                                <Quote size={200} className="testi-quote-mark" />
+                                
+                                <AnimatePresence mode="wait" custom={direction}>
+                                    <motion.div
+                                        key={activeIndex}
+                                        custom={direction}
+                                        variants={variants}
+                                        initial="enter"
+                                        animate="center"
+                                        exit="exit"
+                                        transition={{
+                                            x: { type: "spring", stiffness: 300, damping: 30 },
+                                            opacity: { duration: 0.2 },
+                                            scale: { duration: 0.4 },
+                                            rotateY: { duration: 0.4 }
+                                        }}
+                                        className="testi-slide"
+                                    >
+                                        <div className="testi-meta-row">
+                                            <div className="testi-avatar-placeholder">
+                                                <User size={32} className="text-white/40" />
+                                            </div>
+                                            <div className="testi-info">
+                                                <h4 className="testi-name">{active.name}</h4>
+                                                <div className="testi-position">
+                                                    <Building size={14} />
+                                                    <span>{active.role} at {active.company}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+
+                                        <div className="testi-stars">
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star 
+                                                    key={i} 
+                                                    size={18} 
+                                                    fill={i < (active.rating || 5) ? "currentColor" : "none"} 
+                                                    className={i < (active.rating || 5) ? "star-filled" : "star-empty"} 
+                                                />
+                                            ))}
+                                        </div>
+
+                                        <blockquote className="testi-quote-text">
+                                            "{active.text}"
+                                        </blockquote>
+                                    </motion.div>
+                                </AnimatePresence>
+
+                                <div className="testi-dots">
+                                    {testimonials.map((_, i) => (
+                                        <div 
+                                            key={i} 
+                                            className={`dot ${i === activeIndex ? 'active' : ''}`} 
+                                            onClick={() => {
+                                                setDirection(i > activeIndex ? 1 : -1)
+                                                setActiveIndex(i)
+                                            }}
+                                        />
+                                    ))}
                                 </div>
-                                
-                                <motion.div 
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="tm-date"
-                                    style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)', fontFamily: 'JetBrains Mono' }}
-                                >
-                                    {active.date}
-                                </motion.div>
+
+                                <div className="testi-nav">
+                                    <button className="testi-btn pause-btn" onClick={() => setIsAutoPlaying(!isAutoPlaying)}>
+                                        {isAutoPlaying ? <Pause size={20} /> : <Play size={20} />}
+                                    </button>
+                                    <button className="testi-btn" onClick={slidePrev}>
+                                        <ChevronLeft size={24} />
+                                    </button>
+                                    <button className="testi-btn" onClick={slideNext}>
+                                        <ChevronRight size={24} />
+                                    </button>
+                                </div>
                             </div>
+
+                            {/* Animated progress bar for auto-play */}
+                            {isAutoPlaying && (
+                                <motion.div 
+                                    key={`progress-${activeIndex}`}
+                                    className="testi-progress-bar"
+                                    initial={{ width: "0%" }}
+                                    animate={{ width: "100%" }}
+                                    transition={{ duration: 6, ease: "linear" }}
+                                />
+                            )}
                         </div>
-                    </motion.div>
-                </AnimatePresence>
-            </div>
-        </section>
+
+                        <div className="testi-glow" />
+                    </motion.section>
+                )
+            })()}
+        </AnimatePresence>
     )
 }
 

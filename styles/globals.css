@@ -1,4 +1,50 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+/* CSS Variables - Advanced Design System */
+:root {
+  /* Colors */
+  --primary: #06f9f9;
+  --primary-rgb: 6, 249, 249;
+  --secondary: #ff00ff;
+  --secondary-rgb: 255, 0, 255;
+  --accent: #2de2e6;
+  --accent-rgb: 45, 226, 230;
+  --background-light: #f5f8f8;
+  --background-dark: #0f2323;
+  --editor-bg: #111818;
+  --sidebar-bg: #0b1212;
+  --border-color: #273a3a;
+  --text-main: #ffffff;
+  --text-dim: #9bbbbb;
+  --glass-bg: rgba(11, 18, 18, 0.7);
+  --hover-bg: rgba(39, 58, 58, 0.3);
+
+  /* Spacing Scale (8px base) */
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem;  /* 8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem;    /* 16px */
+  --space-6: 1.5rem;  /* 24px */
+  --space-8: 2rem;    /* 32px */
+  --space-12: 3rem;   /* 48px */
+  --space-16: 4rem;   /* 64px */
+
+  /* Typography Scale */
+  --text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
+  --text-sm: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-base: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
+  --text-lg: clamp(1rem, 0.95rem + 0.5vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.1rem + 1vw, 1.75rem);
+  --text-2xl: clamp(1.5rem, 1.3rem + 1.5vw, 2.5rem);
+  --text-3xl: clamp(2rem, 1.8rem + 2vw, 4rem);
+
+  /* Shadows & Effects */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-primary: 0 0 20px -5px rgba(var(--primary-rgb), 0.3);
+  
+  /* Transitions */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 /* CSS Reset and Base Styles */
 * {
@@ -13,28 +59,15 @@ body {
   overflow: hidden;
   font-family: 'Space Grotesk', sans-serif;
   height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  color: white;
-  background: #0f2323;
+  color: var(--text-main);
+  background: var(--background-dark);
   line-height: 1.6;
-}
-
-/* CSS Variables */
-:root {
-  --primary: #06f9f9;
-  --primary-rgb: 6, 249, 249;
-  --secondary: #ff00ff;
-  --accent: #2de2e6;
-  --background-light: #f5f8f8;
-  --background-dark: #0f2323;
-  --editor-bg: #111818;
-  --sidebar-bg: #0b1212;
-  --border-color: #273a3a;
-  --text-dim: #9bbbbb;
-  --glass-bg: rgba(11, 18, 18, 0.7);
-  --hover-bg: rgba(39, 58, 58, 0.3);
+  font-size: var(--text-base);
 }
 
 /* Custom scrollbar */
@@ -243,7 +276,7 @@ body {
 }
 
 /* Main App Layout - VS Code Style */
-#portfolio-app {
+.app-container {
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -251,7 +284,14 @@ body {
   overflow: hidden;
 }
 
-#portfolio-app main {
+.app-body {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+.editor-main {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -262,51 +302,45 @@ body {
   overflow: hidden;
 }
 
-#portfolio-app main .main-content {
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-size: 30px 30px;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.main-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
   z-index: 10;
-  padding: 8px;
+  padding: var(--space-2);
   scroll-behavior: smooth;
+  scroll-padding-top: var(--space-8);
 }
 
 /* Responsive main content padding */
 @media (min-width: 640px) {
-  #portfolio-app main .main-content {
-    padding: 16px;
+  .main-content {
+    padding: var(--space-4);
   }
-}
-
-@media (min-width: 768px) {
-  #portfolio-app main .main-content {
-    padding: 24px;
-  }
-}
-
-@media (min-width: 1024px) {
-  #portfolio-app main .main-content {
-    padding: 32px;
-  }
-}
-
-@media (min-width: 1280px) {
-  #portfolio-app main .main-content {
-    padding: 48px;
-  }
-}
-
-/* Grid pattern responsive sizing */
-@media (min-width: 640px) {
-  .grid-pattern {
-    background-size: 30px 30px !important;
+  .grid-overlay {
+    background-size: 40px 40px;
   }
 }
 
 @media (min-width: 1024px) {
-  .grid-pattern {
-    background-size: 40px 40px !important;
+  .main-content {
+    padding: var(--space-8);
+  }
+}
+
+@media (min-width: 1536px) {
+  .main-content {
+    padding: var(--space-12);
   }
 }
 
@@ -358,20 +392,30 @@ textarea:focus {
 }
 
 @keyframes skeleton-pulse-subtle {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 0.8; }
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.9; }
 }
 
 @keyframes skeleton-glow-pulse {
     0%, 100% { box-shadow: 0 0 5px rgba(var(--primary-rgb), 0.05); }
-    50% { box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.15); }
+    50% { box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.2); }
 }
 
 @keyframes skeleton-scan {
     0% { transform: translateY(-100%); opacity: 0; }
-    10% { opacity: 0.5; }
-    90% { opacity: 0.5; }
+    15% { opacity: 0.4; }
+    85% { opacity: 0.4; }
     100% { transform: translateY(300%); opacity: 0; }
+}
+
+@keyframes skeleton-reveal {
+  from { opacity: 1; transform: scale(1); filter: blur(0); }
+  to { opacity: 0; transform: scale(1.05); filter: blur(4px); }
+}
+
+@keyframes content-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .skeleton {

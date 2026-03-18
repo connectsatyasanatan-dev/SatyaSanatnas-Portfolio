@@ -74,8 +74,8 @@ const Header = () => {
                     <Terminal />
                 </div> */}
                 
-                {/* Fixed width container prevents layout shifting of the nav buttons */}
-                <div style={{ display: 'flex', alignItems: 'center', minWidth: '180px', width: '180px' }}>
+                {/* Title Container replaces hardcoded width/display */}
+                <div className="header-title-container">
                     <AnimatePresence mode="wait">
                         <motion.h2 
                             key={`header-title-${seqIndex}`}
@@ -85,31 +85,17 @@ const Header = () => {
                             animate={{ opacity: phase === 'fading' ? 0 : 1, y: phase === 'fading' ? -5 : 0 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.4 }}
-                            style={{ 
-                                color: 'goldenrod', 
-                                textShadow: '0 0 10px rgba(218, 165, 32, 0.4)',
-                                fontFamily: current.fontFamily,
-                                margin: 0,
-                                whiteSpace: 'nowrap'
-                            }}
+                            style={{ fontFamily: current.fontFamily }}
                         >
                             {displayText}
                         </motion.h2>
                     </AnimatePresence>
                     
-                    {/* Blinking cursor */}
+                    {/* Blinking cursor via CSS class */}
                     <motion.span
                         animate={{ opacity: phase === 'fading' ? 0 : [0, 1, 0] }}
                         transition={{ duration: 0.75, repeat: Infinity, ease: 'easeInOut' }}
-                        style={{
-                            display: 'inline-block',
-                            marginLeft: '5px',
-                            width: '2px',
-                            height: '1.2rem',
-                            background: 'goldenrod',
-                            verticalAlign: 'middle',
-                            boxShadow: '0 0 6px rgba(218,165,32,0.8)',
-                        }}
+                        className="header-cursor"
                     />
                 </div>
 

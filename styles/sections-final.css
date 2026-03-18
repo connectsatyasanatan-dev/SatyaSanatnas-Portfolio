@@ -1,19 +1,18 @@
-/* Projects Section Styles */
 #projects-section {
   max-width: 1536px;
-  margin: 0 auto 48px auto;
-  padding: 0 16px;
+  margin: 0 auto var(--space-12) auto;
+  padding: 0 var(--space-4);
 }
 
 #projects-section .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 32px;
+  margin-bottom: var(--space-8);
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
+  padding-bottom: var(--space-2);
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 #projects-section .section-header-left {
@@ -29,7 +28,7 @@
 }
 
 #projects-section .section-title {
-  font-size: 20px;
+  font-size: var(--text-lg);
   font-weight: bold;
   font-family: 'Space Grotesk', sans-serif;
   letter-spacing: -0.025em;
@@ -245,7 +244,7 @@
 }
 
 #projects-section .project-content {
-  padding: 20px;
+  padding: var(--space-5, 20px);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -259,10 +258,10 @@
 }
 
 #projects-section .project-name {
-  font-size: 18px;
+  font-size: var(--text-lg);
   font-weight: bold;
   color: white;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
   transition: color 0.3s ease;
 }
 
@@ -481,7 +480,7 @@
 }
 
 #testimonials-section .section-title {
-  font-size: 20px;
+  font-size: var(--text-lg);
   font-weight: bold;
   font-family: 'Space Grotesk', sans-serif;
   letter-spacing: -0.025em;
@@ -785,7 +784,7 @@
 }
 
 #blog-section .section-title {
-  font-size: 20px;
+  font-size: var(--text-lg);
   font-weight: bold;
   font-family: 'Space Grotesk', sans-serif;
   letter-spacing: -0.025em;
@@ -881,6 +880,7 @@
   transition: color 0.3s ease;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -896,6 +896,7 @@
   margin-bottom: 16px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

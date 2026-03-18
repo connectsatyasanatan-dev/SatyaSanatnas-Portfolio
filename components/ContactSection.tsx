@@ -1,8 +1,8 @@
 'use client'
 
+import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Github, Linkedin, Twitter, MapPin, Calendar, Coffee, Send } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
 import portfolioAPI, { PersonalInfo } from '@/lib/api'
 import { ContactSectionSkeleton } from './AppSkeletons'
 
@@ -54,9 +54,6 @@ const ContactSection = () => {
 
         fetch()
     }, [])
-    if (loadingInfo) {
-        return <ContactSectionSkeleton />
-    }
 
     const contactMethods = [
         {
@@ -111,235 +108,261 @@ const ContactSection = () => {
     ]
 
     return (
-        <section id="contact-section">
-            <div className="section-header">
-                <Mail className="w-5 h-5 text-primary" />
-                <h3 className="section-title">Contact & Availability</h3>
-            </div>
-
-            <div className="contact-grid">
-                {/* Contact Methods */}
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="contact-methods-card"
+        <AnimatePresence mode="wait">
+            {loadingInfo ? (
+                <motion.div 
+                    key="skeleton-contact"
+                    initial={{ opacity: 1 }}
+                    exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                    transition={{ duration: 0.5 }}
                 >
-                    <h4 className="card-title">
-                        <span className="bracket">{'{'}</span>
-                        Connect with me
-                        <span className="bracket">{'}'}</span>
-                    </h4>
-
-                    <div className="contact-methods">
-                        {contactMethods.map((method, index) => {
-                            const IconComponent = method.icon
-                            return (
-                                <motion.a
-                                    key={index}
-                                    href={method.href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                                    whileHover={{ x: 5 }}
-                                    className="contact-method"
-                                >
-                                    <div className="method-icon">
-                                        <IconComponent className={`w-5 h-5 ${method.color}`} />
-                                    </div>
-                                    <div className="method-info">
-                                        <div className="method-label">{method.label}</div>
-                                        <div className="method-value">{method.value}</div>
-                                    </div>
-                                    <div className="method-arrow">
-                                        <span>→</span>
-                                    </div>
-                                </motion.a>
-                            )
-                        })}
-                    </div>
+                    <ContactSectionSkeleton />
                 </motion.div>
-
-                {/* Availability Info */}
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="availability-card"
+            ) : (
+                <motion.section 
+                    key="contact-content" 
+                    id="contact-section"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                    <h4 className="card-title">
-                        <span className="bracket secondary">{'<'}</span>
-                        Current Status
-                        <span className="bracket secondary">{'/>'}</span>
-                    </h4>
-
-                    <div className="availability-info">
-                        {availability.map((item, index) => {
-                            const IconComponent = item.icon
-                            return (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.3, delay: index * 0.1 + 0.2 }}
-                                    className="availability-item"
-                                >
-                                    <div className="item-icon">
-                                        <IconComponent className={`w-5 h-5 ${item.color}`} />
-                                    </div>
-                                    <div className="item-info">
-                                        <div className="item-label">{item.label}</div>
-                                        <div className="item-value">{item.value}</div>
-                                    </div>
-                                </motion.div>
-                            )
-                        })}
+                    <div className="section-header">
+                        <Mail className="w-5 h-5 text-primary" />
+                        <h3 className="section-title">Contact & Availability</h3>
                     </div>
 
-                    {/* Status indicator */}
+                    <div className="contact-grid">
+                        {/* Contact Methods */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6 }}
+                            className="contact-methods-card"
+                        >
+                            <h4 className="card-title">
+                                <span className="bracket">{'{'}</span>
+                                Connect with me
+                                <span className="bracket">{'}'}</span>
+                            </h4>
+
+                            <div className="contact-methods">
+                                {contactMethods.map((method, index) => {
+                                    const IconComponent = method.icon
+                                    return (
+                                        <motion.a
+                                            key={index}
+                                            href={method.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ duration: 0.3, delay: index * 0.1 }}
+                                            whileHover={{ x: 5 }}
+                                            className="contact-method"
+                                        >
+                                            <div className="method-icon">
+                                                <IconComponent className={`w-5 h-5 ${method.color}`} />
+                                            </div>
+                                            <div className="method-info">
+                                                <div className="method-label">{method.label}</div>
+                                                <div className="method-value">{method.value}</div>
+                                            </div>
+                                            <div className="method-arrow">
+                                                <span>→</span>
+                                            </div>
+                                        </motion.a>
+                                    )
+                                })}
+                            </div>
+                        </motion.div>
+
+                        {/* Availability Info */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="availability-card"
+                        >
+                            <h4 className="card-title">
+                                <span className="bracket secondary">{'<'}</span>
+                                Current Status
+                                <span className="bracket secondary">{'/>'}</span>
+                            </h4>
+
+                            <div className="availability-info">
+                                {availability.map((item, index) => {
+                                    const IconComponent = item.icon
+                                    return (
+                                        <motion.div
+                                            key={index}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ duration: 0.3, delay: index * 0.1 + 0.2 }}
+                                            className="availability-item"
+                                        >
+                                            <div className="item-icon">
+                                                <IconComponent className={`w-5 h-5 ${item.color}`} />
+                                            </div>
+                                            <div className="item-info">
+                                                <div className="item-label">{item.label}</div>
+                                                <div className="item-value">{item.value}</div>
+                                            </div>
+                                        </motion.div>
+                                    )
+                                })}
+                            </div>
+
+                            {/* Status indicator */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6, delay: 0.8 }}
+                                className="status-indicator"
+                            >
+                                <div className="status-header">
+                                    <div className="status-dot available"></div>
+                                    <span className="status-text">AVAILABLE FOR HIRE</span>
+                                </div>
+                                <p className="status-description">
+                                    Currently seeking new opportunities in full-stack development,
+                                    particularly interested in React, Node.js, and cloud architecture projects.
+                                </p>
+                            </motion.div>
+                        </motion.div>
+                    </div>
+
+                    {/* Quick contact CTA */}
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.6, delay: 0.8 }}
-                        className="status-indicator"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        className="contact-cta"
                     >
-                        <div className="status-header">
-                            <div className="status-dot available"></div>
-                            <span className="status-text">AVAILABLE FOR HIRE</span>
-                        </div>
-                        <p className="status-description">
-                            Currently seeking new opportunities in full-stack development,
-                            particularly interested in React, Node.js, and cloud architecture projects.
-                        </p>
+                        <motion.a
+                            href={personalInfo?.email ? `mailto:${personalInfo.email}?subject=Let's work together!` : '#'}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="cta-button"
+                        >
+                            <Mail className="w-5 h-5" />
+                            Let's Build Something Amazing
+                        </motion.a>
                     </motion.div>
-                </motion.div>
-            </div>
 
-            {/* Quick contact CTA */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="contact-cta"
-            >
-                <motion.a
-                    href={personalInfo?.email ? `mailto:${personalInfo.email}?subject=Let's work together!` : '#'}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="cta-button"
-                >
-                    <Mail className="w-5 h-5" />
-                    Let's Build Something Amazing
-                </motion.a>
-            </motion.div>
-
-            {/* Contact Form */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="contact-form-section"
-            >
-                <h4 className="card-title">
-                    <span className="bracket">{'{'}</span>
-                    Send Message
-                    <span className="bracket">{'}'}</span>
-                </h4>
-
-                <form onSubmit={handleSubmit} className="contact-form">
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label htmlFor="name">Name *</label>
-                            <input
-                                type="text"
-                                id="name"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                required
-                                disabled={isSubmitting}
-                                className="form-input"
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="email">Email *</label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                required
-                                disabled={isSubmitting}
-                                className="form-input"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="subject">Subject</label>
-                        <input
-                            type="text"
-                            id="subject"
-                            name="subject"
-                            value={formData.subject}
-                            onChange={handleInputChange}
-                            disabled={isSubmitting}
-                            className="form-input"
-                            placeholder="Project inquiry, collaboration, etc."
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="message">Message *</label>
-                        <textarea
-                            id="message"
-                            name="message"
-                            value={formData.message}
-                            onChange={handleInputChange}
-                            required
-                            disabled={isSubmitting}
-                            rows={5}
-                            className="form-textarea"
-                            placeholder="Tell me about your project or how we can work together..."
-                        />
-                    </div>
-
-                    <motion.button
-                        type="submit"
-                        disabled={isSubmitting}
-                        whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                        whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                        className={`form-submit ${isSubmitting ? 'submitting' : ''}`}
+                    {/* Contact Form */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.6 }}
+                        className="contact-form-section"
                     >
-                        <Send className="w-5 h-5" />
-                        {isSubmitting ? 'Sending...' : 'Send Message'}
-                    </motion.button>
+                        <h4 className="card-title">
+                            <span className="bracket">{'{'}</span>
+                            Send Message
+                            <span className="bracket">{'}'}</span>
+                        </h4>
 
-                    {submitStatus === 'success' && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="form-message success"
-                        >
-                            ✅ Message sent successfully! I'll get back to you soon.
-                        </motion.div>
-                    )}
+                        <form onSubmit={handleSubmit} className="contact-form">
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label htmlFor="name">Name *</label>
+                                    <input
+                                        type="text"
+                                        id="name"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        required
+                                        disabled={isSubmitting}
+                                        className="form-input"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="email">Email *</label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        required
+                                        disabled={isSubmitting}
+                                        className="form-input"
+                                    />
+                                </div>
+                            </div>
 
-                    {submitStatus === 'error' && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="form-message error"
-                        >
-                            ❌ Failed to send message. Please try again or email me directly.
-                        </motion.div>
-                    )}
-                </form>
-            </motion.div>
-        </section>
+                            <div className="form-group">
+                                <label htmlFor="subject">Subject</label>
+                                <input
+                                    type="text"
+                                    id="subject"
+                                    name="subject"
+                                    value={formData.subject}
+                                    onChange={handleInputChange}
+                                    disabled={isSubmitting}
+                                    className="form-input"
+                                    placeholder="Project inquiry, collaboration, etc."
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="message">Message *</label>
+                                <textarea
+                                    id="message"
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleInputChange}
+                                    required
+                                    disabled={isSubmitting}
+                                    rows={5}
+                                    className="form-textarea"
+                                    placeholder="Tell me about your project or how we can work together..."
+                                />
+                            </div>
+
+                            <motion.button
+                                type="submit"
+                                disabled={isSubmitting}
+                                whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+                                whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+                                className={`form-submit ${isSubmitting ? 'submitting' : ''}`}
+                            >
+                                <Send className="w-5 h-5" />
+                                {isSubmitting ? 'Sending...' : 'Send Message'}
+                            </motion.button>
+
+                            {submitStatus === 'success' && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="form-message success"
+                                >
+                                    ✅ Message sent successfully! I'll get back to you soon.
+                                </motion.div>
+                            )}
+
+                            {submitStatus === 'error' && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="form-message error"
+                                >
+                                    ❌ Failed to send message. Please try again or email me directly.
+                                </motion.div>
+                            )}
+                        </form>
+                    </motion.div>
+                </motion.section>
+            )}
+        </AnimatePresence>
     )
 }
 

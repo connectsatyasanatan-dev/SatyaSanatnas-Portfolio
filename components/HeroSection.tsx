@@ -4,6 +4,20 @@ import { Play, Github, Linkedin, Download, Terminal, X, CheckCircle2, Cpu, Zap, 
 import { useState, useEffect, useRef } from 'react'
 import portfolioAPI, { PersonalInfo, PortfolioStats, Achievements } from '@/lib/api'
 import { HeroSectionSkeleton } from './AppSkeletons'
+import { AnimatePresence, motion } from 'framer-motion'
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+        opacity: 1,
+        transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+    }
+}
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+}
 
 const HeroSection = () => {
     const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null)
@@ -36,16 +50,12 @@ const HeroSection = () => {
         fetch()
     }, [])
 
-    if (loading) {
-        return <HeroSectionSkeleton />
-    }
-
     const codeLines = [
         { text: "// Welcome to my digital workspace", type: "comment" },
         { text: "", type: "empty" },
         { text: `import { Human, Developer } from '@universe/core';`, type: "import" },
         { text: "", type: "empty" },
-        { text: `const ${personalInfo?.name?.replace(/\s+/g, '') || 'Developer'} = new Developer  ;`, type: "const" },
+        { text: `const ${personalInfo?.name?.replace(/\s+/g, '') || 'Developer'} = new Developer;`, type: "const" },
         { text: "", type: "empty" },
         { text: `${personalInfo?.name?.replace(/\s+/g, '') || 'Developer'}.configure({`, type: "configure" },
         { text: `  role: '${personalInfo?.role || ''}',`, type: "role" },
@@ -79,7 +89,6 @@ const HeroSection = () => {
             if (currentLog < logs.length) {
                 setTerminalLogs(prev => [...prev, logs[currentLog]])
                 currentLog++
-                // Auto-scroll terminal
                 if (terminalRef.current) {
                     terminalRef.current.scrollTop = terminalRef.current.scrollHeight
                 }
@@ -206,175 +215,191 @@ const HeroSection = () => {
         }
     }
 
-    // Derived stats
     const yearsExp = stats?.experience_years ?? achievements?.stats.yearsOfExperience ?? 0
     const projectsCount = stats?.projects_count ?? achievements?.stats.projectsCompleted ?? 0
     const clientsCount = achievements?.stats.clientsSatisfied ?? 0
-    // Satisfaction rate not typically tracked in simple stats, defaulting to 100% or hiding if 0 clients
     const satisfactionRate = clientsCount > 0 ? 100 : 0
 
     return (
-        <section id="hero-section">
-            <div className="hero-container">
-                {/* Window controls */}
-                <div className="window-controls">
-                    <div className="window-dots">
-                        <div className="window-dot red"></div>
-                        <div className="window-dot yellow"></div>
-                        <div className="window-dot green"></div>
-                    </div>
-                    <div className="window-status">Read-Only</div>
-                </div>
-
-                {/* Code content */}
-                <div className="code-content code-block">
-                    {codeLines.map((line, index) => (
-                        <div key={index} className="code-line">
-                            {renderCodeLine(line, index)}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Execute button */}
-                <div className="execute-bar">
-                    <button className="execute-btn" onClick={handleExecuteClick}>
-                        <Play />
-                        <span className="btn-text-full">Execute Code</span>
-                        <span className="btn-text-short">Run</span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Execution Modal */}
-            {isExecuting && (
-                <div className="execution-modal-overlay">
-                    <div className="execution-modal-content glass-panel animate-delay-1">
-                        <div className="execution-modal-header">
-                            <div className="header-left">
-                                <Terminal size={18} />
-                                <span>Execution Terminal</span>
+        <AnimatePresence mode="wait">
+            {loading ? (
+                <motion.div 
+                    key="skeleton"
+                    initial={{ opacity: 1 }}
+                    exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <HeroSectionSkeleton />
+                </motion.div>
+            ) : (
+                <motion.section 
+                    key="hero-content"
+                    className="hero-modern" 
+                    id="hero-section"
+                    initial="hidden"
+                    animate="visible"
+                    variants={containerVariants}
+                >
+                    <div className="hero-container">
+                        <div className="window-controls">
+                            <div className="window-dots">
+                                <div className="window-dot red"></div>
+                                <div className="window-dot yellow"></div>
+                                <div className="window-dot green"></div>
                             </div>
-                            <button className="close-btn" onClick={closeExecutionModal}>
-                                <X size={20} />
+                            <div className="window-status">Read-Only</div>
+                        </div>
+
+                        <div className="code-content code-block">
+                            {codeLines.map((line, index) => (
+                                <div key={index} className="code-line">
+                                    {renderCodeLine(line, index)}
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="execute-bar">
+                            <button className="execute-btn" onClick={handleExecuteClick}>
+                                <Play />
+                                <span className="btn-text-full">Execute Code</span>
+                                <span className="btn-text-short">Run</span>
                             </button>
                         </div>
+                    </div>
 
-                        <div className="execution-modal-body">
-                            {executionStep === 1 && (
-                                <div className="terminal-wrapper" ref={terminalRef}>
-                                    {terminalLogs.map((log, idx) => (
-                                        <div key={idx} className={`terminal-line ${log && typeof log === 'string' && log.includes('SUCCESS') ? 'text-primary' : 'text-white'}`}>
-                                            {log}
-                                        </div>
-                                    ))}
-                                    <div className="blinking-cursor"></div>
-                                </div>
-                            )}
-
-                            {executionStep === 2 && (
-                                <div className="success-profile-card">
-                                    <div className="profile-badge">
-                                        <CheckCircle2 size={48} className="text-primary" />
-                                        <h2>Compilation Successful</h2>
+                    {isExecuting && (
+                        <div className="execution-modal-overlay">
+                            <div className="execution-modal-content glass-panel animate-delay-1">
+                                <div className="execution-modal-header">
+                                    <div className="header-left">
+                                        <Terminal size={18} />
+                                        <span>Execution Terminal</span>
                                     </div>
-                                    
-                                    <div className="profile-content">
-                                        <div className="profile-main-info">
-                                            <h3>{personalInfo?.name}</h3>
-                                            <p className="text-primary">{personalInfo?.role}</p>
-                                        </div>
-
-                                        <div className="profile-grid">
-                                            <div className="profile-grid-item">
-                                                <Cpu size={16} className="text-accent" />
-                                                <div>
-                                                    <span className="label">Stack</span>
-                                                    <span className="value">Full Stack</span>
-                                                </div>
-                                            </div>
-                                            <div className="profile-grid-item">
-                                                <Zap size={16} className="text-secondary" />
-                                                <div>
-                                                    <span className="label">Performance</span>
-                                                    <span className="value">Optimal</span>
-                                                </div>
-                                            </div>
-                                            <div className="profile-grid-item">
-                                                <Globe size={16} className="text-primary" />
-                                                <div>
-                                                    <span className="label">Availability</span>
-                                                    <span className="value">Remote / On-site</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="profile-actions">
-                                            <button className="hero-btn primary" onClick={handleEmailClick}>
-                                                <Play size={16} /> Hire Now
-                                            </button>
-                                            <button className="hero-btn secondary" onClick={handleResumeClick}>
-                                                <Download size={16} /> Profile.pdf
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <button className="close-btn" onClick={closeExecutionModal}>
+                                        <X size={20} />
+                                    </button>
                                 </div>
-                            )}
+
+                                <div className="execution-modal-body">
+                                    {executionStep === 1 && (
+                                        <div className="terminal-wrapper" ref={terminalRef}>
+                                            {terminalLogs.map((log, idx) => (
+                                                <div key={idx} className={`terminal-line ${log && typeof log === 'string' && log.includes('SUCCESS') ? 'text-primary' : 'text-white'}`}>
+                                                    {log}
+                                                </div>
+                                            ))}
+                                            <div className="blinking-cursor"></div>
+                                        </div>
+                                    )}
+
+                                    {executionStep === 2 && (
+                                        <div className="success-profile-card">
+                                            <div className="profile-badge">
+                                                <CheckCircle2 size={48} className="text-primary" />
+                                                <h2>Compilation Successful</h2>
+                                            </div>
+                                            
+                                            <div className="profile-content">
+                                                <div className="profile-main-info">
+                                                    <h3>{personalInfo?.name}</h3>
+                                                    <p className="text-primary">{personalInfo?.role}</p>
+                                                </div>
+
+                                                <div className="profile-grid">
+                                                    <div className="profile-grid-item">
+                                                        <Cpu size={16} className="text-accent" />
+                                                        <div>
+                                                            <span className="label">Stack</span>
+                                                            <span className="value">Full Stack</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="profile-grid-item">
+                                                        <Zap size={16} className="text-secondary" />
+                                                        <div>
+                                                            <span className="label">Performance</span>
+                                                            <span className="value">Optimal</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="profile-grid-item">
+                                                        <Globe size={16} className="text-primary" />
+                                                        <div>
+                                                            <span className="label">Availability</span>
+                                                            <span className="value">Remote / On-site</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="profile-actions">
+                                                    <button className="hero-btn primary" onClick={handleEmailClick}>
+                                                        <Play size={16} /> Hire Now
+                                                    </button>
+                                                    <button className="hero-btn secondary" onClick={handleResumeClick}>
+                                                        <Download size={16} /> Profile.pdf
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
+                    )}
+
+                    <div className="hero-info">
+                        <div className="hero-bio">
+                            <motion.h1 className="hero-name" variants={itemVariants} style={{ fontSize: 'var(--text-3xl)' }}>
+                                {personalInfo?.name || 'Developer'}
+                            </motion.h1>
+                            <motion.p className="hero-title" variants={itemVariants} style={{ fontSize: 'var(--text-2xl)', fontWeight: 700 }}>
+                                {personalInfo?.title || ''}
+                            </motion.p>
+                            <motion.p className="hero-description" variants={itemVariants} style={{ fontSize: 'var(--text-lg)' }}>
+                                {personalInfo?.bio || ''}
+                            </motion.p>
+                        </div>
+
+                        <motion.div className="hero-actions" variants={itemVariants}>
+                            <button className="hero-btn primary" onClick={handleGithubClick}>
+                                <Github />
+                                <span className="btn-text-full">Browse Repo</span>
+                                <span className="btn-text-short">GitHub</span>
+                            </button>
+
+                            <button className="hero-btn secondary" onClick={handleResumeClick}>
+                                <Download />
+                                <span className="btn-text-full">Download CV</span>
+                                <span className="btn-text-short">Resume</span>
+                            </button>
+
+                            <button className="hero-btn accent" onClick={handleLinkedinClick}>
+                                <Linkedin />
+                                <span className="btn-text-full">Connect</span>
+                                <span className="btn-text-short">LinkedIn</span>
+                            </button>
+                        </motion.div>
+
+                        <motion.div className="hero-stats" variants={itemVariants}>
+                            <div className="stat-item hover-scale">
+                                <div className="stat-value primary">{yearsExp}+</div>
+                                <div className="stat-label">Years Exp</div>
+                            </div>
+                            <div className="stat-item hover-scale">
+                                <div className="stat-value secondary">{projectsCount}+</div>
+                                <div className="stat-label">Projects</div>
+                            </div>
+                            <div className="stat-item hover-scale">
+                                <div className="stat-value accent">{clientsCount}+</div>
+                                <div className="stat-label">Clients</div>
+                            </div>
+                            <div className="stat-item hover-scale">
+                                <div className="stat-value green">{satisfactionRate}%</div>
+                                <div className="stat-label">Satisfaction</div>
+                            </div>
+                        </motion.div>
                     </div>
-                </div>
+                </motion.section>
             )}
-
-            {/* Personal Info & Action buttons */}
-            <div className="hero-info">
-                {/* Bio */}
-                <div className="hero-bio">
-                    <h1 className="hero-name">{personalInfo?.name || (loading ? 'Loading...' : 'No name')}</h1>
-                    <p className="hero-title">{personalInfo?.title || ''}</p>
-                    <p className="hero-description">{personalInfo?.bio || ''}</p>
-                </div>
-
-                {/* Action buttons */}
-                <div className="hero-actions">
-                    <button className="hero-btn primary" onClick={handleGithubClick}>
-                        <Github />
-                        <span className="btn-text-full">Browse Repo</span>
-                        <span className="btn-text-short">GitHub</span>
-                    </button>
-
-                    <button className="hero-btn secondary" onClick={handleResumeClick}>
-                        <Download />
-                        <span className="btn-text-full">Download CV</span>
-                        <span className="btn-text-short">Resume</span>
-                    </button>
-
-                    <button className="hero-btn accent" onClick={handleLinkedinClick}>
-                        <Linkedin />
-                        <span className="btn-text-full">Connect</span>
-                        <span className="btn-text-short">LinkedIn</span>
-                    </button>
-                </div>
-
-                {/* Quick stats */}
-                <div className="hero-stats">
-                    <div className="stat-item">
-                        <div className="stat-value primary">{yearsExp}+</div>
-                        <div className="stat-label">Years Exp</div>
-                    </div>
-                    <div className="stat-item">
-                        <div className="stat-value secondary">{projectsCount}+</div>
-                        <div className="stat-label">Projects</div>
-                    </div>
-                    <div className="stat-item">
-                        <div className="stat-value accent">{clientsCount}+</div>
-                        <div className="stat-label">Clients</div>
-                    </div>
-                    <div className="stat-item">
-                        <div className="stat-value green">{satisfactionRate}%</div>
-                        <div className="stat-label">Satisfaction</div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        </AnimatePresence>
     )
 }
 

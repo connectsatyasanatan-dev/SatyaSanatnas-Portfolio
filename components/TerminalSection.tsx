@@ -1,7 +1,7 @@
 'use client'
 
 import { Terminal, Minimize2, Maximize2, X } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { TerminalSectionSkeleton } from './AppSkeletons'
 
@@ -99,111 +99,120 @@ const TerminalSection = () => {
         return () => clearTimeout(timer)
     }, [])
 
-    if (isLoading) {
-        return <TerminalSectionSkeleton />
-    }
-
     return (
-        <section id="terminal-section">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className={`terminal-window ${isMinimized ? 'minimized' : ''}`}
-            >
-                {/* Terminal header */}
-                <div className="terminal-header">
-                    <div className="terminal-title">
-                        <Terminal className="w-4 h-4 text-primary" />
-                        <span className="title-text">Terminal</span>
-                        <span className="title-info">— zsh — 80×24</span>
-                    </div>
-                    <div className="terminal-controls">
-                        <button
-                            onClick={() => setIsMinimized(!isMinimized)}
-                            className="control-btn"
-                        >
-                            {isMinimized ? (
-                                <Maximize2 className="w-3 h-3 text-text-dim hover:text-white" />
-                            ) : (
-                                <Minimize2 className="w-3 h-3 text-text-dim hover:text-white" />
-                            )}
-                        </button>
-                        <button className="control-btn close">
-                            <X className="w-3 h-3 text-text-dim hover:text-red-400" />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Terminal content */}
-                {!isMinimized && (
-                    <div className="terminal-content">
-                        <div className="terminal-output">
-                            <div className="terminal-scroll">
-                                {/* Static logs */}
-                                {terminalLogs.map((log, index) => (
-                                    <motion.div
-                                        key={index}
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ duration: 0.1, delay: index * 0.05 }}
-                                        className={`terminal-line ${log.startsWith('$') ? 'command' :
-                                            log.includes('✔') || log.includes('✅') ? 'success' :
-                                                log.includes('🔗') || log.includes('🔍') ? 'info' :
-                                                    log.includes('modified:') || log.includes('new file:') ? 'warning' :
-                                                        log.includes('Ready for new opportunities!') ? 'highlight' :
-                                                            log.startsWith('  ') ? 'dim' :
-                                                                'default'
-                                            }`}
-                                    >
-                                        {log || '\u00A0'}
-                                    </motion.div>
-                                ))}
+        <AnimatePresence mode="wait">
+            {isLoading ? (
+                <motion.div 
+                    key="skeleton-terminal"
+                    initial={{ opacity: 1 }}
+                    exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <TerminalSectionSkeleton />
+                </motion.div>
+            ) : (
+                <motion.section 
+                    key="terminal-content-root" 
+                    id="terminal-section"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                    <motion.div
+                        className={`terminal-window ${isMinimized ? 'minimized' : ''}`}
+                    >
+                        {/* Terminal header */}
+                        <div className="terminal-header">
+                            <div className="terminal-title">
+                                <Terminal className="w-4 h-4 text-primary" />
+                                <span className="title-text">Terminal</span>
+                                <span className="title-info">— zsh — 80×24</span>
                             </div>
-
-                            {/* Command history */}
-                            {commandHistory.map((cmd, index) => (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="terminal-line command"
+                            <div className="terminal-controls">
+                                <button
+                                    onClick={() => setIsMinimized(!isMinimized)}
+                                    className="control-btn"
                                 >
-                                    {cmd}
-                                </motion.div>
-                            ))}
-
-                            {/* Current typing command */}
-                            <div className="terminal-line command current">
-                                <span>$ {currentCommand}</span>
-                                <span className="cursor">|</span>
+                                    {isMinimized ? (
+                                        <Maximize2 className="w-3 h-3 text-text-dim hover:text-white" />
+                                    ) : (
+                                        <Minimize2 className="w-3 h-3 text-text-dim hover:text-white" />
+                                    )}
+                                </button>
+                                <button className="control-btn close">
+                                    <X className="w-3 h-3 text-text-dim hover:text-red-400" />
+                                </button>
                             </div>
                         </div>
-                    </div>
-                )}
-            </motion.div>
 
-            {/* Terminal stats */}
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="terminal-stats"
-            >
-                <div className="stat-indicator">
-                    <div className="status-dot online"></div>
-                    <span>System Online</span>
-                </div>
-                <div className="stat-indicator">
-                    <div className="status-dot success"></div>
-                    <span>Build: Successful</span>
-                </div>
-                <div className="stat-indicator">
-                    <div className="status-dot warning"></div>
-                    <span>Deploy: Ready</span>
-                </div>
-            </motion.div>
-        </section>
+                        {/* Terminal content */}
+                        {!isMinimized && (
+                            <div className="terminal-content">
+                                <div className="terminal-logs">
+                                    {terminalLogs.map((log, index) => (
+                                        <motion.div
+                                            key={index}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.3, delay: index * 0.05 }}
+                                            className={`terminal-line ${log.startsWith('$') ? 'command' :
+                                                log.includes('✔') || log.includes('✅') ? 'success' :
+                                                    log.includes('🔗') || log.includes('🔍') ? 'info' :
+                                                        log.includes('modified:') || log.includes('new file:') ? 'warning' :
+                                                            log.includes('Ready for new opportunities!') ? 'highlight' :
+                                                                log.startsWith('  ') ? 'dim' :
+                                                                    'default'
+                                                }`}
+                                        >
+                                            {log || '\u00A0'}
+                                        </motion.div>
+                                    ))}
+                                </div>
+
+                                {/* Command history */}
+                                {commandHistory.map((cmd, index) => (
+                                    <motion.div
+                                        key={index}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="terminal-line command"
+                                    >
+                                        {cmd}
+                                    </motion.div>
+                                ))}
+
+                                {/* Current typing command */}
+                                <div className="terminal-line command current">
+                                    <span>$ {currentCommand}</span>
+                                    <span className="cursor">|</span>
+                                </div>
+                            </div>
+                        )}
+                    </motion.div>
+
+                    {/* Terminal stats */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="terminal-stats"
+                    >
+                        <div className="stat-indicator">
+                            <div className="status-dot online"></div>
+                            <span>System Online</span>
+                        </div>
+                        <div className="stat-indicator">
+                            <div className="status-dot success"></div>
+                            <span>Build: Successful</span>
+                        </div>
+                        <div className="stat-indicator">
+                            <div className="status-dot warning"></div>
+                            <span>Deploy: Ready</span>
+                        </div>
+                    </motion.div>
+                </motion.section>
+            )}
+        </AnimatePresence>
     )
 }
 

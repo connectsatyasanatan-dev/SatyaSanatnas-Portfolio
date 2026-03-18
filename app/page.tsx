@@ -30,75 +30,39 @@ export default function Home() {
 
             {!isLoading && (
                 <motion.div 
-                    id="portfolio-app" 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    style={{
-                        height: '100vh',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        background: 'var(--background-dark)',
-                        overflow: 'hidden'
-                    }}
+                    className="app-container"
                 >
-            <Header />
+                    <Header />
 
-            <div style={{
-                display: 'flex',
-                flex: 1,
-                height: '100%',
-                overflow: 'hidden'
-            }}>
-                <ResizableSidebar
-                    minWidth={200}
-                    maxWidth={600}
-                    defaultWidth={288}
-                />
+                    <div className="app-body">
+                        <ResizableSidebar
+                            minWidth={200}
+                            maxWidth={600}
+                            defaultWidth={288}
+                        />
 
-                <main style={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    minWidth: 0,
-                    background: 'var(--editor-bg)',
-                    position: 'relative',
-                    height: '100%',
-                    overflow: 'hidden'
-                }}>
-                    {/* Grid pattern background */}
-                    <div className="grid-pattern" style={{
-                        position: 'absolute',
-                        inset: 0,
-                        backgroundSize: '20px 20px',
-                        opacity: 0.03,
-                        pointerEvents: 'none',
-                        zIndex: 0
-                    }}></div>
+                        <main className="editor-main">
+                            <div className="grid-overlay grid-pattern" />
 
-                    <TabBar />
+                            <TabBar />
 
-                    {/* Main content - this is the scrollable area */}
-                    <div className="main-content" style={{
-                        flex: 1,
-                        overflowY: 'auto',
-                        overflowX: 'hidden',
-                        position: 'relative',
-                        zIndex: 1
-                    }}>
-                        <HeroSection />
-                        <SkillsSection />
-                        <GitHistory />
-                        <EducationSection />
-                        <CertificationsSection />
-                        <ProjectsSection />
-                        <TestimonialsSection />
-                        <BlogSection />
-                        <TerminalSection />
-                        <ContactSection />
+                            <div className="main-content">
+                                <HeroSection />
+                                <SkillsSection />
+                                <GitHistory />
+                                <EducationSection />
+                                <CertificationsSection />
+                                <ProjectsSection />
+                                <TestimonialsSection />
+                                <BlogSection />
+                                <TerminalSection />
+                                <ContactSection />
+                            </div>
+                        </main>
                     </div>
-                </main>
-            </div>
                 </motion.div>
             )}
         </>
