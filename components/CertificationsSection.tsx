@@ -37,7 +37,7 @@ const CertificationsSection = () => {
     return (
         <AnimatePresence mode="wait">
             {loading ? (
-                <motion.div 
+                <motion.div
                     key="skeleton-certifications"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
@@ -46,7 +46,7 @@ const CertificationsSection = () => {
                     <CertificationsSectionSkeleton />
                 </motion.div>
             ) : certifications.length === 0 ? null : (
-                <motion.section 
+                <motion.section
                     key="certifications-content"
                     id="certifications-section"
                     initial={{ opacity: 0, y: 20 }}
@@ -473,7 +473,7 @@ const CertificationsSection = () => {
                         {certifications.map((cert, index) => {
                             const isValid = cert.validity?.includes('2025') || cert.validity?.includes('2026') || cert.validity?.toLowerCase().includes('no expiration');
                             const isOracle = cert.name.toLowerCase().includes('oracle') || cert.issuer.toLowerCase().includes('oracle');
-                            
+
                             return (
                                 <motion.div
                                     key={index}
@@ -487,10 +487,10 @@ const CertificationsSection = () => {
                                     <div className="cert-header">
                                         <div className={`cert-icon-wrapper ${isOracle ? 'has-image' : ''}`}>
                                             {isOracle ? (
-                                                <img 
-                                                    src="/images/oci-badge.png" 
-                                                    alt="Oracle Certification Badge" 
-                                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                                <img
+                                                    src="/images/oci-badge.png"
+                                                    alt="Oracle Certification Badge"
+                                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                                 />
                                             ) : (
                                                 <Award size={28} />
@@ -511,7 +511,7 @@ const CertificationsSection = () => {
                                         )}
                                         {cert.validity && (
                                             <div className="cert-meta-item">
-                                                <span 
+                                                <span
                                                     className="cert-status-indicator"
                                                     style={{ color: isValid ? '#22c55e' : '#eab308' }}
                                                 />
@@ -577,7 +577,7 @@ const CertificationsSection = () => {
                                                 <div className="cert-modal-detail-label">
                                                     <Activity size={14} /> Status
                                                 </div>
-                                                <div className="cert-modal-detail-value" style={{ 
+                                                <div className="cert-modal-detail-value" style={{
                                                     color: (selectedCert.validity.includes('2025') || selectedCert.validity.includes('2026') || selectedCert.validity.toLowerCase().includes('no expiration')) ? '#4ade80' : '#facc15'
                                                 }}>
                                                     {selectedCert.validity}

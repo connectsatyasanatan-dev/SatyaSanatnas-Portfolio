@@ -284,8 +284,12 @@ const TestimonialsSection = () => {
                                         className="testi-slide"
                                     >
                                         <div className="testi-meta-row">
-                                            <div className="testi-avatar-placeholder">
-                                                <User size={32} className="text-white/40" />
+                                            <div className="testi-avatar-placeholder" style={{ padding: 0, overflow: 'hidden', background: 'linear-gradient(135deg, rgba(255,255,255,0.05), transparent)' }}>
+                                                <img 
+                                                    src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(active.name)}&backgroundColor=transparent`}
+                                                    alt={`${active.name} Avatar`}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                                />
                                             </div>
                                             <div className="testi-info">
                                                 <h4 className="testi-name">{active.name}</h4>

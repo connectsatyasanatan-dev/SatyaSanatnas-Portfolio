@@ -126,6 +126,194 @@ const ContactSection = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
                 >
+                    <style>{`
+                        .contact-form-section {
+                            background: rgba(15, 23, 42, 0.6) !important;
+                            backdrop-filter: blur(20px);
+                            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                            border-radius: 16px !important;
+                            padding: 24px !important;
+                            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5) !important;
+                            position: relative;
+                            overflow: hidden;
+                        }
+
+                        @media (min-width: 768px) {
+                            .contact-form-section {
+                                padding: 36px !important;
+                                border-radius: 20px !important;
+                            }
+                        }
+
+                        .contact-form-section::before {
+                            content: '';
+                            position: absolute;
+                            top: -100%; left: -100%; width: 300%; height: 300%;
+                            background: radial-gradient(circle at 50% 50%, rgba(244, 63, 94, 0.12) 0%, rgba(139, 92, 246, 0.12) 25%, transparent 50%);
+                            animation: aurora 15s linear infinite;
+                            z-index: 0;
+                            pointer-events: none;
+                        }
+
+                        @keyframes aurora {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+
+                        .contact-form-section > * {
+                            position: relative;
+                            z-index: 1;
+                        }
+
+                        .contact-form-section .card-title {
+                            color: white;
+                            margin-bottom: 24px !important;
+                            text-align: center;
+                            font-size: 20px !important;
+                            font-weight: 700 !important;
+                            letter-spacing: -0.01em;
+                            display: flex;
+                            align-items: left;
+                            justify-content: left;
+                            gap: 8px;
+                        }
+                        
+                        @media (min-width: 768px) {
+                            .contact-form-section .card-title {
+                                font-size: 24px !important;
+                                margin-bottom: 32px !important;
+                            }
+                        }
+
+                        .contact-form-section .card-title .bracket {
+                            color: #f43f5e;
+                            font-weight: 400;
+                        }
+
+                        .form-row {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 16px;
+                            margin-bottom: 16px;
+                        }
+
+                        @media (min-width: 768px) {
+                            .form-row {
+                                flex-direction: row;
+                                gap: 20px;
+                            }
+                            .form-row .form-group {
+                                flex: 1;
+                                margin-bottom: 0;
+                            }
+                        }
+
+                        .form-group {
+                            margin-bottom: 16px;
+                        }
+
+                        .form-group label {
+                            color: rgba(255, 255, 255, 0.6);
+                            font-size: 11px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.1em;
+                            margin-bottom: 8px;
+                            display: block;
+                            transition: color 0.3s;
+                        }
+
+                        .form-group:focus-within label {
+                            color: #f43f5e;
+                        }
+
+                        .form-input, .form-textarea {
+                            width: 100%;
+                            background: rgba(0, 0, 0, 0.25) !important;
+                            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                            border-radius: 10px !important;
+                            padding: 12px 16px !important;
+                            color: white !important;
+                            font-size: 14px !important;
+                            font-family: inherit;
+                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+                        }
+                        
+                        .form-textarea {
+                            min-height: 120px;
+                            resize: vertical;
+                        }
+
+                        .form-input::placeholder, .form-textarea::placeholder {
+                            color: rgba(255, 255, 255, 0.3);
+                        }
+
+                        .form-input:focus, .form-textarea:focus {
+                            outline: none !important;
+                            background: rgba(0, 0, 0, 0.4) !important;
+                            border-color: rgba(244, 63, 94, 0.6) !important;
+                            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15), inset 0 2px 4px rgba(0,0,0,0.2) !important;
+                            transform: translateY(-1px);
+                        }
+
+                        .form-submit {
+                            width: 100%;
+                            background: linear-gradient(135deg, #f43f5e 0%, #8b5cf6 50%, #3b82f6 100%) !important;
+                            background-size: 200% auto !important;
+                            color: white !important;
+                            border: none !important;
+                            border-radius: 10px !important;
+                            padding: 14px 24px !important;
+                            font-size: 14px !important;
+                            font-weight: 700 !important;
+                            text-transform: uppercase;
+                            letter-spacing: 0.08em;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 10px;
+                            cursor: pointer;
+                            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                            box-shadow: 0 8px 20px -5px rgba(244, 63, 94, 0.4) !important;
+                            position: relative;
+                            overflow: hidden;
+                            margin-top: 8px;
+                        }
+
+                        .form-submit::before {
+                            content: '';
+                            position: absolute;
+                            top: 0; left: -100%; width: 50%; height: 100%;
+                            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                            transform: skewX(-20deg);
+                            transition: all 0.7s ease;
+                        }
+
+                        .form-submit:hover {
+                            background-position: right center !important;
+                            box-shadow: 0 15px 30px -5px rgba(139, 92, 246, 0.5) !important;
+                            transform: translateY(-2px);
+                        }
+
+                        .form-submit:hover::before {
+                            left: 200%;
+                        }
+
+                        .send-icon {
+                            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                        }
+
+                        .form-submit:hover .send-icon {
+                            transform: translateX(4px) translateY(-4px) rotate(15deg) scale(1.1);
+                        }
+
+                        .form-submit.submitting {
+                            opacity: 0.8 !important;
+                            cursor: wait !important;
+                            transform: scale(0.98) !important;
+                        }
+                    `}</style>
                     <div className="section-header">
                         <Mail className="w-5 h-5 text-primary" />
                         <h3 className="section-title">Contact & Availability</h3>
@@ -331,11 +519,9 @@ const ContactSection = () => {
                             <motion.button
                                 type="submit"
                                 disabled={isSubmitting}
-                                whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                                whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                                 className={`form-submit ${isSubmitting ? 'submitting' : ''}`}
                             >
-                                <Send className="w-5 h-5" />
+                                <Send className="w-5 h-5 send-icon" />
                                 {isSubmitting ? 'Sending...' : 'Send Message'}
                             </motion.button>
 
