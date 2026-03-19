@@ -1,4 +1,4 @@
-﻿/* Git History Section Styles */
+/* Git History Section Styles */
 #git-history-section {
   max-width: 1536px;
   margin: 0 auto 48px auto;
@@ -506,3 +506,48 @@
   }
 }
 
+/* Extra small screen git history fixes */
+@media (max-width: 480px) {
+  #git-history-section {
+    padding: 0 8px;
+  }
+
+  #git-history-section .timeline-main {
+    padding-left: 24px;
+  }
+
+  #git-history-section .timeline-dot {
+    left: -24px;
+  }
+
+  #git-history-section .timeline-dot-inner {
+    width: 32px;
+    height: 32px;
+  }
+
+  #git-history-section .timeline-dot svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  #git-history-section .timeline-content {
+    padding: 16px;
+  }
+
+  #git-history-section .timeline-title {
+    font-size: 15px;
+  }
+
+  #git-history-section .timeline-description {
+    font-size: 13px;
+  }
+
+  #git-history-section .timeline-item {
+    margin-bottom: 32px;
+  }
+
+  #git-history-section .tech-tag {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}

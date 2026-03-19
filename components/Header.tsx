@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Settings, Bell, Terminal } from 'lucide-react'
+import { Play, Settings, Bell, Menu, X } from 'lucide-react'
 
 const languageSequences = [
     {
@@ -67,12 +67,32 @@ const Header = () => {
         }
     }, [phase, seqIndex])
 
+    const [isMenuOpen, setIsMenuOpen] = useState(false)
+    
+    // Toggle class on app-container which can then control the sidebar visibility
+    const toggleSidebar = () => {
+        const isOpen = !isMenuOpen
+        setIsMenuOpen(isOpen)
+        const appBody = document.querySelector('.app-body')
+        if (appBody) {
+            if (isOpen) {
+                appBody.classList.add('mobile-sidebar-open')
+            } else {
+                appBody.classList.remove('mobile-sidebar-open')
+            }
+        }
+    }
+
     return (
         <header id="portfolio-header">
             <div className="header-left">
-                {/* <div className="header-logo">
-                    <Terminal />
-                </div> */}
+                <button 
+                    className="mobile-menu-btn" 
+                    onClick={toggleSidebar}
+                    aria-label="Toggle Sidebar"
+                >
+                    {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
                 
                 {/* Title Container replaces hardcoded width/display */}
                 <div className="header-title-container">
@@ -109,7 +129,8 @@ const Header = () => {
             <div className="header-right">
                 <div className="run-build-btn">
                     <Play className="play-icon" />
-                    <span>Run Build</span>
+                    <span className="btn-text-full">Run Build</span>
+                    <span className="btn-text-short">Run</span>
                 </div>
                 <div className="header-buttons">
                     <button className="header-btn">

@@ -6,10 +6,12 @@
   white-space: nowrap;
   border-bottom: 1px solid var(--border-color);
   background-color: var(--sidebar-bg);
-  padding: 8px 8px;
+  padding: 6px 12px;
   font-size: 12px;
-  z-index: 50;
+  z-index: 100;
   position: relative;
+  min-height: 44px;
+  flex-shrink: 0;
 }
 
 #portfolio-header .header-left {
@@ -24,10 +26,34 @@
   color: var(--primary);
 }
 
+#portfolio-header .mobile-menu-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  color: var(--primary);
+  cursor: pointer;
+  margin-right: 4px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+#portfolio-header .mobile-menu-btn:hover {
+  background-color: rgba(6, 249, 249, 0.1);
+  color: white;
+  border-color: var(--primary);
+}
+
 #portfolio-header .header-title-container {
   display: flex;
   align-items: center;
-  min-width: 240px;
+  min-width: 0;
+  max-width: 140px;
+  overflow: hidden;
 }
 
 #portfolio-header .header-title {
@@ -74,7 +100,7 @@
 }
 
 #portfolio-header .run-build-btn {
-  display: none;
+  display: flex;
   align-items: center;
   gap: 8px;
   padding: 4px 8px;
@@ -101,10 +127,18 @@
 }
 
 #portfolio-header .run-build-btn span {
-  color: var(--text-dim);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
+  font-size: 11px;
   transition: color 0.2s;
+}
+
+#portfolio-header .run-build-btn span.btn-text-full {
+  display: none;
+}
+
+#portfolio-header .run-build-btn span.btn-text-short {
+  display: inline;
+  color: var(--primary);
 }
 
 #portfolio-header .run-build-btn:hover span {
@@ -141,6 +175,24 @@
 }
 
 /* Responsive Header */
+@media (min-width: 480px) {
+  #portfolio-header .mobile-menu-btn {
+    display: none;
+  }
+
+  #portfolio-header .header-title-container {
+    max-width: 220px;
+  }
+
+  #portfolio-header .run-build-btn span.btn-text-short {
+    display: none;
+  }
+  
+  #portfolio-header .run-build-btn span.btn-text-full {
+    display: inline;
+  }
+}
+
 @media (min-width: 640px) {
   #portfolio-header {
     padding: 8px 16px;
@@ -148,6 +200,10 @@
   
   #portfolio-header .header-left {
     gap: 16px;
+  }
+
+  #portfolio-header .header-title-container {
+    max-width: 320px;
   }
   
   #portfolio-header .header-title {
@@ -186,6 +242,11 @@
 @media (min-width: 768px) {
   #portfolio-header {
     font-size: 14px;
+  }
+
+  #portfolio-header .header-title-container {
+    max-width: none;
+    min-width: 240px;
   }
   
   #portfolio-header .header-nav {
@@ -649,27 +710,48 @@ body.resizing * {
 
 /* Mobile sidebar adjustments */
 @media (max-width: 1023px) {
-  body {
-    overflow: auto;
-  }
-  
   html, body {
-    height: auto;
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
   }
   
-  #portfolio-app {
-    height: auto;
-    min-height: 100vh;
-    overflow: visible;
+  .app-container {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
   }
-  
-  #portfolio-app main {
-    overflow: visible;
-    height: auto;
+
+  .resizable-sidebar-container {
+    position: fixed;
+    top: 44px; /* header height */
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    background-color: var(--sidebar-bg);
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+    display: flex !important;
+    width: 280px !important;
   }
-  
-  #portfolio-app main .main-content {
-    overflow: visible;
+
+  .mobile-sidebar-open .resizable-sidebar-container {
+    transform: translateX(0);
   }
-}
+
+  /* Overlay when sidebar is open */
+  .mobile-sidebar-open::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    top: 44px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 900;
+  }
+
+  #portfolio-sidebar {
+    width: 280px !important;
+  }
+}

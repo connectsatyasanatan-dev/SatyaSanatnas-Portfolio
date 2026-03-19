@@ -52,14 +52,19 @@ const CertificationsSection = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    style={{ maxWidth: '1536px', margin: '0 auto 48px auto', padding: '0 16px', position: 'relative' }}
+                    style={{ maxWidth: '1536px', margin: '0 auto 48px auto', padding: '0 var(--space-4, 16px)', position: 'relative' }}
                 >
                     <style>{`
                         .certifications-grid {
                             display: grid;
-                            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                            grid-template-columns: 1fr;
                             gap: 24px;
                             margin-bottom: 32px;
+                        }
+                        @media (min-width: 720px) {
+                            .certifications-grid {
+                                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                            }
                         }
                         .certifications-grid.single-item {
                             grid-template-columns: 1fr;
@@ -460,6 +465,20 @@ const CertificationsSection = () => {
                             }
                             .cert-modal-details {
                                 grid-template-columns: 1fr;
+                            }
+                            .cert-modal-content {
+                                padding: 32px 20px;
+                            }
+                            .cert-modal-title {
+                                font-size: 22px;
+                            }
+                        }
+                        @media (max-width: 480px) {
+                            .cert-card {
+                                padding: 18px;
+                            }
+                            .cert-name {
+                                font-size: 16px;
                             }
                         }
                     `}</style>

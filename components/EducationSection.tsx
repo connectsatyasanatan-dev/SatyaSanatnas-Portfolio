@@ -461,7 +461,36 @@ const EducationSection = () => {
                             }
 
                             /* ── responsive ── */
-                            @media (max-width: 600px) {
+                            @media (max-width: 720px) {
+                                .edu-layout { grid-template-columns: 1fr; }
+                                .edu-nav {
+                                    flex-direction: row;
+                                    overflow-x: auto;
+                                    -webkit-overflow-scrolling: touch;
+                                    padding-bottom: 8px;
+                                    gap: 8px;
+                                }
+                                .edu-nav-item {
+                                    min-width: 220px;
+                                    flex-shrink: 0;
+                                }
+                            }
+                            @media (max-width: 480px) {
+                                .edu-detail-inner { padding: 16px 12px 14px; }
+                                .edu-detail-degree { font-size: 16px; }
+                                .edu-detail-school { font-size: 13px; }
+                                #edu-root { padding: 0 8px; margin-bottom: 48px; }
+                                .edu-header-title { font-size: 20px; }
+                                .edu-meta-pill { font-size: 11px; padding: 4px 8px; }
+                                .edu-chip { font-size: 11px; padding: 4px 8px; }
+                                .edu-nav-item {
+                                    min-width: 180px;
+                                    padding: 10px 12px;
+                                }
+                                .edu-nav-degree { font-size: 12px; }
+                                .edu-nav-school { font-size: 10px; }
+                            }
+                            @media (min-width: 481px) and (max-width: 600px) {
                                 .edu-detail-inner { padding: 20px 16px 18px; }
                                 .edu-detail-degree { font-size: 17px; }
                                 #edu-root { padding: 0 10px; }

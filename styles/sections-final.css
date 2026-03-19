@@ -458,6 +458,31 @@
   }
 }
 
+/* Extra small screen project fixes */
+@media (max-width: 480px) {
+  #projects-section .toggle-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    min-width: 50px;
+  }
+
+  #projects-section .project-content {
+    padding: 14px;
+  }
+
+  #projects-section .project-terminal {
+    height: 160px;
+    padding: 12px;
+    font-size: 11px;
+  }
+
+  #projects-section .project-footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}
+
 /* Testimonials Section Styles */
 #testimonials-section {
   max-width: 1536px;
@@ -1062,7 +1087,14 @@
 
 #blog-section .newsletter-form {
   display: flex;
+  flex-direction: column;
   gap: 8px;
+}
+
+@media (min-width: 480px) {
+  #blog-section .newsletter-form {
+    flex-direction: row;
+  }
 }
 
 #blog-section .newsletter-input {
@@ -1141,6 +1173,21 @@
   
   #blog-section .article-card.featured {
     grid-column: span 2;
+  }
+}
+
+/* Extra small screen blog fixes */
+@media (max-width: 480px) {
+  #blog-section .article-content {
+    padding: 16px;
+  }
+
+  #blog-section .article-title {
+    font-size: 16px;
+  }
+
+  #blog-section .stats-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1354,6 +1401,25 @@
   #terminal-section {
     margin-bottom: 80px;
     padding: 0;
+  }
+}
+
+/* Small screen terminal fixes */
+@media (max-width: 480px) {
+  #terminal-section .terminal-window {
+    height: 320px;
+  }
+
+  #terminal-section .terminal-content {
+    height: 260px;
+    font-size: 12px;
+    padding: 12px;
+  }
+
+  #terminal-section .terminal-stats {
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 11px;
   }
 }
 
@@ -1591,5 +1657,31 @@
   
   #contact-section .contact-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Small screen contact fixes */
+@media (max-width: 480px) {
+  #contact-section .contact-methods-card,
+  #contact-section .availability-card {
+    padding: 18px;
+  }
+
+  #contact-section .contact-method {
+    gap: 12px;
+    padding: 10px;
+  }
+
+  #contact-section .method-value,
+  #contact-section .item-value {
+    font-size: 12px;
+    word-break: break-all;
+  }
+
+  #contact-section .cta-button {
+    padding: 12px 24px;
+    font-size: 13px;
+    width: 100%;
+    justify-content: center;
   }
 }

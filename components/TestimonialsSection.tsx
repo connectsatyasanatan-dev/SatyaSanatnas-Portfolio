@@ -253,6 +253,75 @@ const TestimonialsSection = () => {
                                 top: 50%; left: 50%; transform: translate(-50%, -50%);
                                 pointer-events: none; z-index: -1;
                             }
+
+                            /* ── mobile responsive ── */
+                            @media (max-width: 600px) {
+                                #testimonials-root {
+                                    margin: 48px auto 64px auto;
+                                    padding: 0 8px;
+                                }
+                                .testi-header {
+                                    flex-direction: column;
+                                    align-items: flex-start;
+                                    gap: 12px;
+                                    margin-bottom: 28px;
+                                }
+                                .testi-header-title {
+                                    font-size: 22px;
+                                }
+                                .testi-header-badge {
+                                    font-size: 11px;
+                                    padding: 4px 10px;
+                                }
+                                .testi-container {
+                                    border-radius: 20px;
+                                }
+                                .testi-slide {
+                                    padding: 28px 20px 80px 20px;
+                                }
+                                .testi-slider {
+                                    min-height: 380px;
+                                }
+                                .testi-meta-row {
+                                    gap: 12px;
+                                    margin-bottom: 20px;
+                                }
+                                .testi-avatar-placeholder {
+                                    width: 52px;
+                                    height: 52px;
+                                    border-radius: 14px;
+                                }
+                                .testi-name {
+                                    font-size: 16px;
+                                }
+                                .testi-position {
+                                    font-size: 12px;
+                                }
+                                .testi-quote-text {
+                                    font-size: 16px;
+                                    margin-bottom: 24px;
+                                }
+                                .testi-nav {
+                                    right: 16px;
+                                    bottom: 16px;
+                                    gap: 8px;
+                                }
+                                .testi-btn {
+                                    width: 40px;
+                                    height: 40px;
+                                    border-radius: 12px;
+                                }
+                                .testi-dots {
+                                    left: 20px;
+                                    bottom: 24px;
+                                }
+                                .testi-quote-mark {
+                                    width: 60px;
+                                    height: 60px;
+                                    top: -10px;
+                                    left: -10px;
+                                }
+                            }
                         `}</style>
 
                         <div className="testi-header">

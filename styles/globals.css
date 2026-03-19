@@ -1,41 +1,46 @@
 /* CSS Variables - Advanced Design System */
 :root {
-  /* Colors */
-  --primary: #06f9f9;
-  --primary-rgb: 6, 249, 249;
-  --secondary: #ff00ff;
-  --secondary-rgb: 255, 0, 255;
-  --accent: #2de2e6;
-  --accent-rgb: 45, 226, 230;
-  --background-light: #f5f8f8;
-  --background-dark: #0f2323;
-  --editor-bg: #111818;
+  /* Portfolio Theme Colors - Cyan/Teal (Restored) */
+  --bg-color: #0f2323;
   --sidebar-bg: #0b1212;
+  --editor-bg: #111818;
   --border-color: #273a3a;
   --text-main: #ffffff;
   --text-dim: #9bbbbb;
+  --primary: #06f9f9;
+  --primary-rgb: 6, 249, 249;
+  --primary-glow: rgba(6, 249, 249, 0.3);
+  --secondary: #ff00ff;
+  --secondary-rgb: 255, 0, 255;
+  --accent: #2de2e6;
+  --error: #f85149;
   --glass-bg: rgba(11, 18, 18, 0.7);
   --hover-bg: rgba(39, 58, 58, 0.3);
+  
+  /* Fluid Spacing tokens (Min to Max) */
+  --space-1: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
+  --space-2: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);
+  --space-3: clamp(0.75rem, 0.6rem + 0.75vw, 1.5rem);
+  --space-4: clamp(1rem, 0.8rem + 1vw, 2rem);
+  --space-6: clamp(1.5rem, 1.2rem + 1.5vw, 3rem);
+  --space-8: clamp(2rem, 1.6rem + 2vw, 4rem);
+  --space-12: clamp(3rem, 2.4rem + 3vw, 6rem);
+  
+  /* Fluid Typography */
+  --font-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.85rem);
+  --font-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.95rem);
+  --font-base: clamp(0.9rem, 0.85rem + 0.25vw, 1.05rem);
+  --font-lg: clamp(1.1rem, 1rem + 0.5vw, 1.35rem);
+  --font-xl: clamp(1.4rem, 1.25rem + 0.75vw, 1.8rem);
+  --font-2xl: clamp(1.8rem, 1.6rem + 1vw, 2.5rem);
+  --font-3xl: clamp(2.2rem, 1.95rem + 1.25vw, 3.2rem);
+  --font-4xl: clamp(2.8rem, 2.4rem + 1.5vw, 4rem);
 
-  /* Spacing Scale (8px base) */
-  --space-1: 0.25rem; /* 4px */
-  --space-2: 0.5rem;  /* 8px */
-  --space-3: 0.75rem; /* 12px */
-  --space-4: 1rem;    /* 16px */
-  --space-6: 1.5rem;  /* 24px */
-  --space-8: 2rem;    /* 32px */
-  --space-12: 3rem;   /* 48px */
-  --space-16: 4rem;   /* 64px */
-
-  /* Typography Scale */
-  --text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
-  --text-sm: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-  --text-base: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
-  --text-lg: clamp(1rem, 0.95rem + 0.5vw, 1.25rem);
-  --text-xl: clamp(1.25rem, 1.1rem + 1vw, 1.75rem);
-  --text-2xl: clamp(1.5rem, 1.3rem + 1.5vw, 2.5rem);
-  --text-3xl: clamp(2rem, 1.8rem + 2vw, 4rem);
-
+  /* Utilities */
+  --header-height: clamp(40px, 36px + 1vw, 48px);
+  --tabbar-height: clamp(36px, 32px + 1vw, 44px);
+  --sidebar-width: clamp(200px, 15vw + 50px, 300px);
+  
   /* Shadows & Effects */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -59,21 +64,30 @@ body {
   overflow: hidden;
   font-family: 'Space Grotesk', sans-serif;
   height: 100vh;
+  height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: var(--font-base);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  color: var(--text-main);
-  background: var(--background-dark);
-  line-height: 1.6;
-  font-size: var(--text-base);
-}
-
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -91,6 +105,14 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Thinner scrollbar on mobile */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
 }
 
 /* Code line numbers */
@@ -154,6 +176,11 @@ body {
 @keyframes scroll-logs {
   0% { transform: translateY(0); }
   100% { transform: translateY(-50%); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 15px -5px rgba(6, 249, 249, 0.3); }
+  50% { box-shadow: 0 0 25px 0px rgba(6, 249, 249, 0.5); }
 }
 
 @keyframes pulse-slow {
@@ -278,6 +305,7 @@ body {
 /* Main App Layout - VS Code Style */
 .app-container {
   height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--background-dark);
@@ -287,8 +315,10 @@ body {
 .app-body {
   display: flex;
   flex: 1;
-  height: 100%;
   overflow: hidden;
+  position: relative;
+  height: calc(100vh - var(--header-height));
+  height: calc(100dvh - var(--header-height));
 }
 
 .editor-main {
@@ -315,20 +345,22 @@ body {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  background-color: var(--editor-bg);
+  padding: var(--space-4);
+  scrollbar-gutter: stable;
   position: relative;
-  z-index: 10;
-  padding: var(--space-2);
-  scroll-behavior: smooth;
-  scroll-padding-top: var(--space-8);
 }
 
 /* Responsive main content padding */
+@media (min-width: 480px) {
+  .main-content {
+    padding: var(--space-4) var(--space-3);
+  }
+}
+
 @media (min-width: 640px) {
   .main-content {
-    padding: var(--space-4);
-  }
-  .grid-overlay {
-    background-size: 40px 40px;
+    padding: var(--space-6);
   }
 }
 
@@ -496,11 +528,89 @@ textarea:focus {
     border-radius: 12px;
 }
 
+/* ═══════════════════════════════════════════════════ */
+/* Scroll To Top Button                                */
+/* ═══════════════════════════════════════════════════ */
+.scroll-to-top-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(11, 18, 18, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(39, 58, 58, 0.6);
+  animation: pulse-glow 3s infinite ease-in-out;
+  transition: box-shadow 0.3s ease;
+  outline: none;
+  padding: 0;
+}
+
+.scroll-to-top-btn:hover {
+  box-shadow:
+    0 6px 30px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(6, 249, 249, 0.5),
+    0 0 30px -5px rgba(6, 249, 249, 0.4);
+}
+
+.scroll-to-top-btn:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.scroll-progress-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.scroll-to-top-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--primary);
+  transition: transform 0.2s ease;
+}
+
+.scroll-to-top-btn:hover .scroll-to-top-icon {
+  transform: translateY(-2px);
+}
+
+/* Responsive scroll-to-top */
+@media (max-width: 640px) {
+  .scroll-to-top-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .scroll-progress-ring {
+    width: 44px;
+    height: 44px;
+  }
+
+  .scroll-to-top-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
 /* Print styles */
 @media print {
   #portfolio-header,
   #portfolio-sidebar,
-  #portfolio-tabbar {
+  #portfolio-tabbar,
+  .scroll-to-top-btn {
     display: none !important;
   }
   

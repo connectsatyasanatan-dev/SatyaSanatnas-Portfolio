@@ -1,7 +1,8 @@
 /* Hero Section Styles */
 #hero-section {
   max-width: 1280px;
-  margin: 0 auto 48px auto;
+  margin: 0 auto 32px auto;
+  padding: 0 var(--space-1, 4px);
 }
 
 #hero-section .hero-container {
@@ -51,12 +52,13 @@
 }
 
 #hero-section .code-content {
-  padding: 12px 12px;
+  padding: 10px 8px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.6;
   background-color: rgba(11, 18, 18, 0.9);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 #hero-section .code-content .code-line {
@@ -223,10 +225,9 @@
 
 #hero-section .hero-stats {
   margin-top: 32px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
   text-align: center;
   animation: fadeInUp 0.6s ease 0.6s forwards;
   opacity: 0;
@@ -252,8 +253,70 @@
 #hero-section .stat-value.green { color: #22c55e; }
 
 #hero-section .stat-label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-dim);
+}
+
+/* Extra small screen hero fixes */
+@media (max-width: 480px) {
+  #hero-section .code-content {
+    font-size: 10px;
+    padding: 8px 6px;
+  }
+
+  #hero-section .code-line::before {
+    width: 1.5rem;
+    margin-right: 0.75rem;
+    font-size: 0.7rem;
+  }
+
+  #hero-section .hero-name {
+    font-size: 22px !important;
+  }
+
+  #hero-section .hero-title {
+    font-size: 28px;
+  }
+
+  #hero-section .hero-description {
+    font-size: 13px;
+  }
+
+  #hero-section .stat-item {
+    padding: 12px 8px;
+  }
+
+  #hero-section .stat-value {
+    font-size: 16px;
+  }
+
+  #hero-section .stat-label {
+    font-size: 10px;
+  }
+
+  #hero-section .hero-btn {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+
+  .execution-modal-overlay {
+    padding: 12px;
+  }
+
+  .execution-modal-content {
+    max-width: 100%;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .terminal-wrapper {
+    font-size: 12px;
+    padding: 12px;
+    max-height: 240px;
+  }
 }
 
 /* Execution Modal Styles */
@@ -490,7 +553,8 @@
   }
   
   #hero-section .hero-stats {
-    gap: 32px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
   }
 }
 

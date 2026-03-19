@@ -1,6 +1,6 @@
 /* Modern Skills Section Styles */
 .skills-modern-section {
-  padding: 2rem !important;
+  padding: var(--space-4) !important;
   background: linear-gradient(135deg, #0f2323 0%, #111818 50%, #0b1212 100%);
   position: relative;
   overflow: hidden;
@@ -24,7 +24,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 3rem;
+  margin-bottom: var(--space-8);
   position: relative;
   z-index: 2;
 }
@@ -76,7 +76,7 @@
 }
 
 .section-title-modern {
-  font-size: 2.5rem;
+  font-size: var(--font-2xl);
   font-weight: 700;
   background: linear-gradient(135deg, #06f9f9, #ffffff, #2de2e6);
   background-clip: text;
@@ -88,7 +88,7 @@
 
 .section-subtitle {
   color: #9bbbbb;
-  font-size: 1rem;
+  font-size: var(--font-sm);
   margin: 0;
   opacity: 0.8;
 }
@@ -118,11 +118,18 @@
 /* Stats Dashboard */
 .stats-dashboard {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 3rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
   position: relative;
   z-index: 2;
+}
+
+@media (min-width: 640px) {
+  .stats-dashboard {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+  }
 }
 
 .stat-card-modern {
@@ -376,8 +383,15 @@
 /* Skills Grid */
 .skills-grid-modern {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .skills-grid-modern {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
 }
 
 .skill-card-modern {
@@ -587,8 +601,15 @@
 
 .achievements-grid-modern {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .achievements-grid-modern {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
 }
 
 .achievement-card-modern {
@@ -698,11 +719,11 @@
 
 @media (max-width: 640px) {
   .skills-modern-section {
-    padding: 1.5rem 0;
+    padding: 1.25rem 0 !important;
   }
   
   .skills-display {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
   
   .skill-card-modern {
@@ -711,5 +732,44 @@
   
   .achievement-card-modern {
     padding: 1rem;
+  }
+
+  .header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .icon-brain {
+    width: 24px;
+    height: 24px;
+  }
+
+  .section-title-modern {
+    font-size: 1.5rem;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+  }
+
+  .category-btn {
+    min-width: 160px;
+    padding: 0.75rem;
+  }
+
+  .achievements-icon-container {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .achievements-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .achievements-title {
+    font-size: 1.5rem;
   }
 }

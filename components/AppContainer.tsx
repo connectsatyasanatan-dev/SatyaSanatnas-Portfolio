@@ -7,6 +7,7 @@ import ResizableSidebar from '@/components/ResizableSidebar'
 import TabBar from '@/components/TabBar'
 import GlobalBackground from '@/components/GlobalBackground'
 import PreLoader from '@/components/PreLoader'
+import ScrollToTop from '@/components/ScrollToTop'
 
 interface AppContainerProps {
     children: React.ReactNode
@@ -48,6 +49,8 @@ export default function AppContainer({ children }: AppContainerProps) {
                             <div className="main-content">
                                 {children}
                             </div>
+
+                            <ScrollToTop />
                         </main>
                     </div>
                 </motion.div>
