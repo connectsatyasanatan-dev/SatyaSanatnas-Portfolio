@@ -1,6 +1,6 @@
  'use client'
 
-import { GitCommit, GitMerge, Play, Diff } from 'lucide-react'
+import { GitCommit, GitMerge, Play, Pause, Diff, Activity } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import portfolioAPI, { Experience } from '@/lib/api'
@@ -62,7 +62,8 @@ const GitHistory = () => {
                             <div className="timeline-line"></div>
 
                             {experiences.map((exp, index) => {
-                                const IconComponent = exp.color === 'secondary' ? GitMerge : exp.color === 'accent' ? GitCommit : Play
+                                const isPresent = exp.period.toLowerCase().includes('present') || exp.period.toLowerCase().includes('current');
+                                const IconComponent = isPresent ? Play : Pause;
                                 return (
                                     <motion.div
                                         key={index}
