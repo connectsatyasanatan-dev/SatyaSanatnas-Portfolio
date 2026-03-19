@@ -471,8 +471,6 @@ const EducationSection = () => {
                             @media (min-width: 1024px) { #edu-root { padding: 0; } }
                         `}</style>
 
-                        <Particles />
-
                         {/* Header */}
                         <div className="edu-header">
                             <div className="edu-header-icon-wrap">

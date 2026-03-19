@@ -14,6 +14,7 @@ import BlogSection from '@/components/BlogSection'
 import TerminalSection from '@/components/TerminalSection'
 import ContactSection from '@/components/ContactSection'
 import PreLoader from '@/components/PreLoader'
+import GlobalBackground from '@/components/GlobalBackground'
 import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -45,6 +46,7 @@ export default function Home() {
                         />
 
                         <main className="editor-main">
+                            <GlobalBackground />
                             <div className="grid-overlay grid-pattern" />
 
                             <TabBar />
