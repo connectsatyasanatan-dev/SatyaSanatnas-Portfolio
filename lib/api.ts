@@ -1,5 +1,5 @@
 // Public API client for portfolio data
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+import apiClient from './apiClient'
 
 export interface PersonalInfo {
     name: string
@@ -140,24 +140,12 @@ export interface PortfolioStats {
     coffee_consumed: number
 }
 
+
 class PortfolioAPI {
-    private baseUrl: string
-
-    constructor(baseUrl: string = API_BASE_URL) {
-        this.baseUrl = baseUrl
-    }
-
     private async request<T>(endpoint: string): Promise<T> {
         try {
-            const response = await fetch(`${this.baseUrl}${endpoint}`, {
-                cache: 'no-store', // Always get fresh data
-            })
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`)
-            }
-
-            return await response.json()
+            const response = await apiClient.get<T>(endpoint)
+            return response.data
         } catch (error) {
             console.error(`API request failed: ${endpoint}`, error)
             throw error
@@ -208,18 +196,8 @@ class PortfolioAPI {
 
     async submitContactForm(data: { name: string; email: string; subject?: string; message: string }) {
         try {
-            const response = await fetch(`${this.baseUrl}/contact`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-                cache: 'no-store'
-            })
-
-            if (!response.ok) {
-                throw new Error(`Contact form submission failed: ${response.status}`)
-            }
-
-            return await response.json()
+            const response = await apiClient.post('/contact', data)
+            return response.data
         } catch (error) {
             console.error('Contact form error:', error)
             throw error

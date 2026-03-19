@@ -38,7 +38,7 @@ const ExperienceTab = ({ experience, onAddExperience, onUpdateExperience, onDele
     })
 
     const handleEdit = (exp: Experience) => {
-        setEditingId(exp.id)
+        setEditingId(exp.id ?? null)
         setEditData({ ...exp })
     }
 
@@ -71,8 +71,8 @@ const ExperienceTab = ({ experience, onAddExperience, onUpdateExperience, onDele
             await onUpdateExperience(Number(id), payload)
             setEditingId(null)
             setEditData(null)
-        } catch (err: any) {
-            setError(err.message || 'Failed to update experience')
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to update experience')
         } finally {
             setLoading(false)
         }
@@ -106,8 +106,8 @@ const ExperienceTab = ({ experience, onAddExperience, onUpdateExperience, onDele
             })
             setShowAddForm(false)
             setError(null)
-        } catch (err: any) {
-            setError(err.message || 'Failed to add experience')
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to add experience')
         } finally {
             setLoading(false)
         }
@@ -123,8 +123,8 @@ const ExperienceTab = ({ experience, onAddExperience, onUpdateExperience, onDele
             try {
                 await onDeleteExperience(deleteConfirm.id)
                 setDeleteConfirm({ isOpen: false, id: null })
-            } catch (err: any) {
-                setError(err.message || 'Failed to delete experience')
+            } catch (err: unknown) {
+                setError((err as Error).message || 'Failed to delete experience')
             } finally {
                 setLoading(false)
             }

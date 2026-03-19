@@ -64,8 +64,8 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
             await onUpdateCertification(Number(id), payload)
             setEditingId(null)
             setEditData(null)
-        } catch (err: any) {
-            setError(err.message || 'Failed to update certification')
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to update certification')
         } finally {
             setLoading(false)
         }
@@ -96,8 +96,8 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
             })
             setShowAddForm(false)
             setError(null)
-        } catch (err: any) {
-            setError(err.message || 'Failed to add certification')
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to add certification')
         } finally {
             setLoading(false)
         }
@@ -113,8 +113,8 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
             try {
                 await onDeleteCertification(deleteConfirm.id)
                 setDeleteConfirm({ isOpen: false, id: null })
-            } catch (err: any) {
-                setError(err.message || 'Failed to delete certification')
+            } catch (err: unknown) {
+                setError((err as Error).message || 'Failed to delete certification')
             } finally {
                 setLoading(false)
             }

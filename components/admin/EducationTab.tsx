@@ -69,8 +69,8 @@ const EducationTab = ({ education, onAddEducation, onUpdateEducation, onDeleteEd
             await onUpdateEducation(Number(id), payload)
             setEditingId(null)
             setEditData(null)
-        } catch (err: any) {
-            setError(err.message || 'Failed to update education')
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to update education')
         } finally {
             setLoading(false)
         }
@@ -103,8 +103,8 @@ const EducationTab = ({ education, onAddEducation, onUpdateEducation, onDeleteEd
             })
             setShowAddForm(false)
             setError(null)
-        } catch (err: any) {
-            setError(err.message || 'Failed to add education')
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to add education')
         } finally {
             setLoading(false)
         }
@@ -120,8 +120,8 @@ const EducationTab = ({ education, onAddEducation, onUpdateEducation, onDeleteEd
             try {
                 await onDeleteEducation(deleteConfirm.id)
                 setDeleteConfirm({ isOpen: false, id: null })
-            } catch (err: any) {
-                setError(err.message || 'Failed to delete education')
+            } catch (err: unknown) {
+                setError((err as Error).message || 'Failed to delete education')
             } finally {
                 setLoading(false)
             }

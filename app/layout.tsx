@@ -10,9 +10,65 @@ import '../styles/skills-modern.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: "Satya Sanatan's Portfolio",
-    description: 'A modern VS Code inspired developer portfolio built with Next.js and React',
+    title: {
+        default: "Satya Sanatan | Full Stack Developer",
+        template: "%s | Satya Sanatan"
+    },
+    description: 'A modern VS Code inspired developer portfolio built with Next.js, React, and Flask.',
+    keywords: ["Satya Sanatan", "Full Stack Developer", "Portfolio", "React", "Next.js", "Python", "Flask", "Developer"],
+    authors: [{ name: "Satya Sanatan" }],
+    creator: "Satya Sanatan",
+    publisher: "Satya Sanatan",
+    alternates: {
+        canonical: "https://satya-sanatan.com", // Replace with your domain
+    },
+    verification: {
+        google: "google-site-verification-placeholder",
+    },
+    category: "technology",
+    openGraph: {
+        type: "website",
+        locale: "en_US",
+        url: "https://satya-sanatan.com",
+        siteName: "Satya Sanatan Portfolio",
+        title: "Satya Sanatan | Full Stack Developer",
+        description: "A modern VS Code inspired developer portfolio built with Next.js, React, and Flask.",
+        images: [
+            {
+                url: "/og-image.jpg",
+                width: 1200,
+                height: 630,
+                alt: "Satya Sanatan Portfolio Default Open Graph Image",
+            }
+        ]
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Satya Sanatan | Full Stack Developer",
+        description: "A modern VS Code inspired developer portfolio built with Next.js, React, and Flask.",
+        images: ["/og-image.jpg"],
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+        },
+    },
 }
+
+import { Viewport } from 'next'
+export const viewport: Viewport = {
+    themeColor: '#0f172a',
+    width: 'device-width',
+    initialScale: 1,
+}
+
+import Providers from './providers'
 
 export default function RootLayout({
     children,
@@ -31,7 +87,9 @@ export default function RootLayout({
                 />
             </head>
             <body className={`${inter.className}`} style={{ background: 'var(--background-dark)', color: 'white', fontFamily: 'var(--font-display)' }}>
-                {children}
+                <Providers>
+                    {children}
+                </Providers>
             </body>
         </html>
     )

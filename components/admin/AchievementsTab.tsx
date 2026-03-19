@@ -7,7 +7,7 @@ import type { Achievements } from '@/lib/admin-types'
 
 interface AchievementsTabProps {
     data: Achievements
-    onUpdate: (category: string, data: any) => Promise<void>
+    onUpdate: (category: string, data: unknown) => Promise<void>
 }
 
 const AchievementsTab = ({ data, onUpdate }: AchievementsTabProps) => {
@@ -374,7 +374,7 @@ const AchievementsTab = ({ data, onUpdate }: AchievementsTabProps) => {
                             style={{ 
                                 '--stat-color': field.color,
                                 '--stat-color-rgb': hexToRgb(field.color)
-                            } as any}
+                            } as React.CSSProperties}
                         >
                             <div className="stat-card-glow" />
                             <div className="stat-edit-header-modern">
@@ -475,7 +475,7 @@ const AchievementsTab = ({ data, onUpdate }: AchievementsTabProps) => {
                     
                     {highlights.length === 0 && (
                         <div className="admin-empty-state" style={{ background: 'rgba(30, 41, 59, 0.2)', borderRadius: '20px', padding: '80px 0' }}>
-                            <div style={{ width: '80px', height: '80px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%', display: 'flex', alignItems: 'center', justify: 'center', margin: '0 auto 24px' }}>
+                            <div style={{ width: '80px', height: '80px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
                                 <Rocket size={40} style={{ opacity: 0.1 }} />
                             </div>
                             <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', fontSize: '15px' }}>

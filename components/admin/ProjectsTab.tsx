@@ -66,8 +66,8 @@ const ProjectsTab = ({ projects, onAddProject, onUpdateProject, onDeleteProject 
             setEditingId(null)
             setEditData(null)
             setError(null)
-        } catch (err: any) {
-            setError(err.message || 'Failed to update project')
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to update project')
         } finally {
             setLoading(false)
         }
@@ -106,8 +106,8 @@ const ProjectsTab = ({ projects, onAddProject, onUpdateProject, onDeleteProject 
             })
             setShowAddForm(false)
             setError(null)
-        } catch (err: any) {
-            setError(err.message || 'Failed to add project')
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to add project')
         } finally {
             setLoading(false)
         }
@@ -124,8 +124,8 @@ const ProjectsTab = ({ projects, onAddProject, onUpdateProject, onDeleteProject 
         try {
             await onDeleteProject(deleteConfirm.id)
             setDeleteConfirm({ isOpen: false, id: null })
-        } catch (err: any) {
-            setError(err.message || 'Failed to delete project')
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to delete project')
         } finally {
             setLoading(false)
         }
@@ -195,7 +195,7 @@ const ProjectsTab = ({ projects, onAddProject, onUpdateProject, onDeleteProject 
                                 <label className="admin-form-label">Status</label>
                                 <select
                                     value={newProject.status}
-                                    onChange={(e) => setNewProject({ ...newProject, status: e.target.value as any })}
+                                    onChange={(e) => setNewProject({ ...newProject, status: e.target.value as "active" | "in-progress" | "archived" })}
                                     className="admin-select"
                                 >
                                     <option value="active">Active</option>
@@ -436,7 +436,7 @@ const ProjectsTab = ({ projects, onAddProject, onUpdateProject, onDeleteProject 
                                             <label className="admin-form-label">Status</label>
                                             <select
                                                 value={editData.status || 'active'}
-                                                onChange={(e) => setEditData({ ...editData, status: e.target.value as any })}
+                                                onChange={(e) => setEditData({ ...editData, status: e.target.value as "active" | "in-progress" | "archived" })}
                                                 className="admin-select"
                                             >
                                                 <option value="active">Active</option>

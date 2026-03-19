@@ -5,8 +5,8 @@ import { motion } from 'framer-motion'
 import { Edit, Save, X, User, Mail, MapPin, Globe, Github, Linkedin, Twitter, Phone, Clock, Languages, Briefcase } from 'lucide-react'
 
 interface PersonalInfoTabProps {
-    data: any
-    onUpdate: (data: any) => void
+    data: Record<string, any>
+    onUpdate: (data: Record<string, any>) => void
 }
 
 const PersonalInfoTab = ({ data, onUpdate }: PersonalInfoTabProps) => {
@@ -73,7 +73,7 @@ const PersonalInfoTab = ({ data, onUpdate }: PersonalInfoTabProps) => {
         }
     ]
 
-    const renderField = (field: any) => {
+    const renderField = (field: Record<string, any>) => {
         const { key, label, icon: Icon, type = 'text', multiline = false, isArray = false, required = false } = field
         const value = editData[key] || ''
         const displayValue = isArray && Array.isArray(value) ? value.join(', ') : value
