@@ -79,7 +79,7 @@ const TestimonialsSection = () => {
     return (
         <AnimatePresence mode="wait">
             {loading ? (
-                <motion.div 
+                <motion.div
                     key="skeleton-testimonials"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
@@ -90,7 +90,7 @@ const TestimonialsSection = () => {
             ) : testimonials.length === 0 ? null : (() => {
                 const active = testimonials[activeIndex]
                 return (
-                    <motion.section 
+                    <motion.section
                         key="testimonials-content"
                         id="testimonials-root"
                         initial={{ opacity: 0, y: 20 }}
@@ -126,7 +126,7 @@ const TestimonialsSection = () => {
                                 display: flex;
                                 align-items: center;
                                 justify-content: space-between;
-                                margin-bottom: 50px;
+                                margin-bottom: 30px;
                                 padding-left: 10px;
                             }
                             .testi-header-title {
@@ -156,7 +156,7 @@ const TestimonialsSection = () => {
                                 grid-area: 1 / 1;
                                 display: flex;
                                 flex-direction: column;
-                                padding: 60px 80px;
+                                padding: 30px 60px;
                             }
                             @media (max-width: 900px) { .testi-slide { padding: 40px 30px; } }
 
@@ -326,16 +326,16 @@ const TestimonialsSection = () => {
 
                         <div className="testi-header">
                             <div className="testi-header-title">Endorsements</div>
-                            <div className="testi-header-badge">
+                            {/* <div className="testi-header-badge">
                                 <Sparkles size={14} className="text-blue-400" />
                                 <span>Premium Collaborations</span>
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className="testi-container">
                             <div className="testi-slider">
                                 <Quote size={200} className="testi-quote-mark" />
-                                
+
                                 <AnimatePresence mode="wait" custom={direction}>
                                     <motion.div
                                         key={activeIndex}
@@ -354,7 +354,7 @@ const TestimonialsSection = () => {
                                     >
                                         <div className="testi-meta-row">
                                             <div className="testi-avatar-placeholder" style={{ padding: 0, overflow: 'hidden', background: 'linear-gradient(135deg, rgba(255,255,255,0.05), transparent)' }}>
-                                                <img 
+                                                <img
                                                     src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(active.name)}&backgroundColor=transparent`}
                                                     alt={`${active.name} Avatar`}
                                                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
@@ -371,11 +371,11 @@ const TestimonialsSection = () => {
 
                                         <div className="testi-stars">
                                             {[...Array(5)].map((_, i) => (
-                                                <Star 
-                                                    key={i} 
-                                                    size={18} 
-                                                    fill={i < (active.rating || 5) ? "currentColor" : "none"} 
-                                                    className={i < (active.rating || 5) ? "star-filled" : "star-empty"} 
+                                                <Star
+                                                    key={i}
+                                                    size={18}
+                                                    fill={i < (active.rating || 5) ? "currentColor" : "none"}
+                                                    className={i < (active.rating || 5) ? "star-filled" : "star-empty"}
                                                 />
                                             ))}
                                         </div>
@@ -388,9 +388,9 @@ const TestimonialsSection = () => {
 
                                 <div className="testi-dots">
                                     {testimonials.map((_, i) => (
-                                        <div 
-                                            key={i} 
-                                            className={`dot ${i === activeIndex ? 'active' : ''}`} 
+                                        <div
+                                            key={i}
+                                            className={`dot ${i === activeIndex ? 'active' : ''}`}
                                             onClick={() => {
                                                 setDirection(i > activeIndex ? 1 : -1)
                                                 setActiveIndex(i)
@@ -414,7 +414,7 @@ const TestimonialsSection = () => {
 
                             {/* Animated progress bar for auto-play */}
                             {isAutoPlaying && (
-                                <motion.div 
+                                <motion.div
                                     key={`progress-${activeIndex}`}
                                     className="testi-progress-bar"
                                     initial={{ width: "0%" }}

@@ -347,13 +347,13 @@ const HeroSection = () => {
 
                     <div className="hero-info">
                         <div className="hero-bio">
-                            <motion.h1 className="hero-name" variants={itemVariants} style={{ fontSize: 'var(--text-3xl)' }}>
+                            <motion.h1 className="hero-name" variants={itemVariants}>
                                 {personalInfo?.name || 'Developer'}
                             </motion.h1>
-                            <motion.p className="hero-title" variants={itemVariants} style={{ fontSize: 'var(--text-2xl)', fontWeight: 700 }}>
-                                {personalInfo?.title || ''}
+                            <motion.p className="hero-title" variants={itemVariants}>
+                                {personalInfo?.role || personalInfo?.title || ''}
                             </motion.p>
-                            <motion.p className="hero-description" variants={itemVariants} style={{ fontSize: 'var(--text-lg)' }}>
+                            <motion.p className="hero-description" variants={itemVariants}>
                                 {personalInfo?.bio || ''}
                             </motion.p>
                         </div>

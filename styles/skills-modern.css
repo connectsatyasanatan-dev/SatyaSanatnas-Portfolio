@@ -37,19 +37,19 @@
 
 .header-icon {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #06f9f9, #2de2e6);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(6, 249, 249, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(6, 249, 249, 0.2);
 }
 
 .icon-brain {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   color: #0f2323;
   z-index: 2;
 }
@@ -97,8 +97,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: var(--space-8);
+  height: var(--space-8);
   background: rgba(39, 58, 58, 0.5);
   border: 1px solid #273a3a;
   border-radius: 12px;
@@ -106,6 +106,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  flex-shrink: 0;
 }
 
 .animation-toggle:hover {
@@ -136,11 +137,14 @@
   background: rgba(11, 18, 18, 0.8);
   border: 1px solid #273a3a;
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: var(--space-4);
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .stat-card-modern:hover {
@@ -166,15 +170,21 @@
 }
 
 .stat-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, #06f9f9, #2de2e6);
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-3);
   color: #0f2323;
+  flex-shrink: 0;
+}
+
+.stat-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .stat-content {
@@ -182,7 +192,7 @@
 }
 
 .stat-number {
-  font-size: 2.5rem;
+  font-size: var(--text-2xl);
   font-weight: 700;
   color: #ffffff;
   line-height: 1;
@@ -191,9 +201,10 @@
 
 .stat-label {
   color: #9bbbbb;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 500;
 }
 
 .stat-progress {
@@ -711,9 +722,25 @@
   }
   
   .section-header-modern {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
+    flex-direction: row;
+    gap: var(--space-3);
+    align-items: center;
+    padding: 0 var(--space-2);
+  }
+
+  .header-content .header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .header-content .section-title-modern {
+    font-size: var(--font-lg);
+  }
+
+  .stats-dashboard {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
   }
 }
 
@@ -735,14 +762,14 @@
   }
 
   .header-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
   }
 
   .icon-brain {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
   }
 
   .section-title-modern {
@@ -750,7 +777,18 @@
   }
 
   .stat-number {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 0.75rem;
+  }
+
+  .stat-icon svg {
+    width: 18px;
+    height: 18px;
   }
 
   .category-btn {
@@ -771,5 +809,45 @@
 
   .achievements-title {
     font-size: 1.5rem;
+  }
+
+  /* Skills Display Mobile Fixes */
+  .skills-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .skills-category-info {
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .category-icon-large {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .category-icon-large svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .category-title-large {
+    font-size: 1.25rem;
+  }
+
+  .category-description {
+    font-size: 0.75rem;
+  }
+
+  .skills-count {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    align-self: flex-start;
   }
 }
