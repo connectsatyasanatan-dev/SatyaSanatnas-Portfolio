@@ -13,7 +13,8 @@ import type {
     Achievements,
     Testimonial,
     BlogPost,
-    ContactMessage
+    ContactMessage,
+    AnalyticsSummary
 } from './admin-types'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
@@ -297,6 +298,11 @@ class AdminApiClient {
         return this.request<ApiResponse>(`/contacts/${id}`, {
             method: 'DELETE',
         })
+    }
+
+    // Analytics
+    async getAnalytics(): Promise<AnalyticsSummary> {
+        return this.request<AnalyticsSummary>('/analytics')
     }
 }
 

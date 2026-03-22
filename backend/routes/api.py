@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app
 from flask_mail import Message
 from models.database import db
+import requests
 
 api = Blueprint("api", __name__)
 
@@ -178,3 +179,69 @@ def get_stats():
         "coffee_consumed": stats_data.get("coffeeConsumed", 0)
     }
     return jsonify(stats)
+
+
+def get_location_from_ip(ip):
+    """Get location info from IP address using ip-api.com"""
+    try:
+        # Skip local IP
+        if ip == '127.0.0.1' or ip.startswith('192.168.') or ip.startswith('10.'):
+            return "Local", "Local"
+        
+        response = requests.get(f"http://ip-api.com/json/{ip}", timeout=5)
+        data = response.json()
+        if data.get('status') == 'success':
+            return data.get('country'), data.get('city')
+    except Exception as e:
+        print(f"GeoIP error: {e}")
+    return "Unknown", "Unknown"
+
+
+@api.route("/track-visit", methods=["POST"])
+def track_visit():
+    """Track a new visit session"""
+    try:
+        data = request.get_json()
+        if not data or not data.get("visitorId") or not data.get("sessionId"):
+            return jsonify({"error": "Missing visitorId or sessionId"}), 400
+
+        # Get IP address
+        ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        if ip and ',' in ip:
+            ip = ip.split(',')[0].strip()
+            
+        country, city = get_location_from_ip(ip) if ip else ("Unknown", "Unknown")
+        
+        visit_data = {
+            "visitor_id": data.get("visitorId"),
+            "session_id": data.get("sessionId"),
+            "ip_address": ip,
+            "device_type": data.get("deviceType"),
+            "browser": data.get("browser"),
+            "referrer": data.get("referrer"),
+            "page_path": data.get("pagePath", "/"),
+            "location_country": country,
+            "location_city": city
+        }
+        
+        db.track_visit(visit_data)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route("/track-duration", methods=["POST"])
+def track_duration():
+    """Update session duration"""
+    try:
+        data = request.get_json()
+        session_id = data.get("sessionId")
+        duration = data.get("duration")
+        
+        if not session_id:
+            return jsonify({"error": "Missing sessionId"}), 400
+            
+        db.update_duration(session_id, duration)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

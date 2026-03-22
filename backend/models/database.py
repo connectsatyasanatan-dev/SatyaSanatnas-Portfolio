@@ -216,6 +216,27 @@ class Database:
         """
         )
 
+        # Analytics Table
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS analytics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                visitor_id TEXT NOT NULL,
+                session_id TEXT NOT NULL,
+                ip_address TEXT,
+                device_type TEXT,
+                browser TEXT,
+                referrer TEXT,
+                page_path TEXT DEFAULT '/',
+                location_country TEXT,
+                location_city TEXT,
+                duration INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """
+        )
+
         conn.commit()
         conn.close()
 
@@ -580,7 +601,7 @@ class Database:
         project_id = cursor.lastrowid
         conn.commit()
         conn.close()
-        return project_id
+        return project_id if project_id is not None else -1
 
     def update_project(self, project_id: int, data: Dict[str, Any]) -> bool:
         """Update project"""
@@ -692,7 +713,7 @@ class Database:
         exp_id = cursor.lastrowid
         conn.commit()
         conn.close()
-        return exp_id
+        return exp_id if exp_id is not None else -1
 
     def update_experience(self, exp_id: int, data: Dict[str, Any]) -> bool:
         """Update experience"""
@@ -814,7 +835,7 @@ class Database:
         edu_id = cursor.lastrowid
         conn.commit()
         conn.close()
-        return edu_id
+        return edu_id if edu_id is not None else -1
 
     def update_education(self, edu_id: int, data: Dict[str, Any]) -> bool:
         """Update education"""
@@ -917,7 +938,7 @@ class Database:
         cert_id = cursor.lastrowid
         conn.commit()
         conn.close()
-        return cert_id
+        return cert_id if cert_id is not None else -1
 
     def update_certification(self, cert_id: int, data: Dict[str, Any]) -> bool:
         """Update certification"""
@@ -1051,7 +1072,7 @@ class Database:
         testimonial_id = cursor.lastrowid
         conn.commit()
         conn.close()
-        return testimonial_id
+        return testimonial_id if testimonial_id is not None else -1
 
     def update_testimonial(self, testimonial_id: int, data: Dict[str, Any]) -> bool:
         """Update testimonial"""
@@ -1136,7 +1157,7 @@ class Database:
         post_id = cursor.lastrowid
         conn.commit()
         conn.close()
-        return post_id
+        return post_id if post_id is not None else -1
 
     def update_blog_post(self, post_id: int, data: Dict[str, Any]) -> bool:
         """Update blog post"""
@@ -1189,7 +1210,7 @@ class Database:
         msg_id = cursor.lastrowid
         conn.commit()
         conn.close()
-        return msg_id
+        return msg_id if msg_id is not None else -1
 
     def get_contact_messages(self) -> List[Dict[str, Any]]:
         """Get all contact form submissions (newest first)"""
@@ -1220,6 +1241,151 @@ class Database:
         conn.commit()
         conn.close()
         return True
+
+    # Analytics Methods
+    def track_visit(self, data: Dict[str, Any]) -> int:
+        """Track a new visit session"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        # Fill location if not provided
+        location_country = data.get("location_country")
+        location_city = data.get("location_city")
+
+        cursor.execute(
+            """
+            INSERT INTO analytics (
+                visitor_id, session_id, ip_address, device_type,
+                browser, referrer, page_path, location_country, location_city
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+            (
+                data["visitor_id"],
+                data["session_id"],
+                data.get("ip_address"),
+                data.get("device_type"),
+                data.get("browser"),
+                data.get("referrer"),
+                data.get("page_path", "/"),
+                location_country,
+                location_city,
+            ),
+        )
+
+        visit_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        return visit_id if visit_id is not None else -1
+
+    def update_duration(self, session_id: str, duration: int) -> bool:
+        """Update session duration and last_active timestamp"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            UPDATE analytics SET
+                duration = COALESCE(?, duration),
+                last_active = CURRENT_TIMESTAMP
+            WHERE session_id = ?
+        """,
+            (duration, session_id),
+        )
+
+        conn.commit()
+        conn.close()
+        return True
+
+    def get_analytics_summary(self) -> Dict[str, Any]:
+        """Get summarized analytics for the admin panel"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        # 1. Total Visits (sessions)
+        cursor.execute("SELECT COUNT(*) FROM analytics")
+        total_visits = cursor.fetchone()[0]
+
+        # 2. Unique Visitors (distinct visitor_id)
+        cursor.execute("SELECT COUNT(DISTINCT visitor_id) FROM analytics")
+        unique_visitors = cursor.fetchone()[0]
+
+        # 3. Active Users (last 5 minutes)
+        cursor.execute(
+            "SELECT COUNT(DISTINCT visitor_id) FROM analytics WHERE last_active >= datetime('now', '-5 minutes')"
+        )
+        active_users = cursor.fetchone()[0]
+
+        # 4. Device Breakdown
+        cursor.execute("SELECT device_type, COUNT(*) as count FROM analytics GROUP BY device_type")
+        device_breakdown = {row["device_type"] or "Unknown": row["count"] for row in cursor.fetchall()}
+
+        # 5. Top Visited Pages
+        cursor.execute("SELECT page_path, COUNT(*) as count FROM analytics GROUP BY page_path ORDER BY count DESC LIMIT 10")
+        top_pages = [{"path": row["page_path"], "visits": row["count"]} for row in cursor.fetchall()]
+
+        # 6. Daily Traffic (Last 30 days)
+        cursor.execute(
+            """
+            SELECT date(created_at) as visit_date, COUNT(*) as visits, COUNT(DISTINCT visitor_id) as unique_visitors
+            FROM analytics
+            WHERE created_at >= date('now', '-30 days')
+            GROUP BY visit_date
+            ORDER BY visit_date
+        """
+        )
+        daily_traffic = [
+            {"date": row["visit_date"], "visits": row["visits"], "unique": row["unique_visitors"]}
+            for row in cursor.fetchall()
+        ]
+
+        # 7. Countries breakdown
+        cursor.execute("SELECT location_country, COUNT(*) as count FROM analytics WHERE location_country IS NOT NULL GROUP BY location_country ORDER BY count DESC LIMIT 10")
+        countries = {row["location_country"]: row["count"] for row in cursor.fetchall()}
+
+        # 8. New vs Returning (Visitor count)
+        cursor.execute(
+            """
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN session_count > 1 THEN 1 ELSE 0 END) as returning_count
+            FROM (
+                SELECT visitor_id, COUNT(DISTINCT session_id) as session_count
+                FROM analytics
+                GROUP BY visitor_id
+            )
+        """
+        )
+        visitor_stats = cursor.fetchone()
+        
+        # Handle case with no data
+        total_unique = (visitor_stats["total"] if visitor_stats else 0) or 0
+        returning = (visitor_stats["returning_count"] if visitor_stats else 0) or 0
+        
+        new_vs_returning = {
+            "new": total_unique - returning,
+            "returning": returning
+        }
+
+        # 9. Bounce Rate (Visits under 5 seconds)
+        cursor.execute(
+            "SELECT (CAST(COUNT(CASE WHEN duration < 5 THEN 1 END) AS FLOAT) / COUNT(*)) * 100 as bounce_rate FROM analytics"
+        )
+        row = cursor.fetchone()
+        bounce_rate = round(row["bounce_rate"], 2) if row and row["bounce_rate"] is not None else 0
+
+        conn.close()
+
+        return {
+            "totalVisits": total_visits,
+            "uniqueVisitors": unique_visitors,
+            "activeUsers": active_users,
+            "deviceBreakdown": device_breakdown,
+            "topPages": top_pages,
+            "dailyTraffic": daily_traffic,
+            "countries": countries,
+            "newVsReturning": new_vs_returning,
+            "bounceRate": bounce_rate
+        }
 
 
 # Global database instance

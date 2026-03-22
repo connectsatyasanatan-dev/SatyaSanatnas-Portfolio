@@ -203,6 +203,31 @@ class PortfolioAPI {
             throw error
         }
     }
+
+    async trackVisit(data: {
+        visitorId: string;
+        sessionId: string;
+        deviceType: string;
+        browser: string;
+        referrer: string;
+        pagePath: string;
+    }) {
+        try {
+            const response = await apiClient.post('/track-visit', data)
+            return response.data
+        } catch (error) {
+            console.error('Track visit error:', error)
+        }
+    }
+
+    async trackDuration(data: { sessionId: string; duration: number }) {
+        try {
+            const response = await apiClient.post('/track-duration', data)
+            return response.data
+        } catch (error) {
+            // Silently fail for duration tracking as it happens in background
+        }
+    }
 }
 
 export const portfolioAPI = new PortfolioAPI()

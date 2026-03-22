@@ -24,6 +24,7 @@ import MessagesTab from '@/components/admin/MessagesTab'
 import AchievementsTab from '@/components/admin/AchievementsTab'
 import EducationTab from '@/components/admin/EducationTab'
 import CertificationsTab from '@/components/admin/CertificationsTab'
+import AnalyticsTab from '@/components/admin/AnalyticsTab'
 
 const AdminPanel = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -513,6 +514,7 @@ const AdminPanel = () => {
 
     const tabs = [
         { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+        { id: 'analytics', label: 'Analytics', icon: BarChart3 },
         { id: 'personal', label: 'Personal Info', icon: User },
         { id: 'skills', label: 'Skills', icon: Settings },
         { id: 'projects', label: 'Projects', icon: FileText },
@@ -589,6 +591,10 @@ const AdminPanel = () => {
                         <>
                             {activeTab === 'dashboard' && (
                                 <DashboardTab stats={adminData.stats} />
+                            )}
+
+                            {activeTab === 'analytics' && (
+                                <AnalyticsTab />
                             )}
 
                             {activeTab === 'personal' && (

@@ -586,3 +586,13 @@ def admin_dashboard():
             ],
         }
     )
+
+
+@admin.route("/analytics", methods=["GET"])
+@admin_required
+def get_analytics():
+    """Get analytics data for the admin panel"""
+    try:
+        return jsonify(db.get_analytics_summary())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

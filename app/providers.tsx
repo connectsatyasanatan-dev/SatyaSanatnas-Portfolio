@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { useState, ReactNode } from 'react'
+import AnalyticsTracker from '@/components/AnalyticsTracker'
 
 export default function Providers({ children }: { children: ReactNode }) {
     // We create the QueryClient inside state to prevent it from being shared across users on SSR
@@ -21,6 +22,7 @@ export default function Providers({ children }: { children: ReactNode }) {
 
     return (
         <QueryClientProvider client={queryClient}>
+            <AnalyticsTracker />
             {children}
             {/* The devtools only are included in development build
             <ReactQueryDevtools initialIsOpen={false} /> */}

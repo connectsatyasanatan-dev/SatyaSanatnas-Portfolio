@@ -169,6 +169,24 @@ export interface AdminData {
     achievements?: Achievements;
 }
 
+export interface DailyTraffic {
+    date: string;
+    visits: number;
+    unique: number;
+}
+
+export interface AnalyticsSummary {
+    totalVisits: number;
+    uniqueVisitors: number;
+    activeUsers: number;
+    deviceBreakdown: Record<string, number>;
+    topPages: { path: string; visits: number }[];
+    dailyTraffic: DailyTraffic[];
+    countries: Record<string, number>;
+    newVsReturning: { new: number; returning: number };
+    bounceRate: number;
+}
+
 // API Response Types
 export interface ApiResponse<T = any> {
     success: boolean;
