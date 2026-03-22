@@ -31,6 +31,7 @@ export default function AppContainer({ children }: AppContainerProps) {
                     transition={{ duration: 0.5 }}
                     className="app-container"
                 >
+                    <GlobalBackground />
                     <Header />
 
                     <div className="app-body">
@@ -40,13 +41,12 @@ export default function AppContainer({ children }: AppContainerProps) {
                             defaultWidth={288}
                         />
 
-                        <main className="editor-main">
-                            <GlobalBackground />
+                        <main className="editor-main" style={{ background: 'transparent' }}>
                             <div className="grid-overlay grid-pattern" />
 
                             <TabBar />
 
-                            <div className="main-content">
+                            <div className="main-content" style={{ backgroundColor: 'rgba(17, 24, 24, 0.4)' }}>
                                 {children}
                             </div>
 

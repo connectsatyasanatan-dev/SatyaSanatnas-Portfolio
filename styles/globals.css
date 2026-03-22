@@ -326,7 +326,7 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: var(--editor-bg);
+  background: transparent;
   position: relative;
   height: 100%;
   overflow: hidden;
@@ -335,8 +335,8 @@ body {
 .grid-overlay {
   position: absolute;
   inset: 0;
-  background-size: 30px 30px;
-  opacity: 0.03;
+  background-size: 40px 40px;
+  opacity: 0.1;
   pointer-events: none;
   z-index: 0;
 }
@@ -345,7 +345,7 @@ body {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: var(--editor-bg);
+  background: rgba(11, 18, 18, 0.85); /* Solid dark feel but allows symbols through */
   padding: var(--space-4);
   scrollbar-gutter: stable;
   position: relative;
