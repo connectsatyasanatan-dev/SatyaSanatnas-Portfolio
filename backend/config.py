@@ -52,3 +52,11 @@ class Config:
     # ------------------------------------------------------------------ #
     JWT_SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY", SECRET_KEY)
     JWT_EXPIRY_HOURS: int = int(os.environ.get("JWT_EXPIRY_HOURS", 24))
+
+    # ------------------------------------------------------------------ #
+    # Uploads
+    # ------------------------------------------------------------------ #
+    UPLOAD_FOLDER: str = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "static/uploads"
+    )
+    MAX_CONTENT_LENGTH: int = 16 * 1024 * 1024  # 16MB limit

@@ -391,7 +391,7 @@ const CertificationsSection = () => {
                         .cert-modal-badge img {
                             width: 100%;
                             height: 100%;
-                            object-fit: cover;
+                            object-fit: contain;
                         }
                         .cert-modal-title {
                             font-size: 26px;
@@ -491,7 +491,7 @@ const CertificationsSection = () => {
                     <div className={`certifications-grid ${certifications.length === 1 ? 'single-item' : ''}`}>
                         {certifications.map((cert, index) => {
                             const isValid = cert.validity?.includes('2025') || cert.validity?.includes('2026') || cert.validity?.toLowerCase().includes('no expiration');
-                            const isOracle = cert.name.toLowerCase().includes('oracle') || cert.issuer.toLowerCase().includes('oracle');
+                            const hasBadge = !!cert.badge;
 
                             return (
                                 <motion.div
@@ -504,11 +504,11 @@ const CertificationsSection = () => {
                                     onClick={() => setSelectedCert(cert)}
                                 >
                                     <div className="cert-header">
-                                        <div className={`cert-icon-wrapper ${isOracle ? 'has-image' : ''}`}>
-                                            {isOracle ? (
+                                        <div className={`cert-icon-wrapper ${hasBadge ? 'has-image' : ''}`}>
+                                            {hasBadge ? (
                                                 <img
-                                                    src="/images/oci-badge.png"
-                                                    alt="Oracle Certification Badge"
+                                                    src={cert.badge}
+                                                    alt={`${cert.name} Badge`}
                                                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                                 />
                                             ) : (
@@ -542,7 +542,14 @@ const CertificationsSection = () => {
                                     {cert.credential && (
                                         <div className="cert-credential-id" onClick={(e) => e.stopPropagation()}>
                                             <span>ID: {cert.credential}</span>
-                                            <a href="#" className="cert-verify-btn">Verify ↗</a>
+                                            <a 
+                                                href={cert.verify_url || "#"} 
+                                                className="cert-verify-btn" 
+                                                target={cert.verify_url ? "_blank" : undefined}
+                                                rel={cert.verify_url ? "noopener noreferrer" : undefined}
+                                            >
+                                                Verify ↗
+                                            </a>
                                         </div>
                                     )}
                                 </motion.div>
@@ -572,8 +579,8 @@ const CertificationsSection = () => {
                                     </button>
 
                                     <div className="cert-modal-badge">
-                                        {(selectedCert.name.toLowerCase().includes('oracle') || selectedCert.issuer.toLowerCase().includes('oracle')) ? (
-                                            <img src="/images/oci-badge.png" alt="Certification Badge" />
+                                        {selectedCert.badge ? (
+                                            <img src={selectedCert.badge} alt="Certification Badge" />
                                         ) : (
                                             <Award size={64} style={{ color: 'goldenrod' }} />
                                         )}
@@ -613,11 +620,11 @@ const CertificationsSection = () => {
                                         )}
                                     </div>
 
-                                    {/* {selectedCert.credential && (
-                                        <a href="#" className="cert-modal-verify" target="_blank" rel="noopener noreferrer">
+                                    {selectedCert.verify_url && (
+                                        <a href={selectedCert.verify_url} className="cert-modal-verify" target="_blank" rel="noopener noreferrer">
                                             Verify Credential <ExternalLink size={18} />
                                         </a>
-                                    )} */}
+                                    )}
                                 </motion.div>
                             </motion.div>
                         )}

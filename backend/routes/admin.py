@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from models.admin import (
     ADMIN_CREDENTIALS,
     verify_password,
@@ -9,6 +9,8 @@ from models.admin import (
 from models.database import db
 import json
 import os
+import secrets
+from werkzeug.utils import secure_filename
 
 admin = Blueprint("admin", __name__)
 
@@ -596,3 +598,55 @@ def get_analytics():
         return jsonify(db.get_analytics_summary())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# File Upload Management
+@admin.route("/upload", methods=["POST"])
+@admin_required
+def upload_file():
+    """Handle image uploads for profile pictures, certification badges, etc."""
+    try:
+        if "file" not in request.files:
+            return jsonify({"error": "No file part in the request"}), 400
+        
+        file = request.files["file"]
+        if file.filename == "":
+            return jsonify({"error": "No file selected"}), 400
+        
+        if file:
+            filename = secure_filename(file.filename)
+            # Add a random prefix to prevent filename collisions
+            random_prefix = secrets.token_hex(4)
+            filename = f"{random_prefix}_{filename}"
+            
+            # Use UPLOAD_FOLDER from config
+            upload_dir = current_app.config.get("UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads"))
+            
+            if not os.path.exists(upload_dir):
+                os.makedirs(upload_dir, exist_ok=True)
+            
+            file_path = os.path.join(upload_dir, filename)
+            file.save(file_path)
+            
+            # The static URL the frontend can use to access this file
+            # Assuming the backend serves files from /static/uploads
+            # (If not, we might need a dedicated route or use send_from_directory)
+            file_url = f"/api/static/uploads/{filename}"
+            
+            return jsonify({
+                "success": True,
+                "message": "File uploaded successfully",
+                "url": file_url,
+                "filename": filename
+            })
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@admin.route("/static/uploads/<filename>", methods=["GET"])
+def serve_uploaded_file(filename):
+    """Fallback route to serve static files if the main app isn't configured for it"""
+    from flask import send_from_directory
+    upload_dir = current_app.config.get("UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads"))
+    return send_from_directory(upload_dir, filename)

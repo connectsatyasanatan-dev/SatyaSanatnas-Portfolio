@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Edit, Save, X, Plus, Trash2, Calendar, Award } from 'lucide-react'
+import { Edit, Save, X, Plus, Trash2, Calendar, Award, Upload, Loader2, Image as ImageIcon } from 'lucide-react'
 import type { Certification } from '@/lib/admin-types'
 import ErrorAlert from './ErrorAlert'
 import ConfirmDialog from './ConfirmDialog'
@@ -24,7 +24,8 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
         date: '',
         credential: '',
         validity: '',
-        badge: ''
+        badge: '',
+        verify_url: ''
     })
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
@@ -32,10 +33,54 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
         isOpen: false,
         id: null
     })
+    const [uploading, setUploading] = useState<string | null>(null) // 'new' or cert.id
 
     const handleEdit = (cert: Certification) => {
         setEditingId(cert.id ?? null)
         setEditData({ ...cert })
+    }
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit: boolean) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        // Basic validation
+        if (!file.type.startsWith('image/')) {
+            setError('Please upload an image file')
+            return
+        }
+
+        const formData = new FormData()
+        formData.append('file', file)
+
+        setUploading(isEdit ? 'edit' : 'new')
+        setError(null)
+
+        try {
+            const token = localStorage.getItem('admin_token')
+            const response = await fetch('/api/admin/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            })
+
+            const data = await response.json()
+            if (data.success) {
+                if (isEdit) {
+                    setEditData(prev => ({ ...prev, badge: data.url }))
+                } else {
+                    setNewCertification(prev => ({ ...prev, badge: data.url }))
+                }
+            } else {
+                throw new Error(data.error || 'Upload failed')
+            }
+        } catch (err: unknown) {
+            setError((err as Error).message || 'Failed to upload image')
+        } finally {
+            setUploading(null)
+        }
     }
 
     const handleSave = async () => {
@@ -59,7 +104,8 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
                 date: (editData.date ?? '').trim(),
                 credential: (editData.credential ?? '').trim() || undefined,
                 validity: (editData.validity ?? '').trim() || undefined,
-                badge: (editData.badge ?? '').trim() || undefined
+                badge: (editData.badge ?? '').trim() || undefined,
+                verify_url: (editData.verify_url ?? '').trim() || undefined
             }
             await onUpdateCertification(Number(id), payload)
             setEditingId(null)
@@ -92,7 +138,8 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
                 date: '',
                 credential: '',
                 validity: '',
-                badge: ''
+                badge: '',
+                verify_url: ''
             })
             setShowAddForm(false)
             setError(null)
@@ -203,6 +250,46 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
                                 onChange={(e) => setNewCertification({ ...newCertification, validity: e.target.value })}
                                 className="admin-form-input"
                                 placeholder="Valid until Jan 2026"
+                            />
+                        </div>
+                        <div className="admin-form-group">
+                            <label className="admin-form-label">Badge Image</label>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <div style={{ flex: 1, position: 'relative' }}>
+                                    <input
+                                        type="text"
+                                        value={newCertification.badge}
+                                        onChange={(e) => setNewCertification({ ...newCertification, badge: e.target.value })}
+                                        className="admin-form-input"
+                                        placeholder="/images/badge.png or upload..."
+                                    />
+                                    {newCertification.badge && (
+                                        <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
+                                            <img src={newCertification.badge} alt="Preview" style={{ height: '20px', borderRadius: '2px' }} />
+                                        </div>
+                                    )}
+                                </div>
+                                <label className="admin-btn admin-btn-gray" style={{ margin: 0, padding: '8px 12px', cursor: 'pointer' }}>
+                                    {uploading === 'new' ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
+                                    <input 
+                                        type="file" 
+                                        hidden 
+                                        accept="image/*" 
+                                        onChange={(e) => handleFileUpload(e, false)}
+                                        disabled={!!uploading}
+                                    />
+                                </label>
+                            </div>
+                            <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>PNG, JPG or SVG formats accepted</p>
+                        </div>
+                        <div className="admin-form-group">
+                            <label className="admin-form-label">Verify URL</label>
+                            <input
+                                type="text"
+                                value={newCertification.verify_url}
+                                onChange={(e) => setNewCertification({ ...newCertification, verify_url: e.target.value })}
+                                className="admin-form-input"
+                                placeholder="https://..."
                             />
                         </div>
                     </div>
@@ -345,6 +432,45 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
                                             onChange={(e) => setEditData({ ...editData, validity: e.target.value })}
                                             className="admin-form-input"
                                             placeholder="Valid until Jan 2026"
+                                        />
+                                    </div>
+                                    <div className="admin-form-group">
+                                        <label className="admin-form-label">Badge Image</label>
+                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                            <div style={{ flex: 1, position: 'relative' }}>
+                                                <input
+                                                    type="text"
+                                                    value={editData.badge ?? ''}
+                                                    onChange={(e) => setEditData({ ...editData, badge: e.target.value })}
+                                                    className="admin-form-input"
+                                                    placeholder="/images/badge.png or upload..."
+                                                />
+                                                {editData.badge && (
+                                                    <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
+                                                        <img src={editData.badge} alt="Preview" style={{ height: '20px', borderRadius: '2px' }} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <label className="admin-btn admin-btn-gray" style={{ margin: 0, padding: '8px 12px', cursor: 'pointer' }}>
+                                                {uploading === 'edit' ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
+                                                <input 
+                                                    type="file" 
+                                                    hidden 
+                                                    accept="image/*" 
+                                                    onChange={(e) => handleFileUpload(e, true)}
+                                                    disabled={!!uploading}
+                                                />
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div className="admin-form-group">
+                                        <label className="admin-form-label">Verify URL</label>
+                                        <input
+                                            type="text"
+                                            value={editData.verify_url ?? ''}
+                                            onChange={(e) => setEditData({ ...editData, verify_url: e.target.value })}
+                                            className="admin-form-input"
+                                            placeholder="https://..."
                                         />
                                     </div>
                                 </div>

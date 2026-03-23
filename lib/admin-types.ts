@@ -67,6 +67,7 @@ export interface Certification {
     credential?: string;
     validity?: string;
     badge?: string;
+    verify_url?: string;
 }
 
 export interface Achievements {

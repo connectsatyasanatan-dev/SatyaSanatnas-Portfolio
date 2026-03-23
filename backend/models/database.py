@@ -150,11 +150,19 @@ class Database:
                 credential TEXT,
                 validity TEXT,
                 badge TEXT,
+                verify_url TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """
         )
+
+        # Ensure verify_url column exists in certifications table (migration)
+        try:
+            cursor.execute("ALTER TABLE certifications ADD COLUMN verify_url TEXT")
+        except sqlite3.OperationalError:
+            # Column already exists
+            pass
 
         # Achievements Table
         cursor.execute(
@@ -910,6 +918,7 @@ class Database:
                     "credential": row["credential"],
                     "validity": row["validity"],
                     "badge": row["badge"],
+                    "verify_url": row["verify_url"],
                 }
             )
         return certifications
@@ -922,8 +931,8 @@ class Database:
         cursor.execute(
             """
             INSERT INTO certifications (
-                name, issuer, date, credential, validity, badge
-            ) VALUES (?, ?, ?, ?, ?, ?)
+                name, issuer, date, credential, validity, badge, verify_url
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
         """,
             (
                 data["name"],
@@ -932,6 +941,7 @@ class Database:
                 data.get("credential"),
                 data.get("validity"),
                 data.get("badge"),
+                data.get("verify_url"),
             ),
         )
 
@@ -954,6 +964,7 @@ class Database:
                 credential = COALESCE(?, credential),
                 validity = COALESCE(?, validity),
                 badge = COALESCE(?, badge),
+                verify_url = COALESCE(?, verify_url),
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         """,
@@ -964,6 +975,7 @@ class Database:
                 data.get("credential"),
                 data.get("validity"),
                 data.get("badge"),
+                data.get("verify_url"),
                 cert_id,
             ),
         )

@@ -20,7 +20,7 @@ apiClient.interceptors.request.use(
     (config) => {
         // Only attach token for admin routes to save overhead
         if (typeof window !== 'undefined' && config.url?.includes('/admin')) {
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('admin_token');
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
@@ -40,7 +40,7 @@ apiClient.interceptors.response.use(
     (error) => {
         // You could theoretically handle global 401 logouts here
         if (error.response?.status === 401 && typeof window !== 'undefined') {
-            localStorage.removeItem('adminToken');
+            localStorage.removeItem('admin_token');
             // uncomment the line below if you want to redirect automatically on 401
             // window.location.href = '/admin';
         }

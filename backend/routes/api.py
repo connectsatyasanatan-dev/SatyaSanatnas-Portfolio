@@ -1,7 +1,8 @@
-from flask import Blueprint, jsonify, request, current_app
-from flask_mail import Message
 from models.database import db
+from flask_mail import Message
 import requests
+import os
+from flask import Blueprint, jsonify, request, current_app, send_from_directory
 
 api = Blueprint("api", __name__)
 
@@ -245,3 +246,11 @@ def track_duration():
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@api.route("/static/uploads/<filename>", methods=["GET"])
+def serve_uploaded_file(filename):
+    """Serve files uploaded via the admin panel"""
+    # Use UPLOAD_FOLDER from config or fallback to relative path
+    upload_dir = current_app.config.get("UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads"))
+    return send_from_directory(upload_dir, filename)
