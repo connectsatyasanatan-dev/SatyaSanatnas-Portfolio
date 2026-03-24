@@ -1,3 +1,4 @@
+import '@/styles/responsive.css'
 import HeroSection from '@/components/HeroSection'
 import SkillsSection from '@/components/SkillsSection'
 import GitHistory from '@/components/GitHistory'
@@ -25,4 +26,4 @@ export default async function Home() {
             <ContactSection />
         </AppContainer>
     )
-}
+}

@@ -29,17 +29,32 @@ const Sidebar = () => {
         <div className="sidebar-content">
             {/* Icon sidebar */}
             <div className="sidebar-icons">
-                <FolderOpen className="active" />
-                <Search />
-                <GitBranch />
-                <Bug />
-                <Package />
+                <div className="icon-wrapper active" title="Explorer">
+                    <FolderOpen size={24} />
+                </div>
+                <div className="icon-wrapper" title="Search">
+                    <Search size={24} />
+                </div>
+                <div className="icon-wrapper" title="Source Control">
+                    <GitBranch size={24} />
+                </div>
+                <div className="icon-wrapper" title="Debug">
+                    <Bug size={24} />
+                </div>
+                <div className="icon-wrapper" title="Extensions">
+                    <Package size={24} />
+                </div>
 
                 <div className="icons-bottom">
-                    <User />
-                    <Settings />
+                    <div className="icon-wrapper" title="Account">
+                        <User size={24} />
+                    </div>
+                    <div className="icon-wrapper" title="Settings">
+                        <Settings size={24} />
+                    </div>
                 </div>
             </div>
+
 
             {/* File explorer */}
             <div className="sidebar-explorer">

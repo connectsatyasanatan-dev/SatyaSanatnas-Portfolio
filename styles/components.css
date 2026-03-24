@@ -32,29 +32,34 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-color);
+  background: rgba(6, 249, 249, 0.05);
+  border: 1px solid var(--primary);
   color: var(--primary);
   cursor: pointer;
-  margin-right: 4px;
-  border-radius: 8px;
-  transition: all 0.2s;
+  margin-right: 8px;
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(6, 249, 249, 0.3);
 }
 
 #portfolio-header .mobile-menu-btn:hover {
-  background-color: rgba(6, 249, 249, 0.1);
+  background-color: rgba(6, 249, 249, 0.15);
   color: white;
-  border-color: var(--primary);
+  border-color: white;
+  box-shadow: 0 0 15px rgba(6, 249, 249, 0.5);
+  transform: scale(1.05);
 }
+
 
 #portfolio-header .header-title-container {
   display: flex;
   align-items: center;
   min-width: 0;
-  max-width: 140px;
+  max-width: clamp(120px, 40vw, 240px);
   overflow: hidden;
 }
+
 
 #portfolio-header .header-title {
   color: #daa522; /* goldenrod */
@@ -175,10 +180,11 @@
 }
 
 /* Responsive Header */
-@media (min-width: 480px) {
+@media (min-width: 1024px) {
   #portfolio-header .mobile-menu-btn {
-    display: none;
+    display: none !important;
   }
+
 
   #portfolio-header .header-title-container {
     max-width: 220px;
@@ -308,34 +314,60 @@
 }
 
 .sidebar-icons {
-  width: var(--space-12);
+  width: 60px;
   background-color: var(--sidebar-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-3) 0;
-  gap: var(--space-5);
+  padding: 16px 0;
+  gap: clamp(10px, 2vh, 15px);
   border-right: 1px solid var(--border-color);
+  height: 100%;
 }
 
-.sidebar-icons svg {
-  width: 24px;
-  height: 24px;
-  color: var(--text-dim);
+.sidebar-icons .icon-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+  height: 28px;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar-icons .icon-wrapper svg {
+  width: 22px;
+  height: 22px;
+  color: var(--text-dim);
   transition: all 0.2s ease;
 }
 
-#portfolio-sidebar .sidebar-icons svg:hover {
+#portfolio-sidebar .sidebar-icons .icon-wrapper:hover svg {
   color: white;
+  transform: scale(1.1);
 }
 
-#portfolio-sidebar .sidebar-icons svg.active {
-  color: white;
-  border-left: 2px solid var(--primary);
-  padding-left: 12px;
-  margin-left: -12px;
+
+#portfolio-sidebar .sidebar-icons .icon-wrapper.active svg {
+  color: var(--primary);
+  filter: drop-shadow(0 0 5px rgba(6, 249, 249, 0.8));
 }
+
+#portfolio-sidebar .sidebar-icons .icon-wrapper.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: clamp(24px, 40%, 32px);
+  background: var(--primary);
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 0 10px var(--primary);
+}
+
+
 
 #portfolio-sidebar .sidebar-icons .icons-bottom {
   margin-top: auto;
@@ -754,4 +786,4 @@ body.resizing * {
   #portfolio-sidebar {
     width: 280px !important;
   }
-}
+}

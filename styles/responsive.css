@@ -1,0 +1,54 @@
+
+@media (max-width: 481px) {
+/* hero section responsive */
+ #portfolio-header .header-right{
+    display: none;
+ }
+
+ #portfolio-header .mobile-menu-btn{
+    width: 30px;
+    height: 30px;
+ }
+
+ #hero-section .hero-name{
+    font-size: 25px;
+ }
+
+ #hero-section .hero-title{
+    font-size: 14px;
+ }
+
+  #hero-section .hero-description{
+    font-size: 12px;
+  }
+
+}
+
+@media (max-width: 768px) {
+   
+
+    
+}
+
+
+@media (max-width: 1024px) {
+   #portfolio-sidebar .sidebar-icons .icons-bottom {
+    padding-bottom: 38px;
+   }
+   .sidebar-icons .icon-wrapper svg {
+      width: 20px;
+      height: 20px;
+   }
+    
+}
+
+
+
+@media (max-width: 1440px) {
+    
+}
+
+@media (max-width: 1920px) {
+    
+}
+
