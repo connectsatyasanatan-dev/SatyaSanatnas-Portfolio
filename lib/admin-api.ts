@@ -304,6 +304,35 @@ class AdminApiClient {
     async getAnalytics(): Promise<AnalyticsSummary> {
         return this.request<AnalyticsSummary>('/analytics')
     }
+
+    // Generic File Upload
+    async uploadFile(file: File): Promise<{ success: boolean; url: string; filename: string }> {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const url = `${this.baseUrl}/admin/upload`
+        const config: RequestInit = {
+            method: 'POST',
+            headers: {
+                ...(this.token && { 'Authorization': `Bearer ${this.token}` }),
+            },
+            body: formData,
+        }
+
+        try {
+            const response = await fetch(url, config)
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'Upload failed' }))
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+            }
+
+            return await response.json()
+        } catch (error) {
+            console.error(`File upload failed: ${url}`, error)
+            throw error
+        }
+    }
 }
 
 export const adminApiClient = new AdminApiClient()

@@ -787,3 +787,209 @@ body.resizing * {
     width: 280px !important;
   }
 }
+/* Resume Modal Styles */
+.resume-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.resume-modal-content {
+  width: 100%;
+  max-width: 1000px;
+  height: 90vh;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.resume-modal-header {
+  padding: 16px 24px;
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resume-modal-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.resume-modal-header .header-left h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.resume-modal-header .header-left p {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 2px 0 0;
+}
+
+.resume-modal-header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.resume-modal-header .zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.resume-modal-header .zoom-controls span {
+  font-size: 12px;
+  font-family: monospace;
+  color: #94a3b8;
+  min-width: 40px;
+  text-align: center;
+}
+
+.resume-modal-header .zoom-controls button, 
+.resume-modal-header .action-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  padding: 4px;
+  transition: all 0.2s;
+}
+
+.resume-modal-header button:hover {
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+.resume-modal-header .download-btn-modern {
+  background: var(--primary);
+  color: #000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.resume-modal-header .download-btn-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(6, 249, 249, 0.3);
+}
+
+.resume-modal-header .close-btn-modern {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: #94a3b8;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.resume-modal-header .close-btn-modern:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.resume-viewer-body {
+  flex: 1;
+  position: relative;
+  background: #1e293b;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.resume-iframe {
+  width: 100%;
+  max-width: 850px;
+  height: 1100px;
+  border: none;
+  background: white;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.resume-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #0f172a;
+  z-index: 10;
+}
+
+.resume-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #94a3b8;
+  padding: 40px;
+}
+
+.resume-modal-footer {
+  padding: 12px 24px;
+  background: rgba(15, 23, 42, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.resume-modal-footer .external-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .resume-modal-content {
+    height: 95vh;
+    border-radius: 16px;
+  }
+  .resume-modal-header .zoom-controls, 
+  .resume-modal-header .action-btn {
+    display: none;
+  }
+  .resume-modal-header .download-btn-modern span {
+    display: none;
+  }
+}

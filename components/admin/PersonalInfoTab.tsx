@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Edit, Save, X, User, Mail, MapPin, Globe, Github, Linkedin, Twitter, Phone, Clock, Languages, Briefcase } from 'lucide-react'
+import { Edit, Save, X, User, Mail, MapPin, Globe, Github, Linkedin, Twitter, Phone, Clock, Languages, Briefcase, FileText, FileUp, Loader2, CheckCircle2, Trash2, Eye } from 'lucide-react'
+import { adminApiClient } from '@/lib/admin-api'
+import ResumeModal from '../ResumeModal'
 
 interface PersonalInfoTabProps {
     data: Record<string, any>
@@ -13,6 +15,8 @@ const PersonalInfoTab = ({ data, onUpdate }: PersonalInfoTabProps) => {
     const [editData, setEditData] = useState(data)
     const [isEditing, setIsEditing] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [uploadingResume, setUploadingResume] = useState(false)
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 
     const handleSave = async () => {
         setLoading(true)
@@ -23,6 +27,38 @@ const PersonalInfoTab = ({ data, onUpdate }: PersonalInfoTabProps) => {
             console.error('Failed to update personal info', error)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setUploadingResume(true)
+        try {
+            const response = await adminApiClient.uploadFile(file)
+            if (response.success) {
+                // Prepend base URL if not already there, but backend returns /api/static/uploads/...
+                // In production, we just want to save the path.
+                setEditData({
+                    ...editData,
+                    resume: response.url
+                })
+            }
+        } catch (error) {
+            console.error('Resume upload failed:', error)
+            alert('Failed to upload resume. Please try again.')
+        } finally {
+            setUploadingResume(false)
+        }
+    }
+
+    const handleDeleteResume = () => {
+        if (confirm('Are you sure you want to delete the CV?')) {
+            setEditData({
+                ...editData,
+                resume: ''
+            })
         }
     }
 
@@ -52,14 +88,14 @@ const PersonalInfoTab = ({ data, onUpdate }: PersonalInfoTabProps) => {
             ]
         },
         {
-            title: 'Professional Links',
+            title: 'Professional Links & CV',
             fields: [
                 { key: 'github', label: 'GitHub', icon: Github, type: 'url' },
                 { key: 'linkedin', label: 'LinkedIn', icon: Linkedin, type: 'url' },
                 { key: 'twitter', label: 'Twitter', icon: Twitter, type: 'url' },
                 { key: 'website', label: 'Website', icon: Globe, type: 'url' },
                 { key: 'portfolio', label: 'Portfolio', icon: Globe, type: 'url' },
-                { key: 'resume', label: 'Resume URL', icon: Globe, type: 'url' },
+                { key: 'resume', label: 'Curriculum Vitae (PDF)', icon: FileText, isResume: true },
             ]
         },
         {
@@ -74,9 +110,95 @@ const PersonalInfoTab = ({ data, onUpdate }: PersonalInfoTabProps) => {
     ]
 
     const renderField = (field: Record<string, any>) => {
-        const { key, label, icon: Icon, type = 'text', multiline = false, isArray = false, required = false } = field
+        const { key, label, icon: Icon, type = 'text', multiline = false, isArray = false, required = false, isResume = false } = field
         const value = editData[key] || ''
         const displayValue = isArray && Array.isArray(value) ? value.join(', ') : value
+
+        if (isResume) {
+            return (
+                <div key={key} className="admin-form-group full-width-field" style={{ gridColumn: 'span 2' }}>
+                    <label className="admin-form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {Icon && <Icon size={14} style={{ opacity: 0.7 }} />}
+                        {label}
+                    </label>
+                    <div className="resume-upload-card" style={{
+                        background: 'rgba(30, 41, 59, 1.0)',
+                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                        borderRadius: '16px',
+                        padding: '20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '16px'
+                    }}>
+                        {value ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(6, 249, 249, 0.05)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(6, 249, 249, 0.1)' }}>
+                                <div style={{ background: 'var(--primary)', color: '#000', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <CheckCircle2 size={14} />
+                                </div>
+                                <div style={{ flex: 1, overflow: 'hidden' }}>
+                                    <p style={{ margin: 0, fontSize: '13px', fontWeight: '600', color: '#fff' }}>Resume Uploaded</p>
+                                    <p style={{ margin: 0, fontSize: '11px', color: 'rgba(255,255,255,0.4)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{value}</p>
+                                </div>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button 
+                                        onClick={() => setIsPreviewOpen(true)}
+                                        className="admin-btn-small" 
+                                        style={{ fontSize: '11px', background: 'rgba(255,255,255,0.05)', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                    >
+                                        <Eye size={12} /> Preview
+                                    </button>
+                                    {isEditing && (
+                                        <button 
+                                            onClick={handleDeleteResume}
+                                            className="admin-btn-small" 
+                                            style={{ fontSize: '11px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                        >
+                                            <Trash2 size={12} /> Delete
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: '1px dashed rgba(255, 255, 255, 0.1)' }}>
+                                <p style={{ margin: 0, fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>No CV uploaded yet</p>
+                            </div>
+                        )}
+
+                        {isEditing && (
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type="file"
+                                    accept=".pdf"
+                                    onChange={handleResumeUpload}
+                                    style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+                                    disabled={uploadingResume}
+                                />
+                                <button
+                                    type="button"
+                                    className="admin-btn"
+                                    disabled={uploadingResume}
+                                    style={{ width: '100%', justifyContent: 'center', gap: '10px' }}
+                                >
+                                    {uploadingResume ? <Loader2 className="animate-spin" size={18} /> : <FileUp size={18} />}
+                                    {uploadingResume ? 'Uploading...' : 'Click to Upload New CV (PDF Only)'}
+                                </button>
+                            </div>
+                        )}
+                        
+                        <p style={{ margin: 0, fontSize: '11px', color: '#64748b' }}>
+                            Supported format: PDF. Max size: 10MB. This CV will be available for download in the Hero section.
+                        </p>
+                    </div>
+
+                    <ResumeModal 
+                        isOpen={isPreviewOpen}
+                        onClose={() => setIsPreviewOpen(false)}
+                        resumeUrl={value}
+                        name={editData.name || 'Developer'}
+                    />
+                </div>
+            )
+        }
 
         return (
             <div key={key} className="admin-form-group">
