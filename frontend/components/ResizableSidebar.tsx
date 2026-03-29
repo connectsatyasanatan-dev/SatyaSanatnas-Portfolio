@@ -7,12 +7,14 @@ interface ResizableSidebarProps {
     minWidth?: number
     maxWidth?: number
     defaultWidth?: number
+    activeSection?: string
 }
 
 const ResizableSidebar = ({
     minWidth = 200,
     maxWidth = 600,
-    defaultWidth = 288
+    defaultWidth = 288,
+    activeSection
 }: ResizableSidebarProps) => {
     const [sidebarWidth, setSidebarWidth] = useState(defaultWidth)
     const [isResizing, setIsResizing] = useState(false)
@@ -153,7 +155,7 @@ const ResizableSidebar = ({
                     flexShrink: 0
                 }}
             >
-                {!isCollapsed && <Sidebar />}
+                {!isCollapsed && <Sidebar activeSection={activeSection} />}
             </aside>
 
             {/* Resize handle */}

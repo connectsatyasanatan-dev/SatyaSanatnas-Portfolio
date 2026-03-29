@@ -2,550 +2,351 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, Github, Linkedin, Twitter, MapPin, Calendar, Coffee, Send } from 'lucide-react'
+import {
+    Mail, Github, Linkedin, Twitter, MapPin, Calendar,
+    Coffee, Send, User, AtSign, MessageSquare, FileText,
+    CheckCircle2, XCircle, Loader2, Terminal
+} from 'lucide-react'
 import portfolioAPI, { PersonalInfo } from '@/lib/api'
 import { ContactSectionSkeleton } from './AppSkeletons'
 
+const MAX_MESSAGE = 1000
+
 const ContactSection = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-    })
+    const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' })
+    const [touched, setTouched] = useState({ name: false, email: false, subject: false, message: false })
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
     const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null)
     const [loadingInfo, setLoadingInfo] = useState(true)
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    useEffect(() => {
+        portfolioAPI.getPersonalInfo()
+            .then(setPersonalInfo)
+            .catch(() => { })
+            .finally(() => setLoadingInfo(false))
+    }, [])
+
+    const validate = {
+        name: formData.name.trim().length >= 2,
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email),
+        message: formData.message.trim().length >= 10,
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
+        if (name === 'message' && value.length > MAX_MESSAGE) return
         setFormData(prev => ({ ...prev, [name]: value }))
+    }
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setTouched(prev => ({ ...prev, [e.target.name]: true }))
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        setTouched({ name: true, email: true, subject: true, message: true })
+        if (!validate.name || !validate.email || !validate.message) return
+
         setIsSubmitting(true)
         setSubmitStatus('idle')
-
         try {
             await portfolioAPI.submitContactForm(formData)
             setSubmitStatus('success')
             setFormData({ name: '', email: '', subject: '', message: '' })
-        } catch (error) {
-            console.error('Contact form submission failed:', error)
+            setTouched({ name: false, email: false, subject: false, message: false })
+        } catch {
             setSubmitStatus('error')
         } finally {
             setIsSubmitting(false)
         }
     }
 
-    useEffect(() => {
-        const fetch = async () => {
-            try {
-                const data = await portfolioAPI.getPersonalInfo()
-                setPersonalInfo(data)
-            } catch (e) {
-                console.error('Failed to load personal info for contact section', e)
-            } finally {
-                setLoadingInfo(false)
-            }
-        }
-
-        fetch()
-    }, [])
-
-    const contactMethods = [
-        {
-            icon: Mail,
-            label: 'Email',
-            value: personalInfo?.email || '',
-            href: personalInfo?.email ? `mailto:${personalInfo.email}` : '#',
-            color: 'text-primary'
-        },
-        {
-            icon: Github,
-            label: 'GitHub',
-            value: personalInfo?.github || '',
-            href: personalInfo?.github || '#',
-            color: 'text-white'
-        },
-        {
-            icon: Linkedin,
-            label: 'LinkedIn',
-            value: personalInfo?.linkedin || '',
-            href: personalInfo?.linkedin || '#',
-            color: 'text-blue-400'
-        },
-        {
-            icon: Twitter,
-            label: 'Twitter',
-            value: personalInfo?.twitter || '',
-            href: personalInfo?.twitter || '#',
-            color: 'text-accent'
-        }
+    const contactLinks = [
+        { icon: Mail, label: 'Email', value: personalInfo?.email, href: personalInfo?.email ? `mailto:${personalInfo.email}` : '#', color: '#06f9f9' },
+        { icon: Github, label: 'GitHub', value: personalInfo?.github, href: personalInfo?.github || '#', color: '#ffffff' },
+        { icon: Linkedin, label: 'LinkedIn', value: personalInfo?.linkedin, href: personalInfo?.linkedin || '#', color: '#60a5fa' },
+        { icon: Twitter, label: 'Twitter', value: personalInfo?.twitter, href: personalInfo?.twitter || '#', color: '#38bdf8' },
     ]
 
-    const availability = [
-        {
-            icon: MapPin,
-            label: 'Location',
-            value: personalInfo?.location || '',
-            color: 'text-secondary'
-        },
-        {
-            icon: Calendar,
-            label: 'Availability',
-            value: personalInfo?.availability || 'Available for new opportunities',
-            color: 'text-green-400'
-        },
-        {
-            icon: Coffee,
-            label: 'Timezone',
-            value: personalInfo?.timezone || 'PST (UTC-8)',
-            color: 'text-yellow-400'
-        }
+    const statusItems = [
+        { icon: MapPin, label: 'Location', value: personalInfo?.location || '—', color: '#f97316' },
+        { icon: Calendar, label: 'Availability', value: personalInfo?.availability || 'Available for opportunities', color: '#22c55e' },
+        { icon: Coffee, label: 'Timezone', value: personalInfo?.timezone || 'IST (UTC+5:30)', color: '#eab308' },
     ]
+
+    const fieldState = (field: 'name' | 'email' | 'message') => {
+        if (!touched[field]) return 'idle'
+        return validate[field] ? 'valid' : 'invalid'
+    }
 
     return (
         <AnimatePresence mode="wait">
             {loadingInfo ? (
-                <motion.div 
-                    key="skeleton-contact"
-                    initial={{ opacity: 1 }}
-                    exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
-                    transition={{ duration: 0.5 }}
-                >
+                <motion.div key="skeleton-contact"
+                    initial={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                    transition={{ duration: 0.5 }}>
                     <ContactSectionSkeleton />
                 </motion.div>
             ) : (
-                <motion.section 
-                    key="contact-content" 
-                    id="contact-section"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                >
-                    <style>{`
-                        .contact-form-section {
-                            background: rgba(15, 23, 42, 0.6) !important;
-                            backdrop-filter: blur(20px);
-                            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-                            border-radius: 16px !important;
-                            padding: 24px !important;
-                            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5) !important;
-                            position: relative;
-                            overflow: hidden;
-                        }
+                <motion.section key="contact-content" id="contact-section"
+                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}>
 
-                        @media (min-width: 768px) {
-                            .contact-form-section {
-                                padding: 36px !important;
-                                border-radius: 20px !important;
-                            }
-                        }
-
-                        .contact-form-section::before {
-                            content: '';
-                            position: absolute;
-                            top: -100%; left: -100%; width: 300%; height: 300%;
-                            background: radial-gradient(circle at 50% 50%, rgba(244, 63, 94, 0.12) 0%, rgba(139, 92, 246, 0.12) 25%, transparent 50%);
-                            animation: aurora 15s linear infinite;
-                            z-index: 0;
-                            pointer-events: none;
-                        }
-
-                        @keyframes aurora {
-                            0% { transform: rotate(0deg); }
-                            100% { transform: rotate(360deg); }
-                        }
-
-                        .contact-form-section > * {
-                            position: relative;
-                            z-index: 1;
-                        }
-
-                        .contact-form-section .card-title {
-                            color: white;
-                            margin-bottom: 24px !important;
-                            text-align: center;
-                            font-size: 20px !important;
-                            font-weight: 700 !important;
-                            letter-spacing: -0.01em;
-                            display: flex;
-                            align-items: left;
-                            justify-content: left;
-                            gap: 8px;
-                        }
-                        
-                        @media (min-width: 768px) {
-                            .contact-form-section .card-title {
-                                font-size: 24px !important;
-                                margin-bottom: 32px !important;
-                            }
-                        }
-
-                        .contact-form-section .card-title .bracket {
-                            color: #f43f5e;
-                            font-weight: 400;
-                        }
-
-                        .form-row {
-                            display: flex;
-                            flex-direction: column;
-                            gap: 16px;
-                            margin-bottom: 16px;
-                        }
-
-                        @media (min-width: 768px) {
-                            .form-row {
-                                flex-direction: row;
-                                gap: 20px;
-                            }
-                            .form-row .form-group {
-                                flex: 1;
-                                margin-bottom: 0;
-                            }
-                        }
-
-                        .form-group {
-                            margin-bottom: 16px;
-                        }
-
-                        .form-group label {
-                            color: rgba(255, 255, 255, 0.6);
-                            font-size: 11px;
-                            font-weight: 600;
-                            text-transform: uppercase;
-                            letter-spacing: 0.1em;
-                            margin-bottom: 8px;
-                            display: block;
-                            transition: color 0.3s;
-                        }
-
-                        .form-group:focus-within label {
-                            color: #f43f5e;
-                        }
-
-                        .form-input, .form-textarea {
-                            width: 100%;
-                            background: rgba(0, 0, 0, 0.25) !important;
-                            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-                            border-radius: 10px !important;
-                            padding: 12px 16px !important;
-                            color: white !important;
-                            font-size: 14px !important;
-                            font-family: inherit;
-                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
-                        }
-                        
-                        .form-textarea {
-                            min-height: 120px;
-                            resize: vertical;
-                        }
-
-                        .form-input::placeholder, .form-textarea::placeholder {
-                            color: rgba(255, 255, 255, 0.3);
-                        }
-
-                        .form-input:focus, .form-textarea:focus {
-                            outline: none !important;
-                            background: rgba(0, 0, 0, 0.4) !important;
-                            border-color: rgba(244, 63, 94, 0.6) !important;
-                            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15), inset 0 2px 4px rgba(0,0,0,0.2) !important;
-                            transform: translateY(-1px);
-                        }
-
-                        .form-submit {
-                            width: 100%;
-                            background: linear-gradient(135deg, #f43f5e 0%, #8b5cf6 50%, #3b82f6 100%) !important;
-                            background-size: 200% auto !important;
-                            color: white !important;
-                            border: none !important;
-                            border-radius: 10px !important;
-                            padding: 14px 24px !important;
-                            font-size: 14px !important;
-                            font-weight: 700 !important;
-                            text-transform: uppercase;
-                            letter-spacing: 0.08em;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            gap: 10px;
-                            cursor: pointer;
-                            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                            box-shadow: 0 8px 20px -5px rgba(244, 63, 94, 0.4) !important;
-                            position: relative;
-                            overflow: hidden;
-                            margin-top: 8px;
-                        }
-
-                        .form-submit::before {
-                            content: '';
-                            position: absolute;
-                            top: 0; left: -100%; width: 50%; height: 100%;
-                            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-                            transform: skewX(-20deg);
-                            transition: all 0.7s ease;
-                        }
-
-                        .form-submit:hover {
-                            background-position: right center !important;
-                            box-shadow: 0 15px 30px -5px rgba(139, 92, 246, 0.5) !important;
-                            transform: translateY(-2px);
-                        }
-
-                        .form-submit:hover::before {
-                            left: 200%;
-                        }
-
-                        .send-icon {
-                            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-                        }
-
-                        .form-submit:hover .send-icon {
-                            transform: translateX(4px) translateY(-4px) rotate(15deg) scale(1.1);
-                        }
-
-                        .form-submit.submitting {
-                            opacity: 0.8 !important;
-                            cursor: wait !important;
-                            transform: scale(0.98) !important;
-                        }
-                    `}</style>
+                    {/* ── Section header ── */}
                     <div className="section-header">
                         <Mail className="w-5 h-5 text-primary" />
-                        <h3 className="section-title">Contact & Availability</h3>
+                        <h3 className="section-title">Contact &amp; Availability</h3>
                     </div>
 
+                    {/* ── Top grid: links + status ── */}
                     <div className="contact-grid">
-                        {/* Contact Methods */}
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                            className="contact-methods-card"
-                        >
+                        {/* Connect card */}
+                        <motion.div className="contact-methods-card"
+                            initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }} transition={{ duration: 0.6 }}>
                             <h4 className="card-title">
-                                <span className="bracket">{'{'}</span>
-                                Connect with me
-                                <span className="bracket">{'}'}</span>
+                                <span className="bracket">{'{'}</span> Connect with me <span className="bracket">{'}'}</span>
                             </h4>
-
                             <div className="contact-methods">
-                                {contactMethods.map((method, index) => {
-                                    const IconComponent = method.icon
-                                    return (
-                                        <motion.a
-                                            key={index}
-                                            href={method.href}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            initial={{ opacity: 0, y: 10 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            transition={{ duration: 0.3, delay: index * 0.1 }}
-                                            whileHover={{ x: 5 }}
-                                            className="contact-method"
-                                        >
-                                            <div className="method-icon">
-                                                <IconComponent className={`w-5 h-5 ${method.color}`} />
-                                            </div>
-                                            <div className="method-info">
-                                                <div className="method-label">{method.label}</div>
-                                                <div className="method-value">{method.value}</div>
-                                            </div>
-                                            <div className="method-arrow">
-                                                <span>→</span>
-                                            </div>
-                                        </motion.a>
-                                    )
-                                })}
+                                {contactLinks.map((m, i) => (
+                                    <motion.a key={i} href={m.href} target="_blank" rel="noopener noreferrer"
+                                        className="contact-method"
+                                        initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }} transition={{ delay: i * 0.08 }}
+                                        whileHover={{ x: 5 }}>
+                                        <div className="method-icon">
+                                            <m.icon size={18} style={{ color: m.color }} />
+                                        </div>
+                                        <div className="method-info">
+                                            <div className="method-label">{m.label}</div>
+                                            <div className="method-value">{m.value || '—'}</div>
+                                        </div>
+                                        <div className="method-arrow">→</div>
+                                    </motion.a>
+                                ))}
                             </div>
                         </motion.div>
 
-                        {/* Availability Info */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="availability-card"
-                        >
+                        {/* Status card */}
+                        <motion.div className="availability-card"
+                            initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
                             <h4 className="card-title">
-                                <span className="bracket secondary">{'<'}</span>
-                                Current Status
-                                <span className="bracket secondary">{'/>'}</span>
+                                <span className="bracket secondary">{'<'}</span> Current Status <span className="bracket secondary">{'/>'}</span>
                             </h4>
-
                             <div className="availability-info">
-                                {availability.map((item, index) => {
-                                    const IconComponent = item.icon
-                                    return (
-                                        <motion.div
-                                            key={index}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            transition={{ duration: 0.3, delay: index * 0.1 + 0.2 }}
-                                            className="availability-item"
-                                        >
-                                            <div className="item-icon">
-                                                <IconComponent className={`w-5 h-5 ${item.color}`} />
-                                            </div>
-                                            <div className="item-info">
-                                                <div className="item-label">{item.label}</div>
-                                                <div className="item-value">{item.value}</div>
-                                            </div>
-                                        </motion.div>
-                                    )
-                                })}
+                                {statusItems.map((item, i) => (
+                                    <motion.div key={i} className="availability-item"
+                                        initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }} transition={{ delay: i * 0.1 + 0.2 }}>
+                                        <div className="item-icon">
+                                            <item.icon size={18} style={{ color: item.color }} />
+                                        </div>
+                                        <div className="item-info">
+                                            <div className="item-label">{item.label}</div>
+                                            <div className="item-value">{item.value}</div>
+                                        </div>
+                                    </motion.div>
+                                ))}
                             </div>
-
-                            {/* Status indicator */}
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.6, delay: 0.8 }}
-                                className="status-indicator"
-                            >
+                            <div className="status-indicator">
                                 <div className="status-header">
-                                    <div className="status-dot available"></div>
+                                    <div className="status-dot available" />
                                     <span className="status-text">AVAILABLE FOR HIRE</span>
                                 </div>
                                 <p className="status-description">
-                                    Currently seeking new opportunities in full-stack development,
-                                    particularly interested in React, Node.js, and cloud architecture projects.
+                                    Open to full-stack roles, freelance projects, and collaborations
+                                    in React, Next.js, Python, and cloud architecture.
                                 </p>
-                            </motion.div>
+                            </div>
                         </motion.div>
                     </div>
 
-                    {/* Quick contact CTA */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                        className="contact-cta"
-                    >
+                    {/* ── Quick CTA ── */}
+                    <motion.div className="contact-cta"
+                        initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.4 }}>
                         <motion.a
                             href={personalInfo?.email ? `mailto:${personalInfo.email}?subject=Let's work together!` : '#'}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="cta-button"
-                        >
-                            <Mail className="w-5 h-5" />
+                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                            className="cta-button">
+                            <Mail size={18} />
                             Let's Build Something Amazing
                         </motion.a>
                     </motion.div>
 
-                    {/* Contact Form */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.6 }}
-                        className="contact-form-section"
-                    >
-                        <h4 className="card-title">
-                            <span className="bracket">{'{'}</span>
-                            Send Message
-                            <span className="bracket">{'}'}</span>
-                        </h4>
+                    {/* ── Send Message form ── */}
+                    <motion.div className="cf-wrapper"
+                        initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.5 }}>
 
-                        <form onSubmit={handleSubmit} className="contact-form">
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label htmlFor="name">Name *</label>
-                                    <input
-                                        type="text"
-                                        id="name"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        required
-                                        disabled={isSubmitting}
-                                        className="form-input"
-                                    />
+                        {/* VS Code window chrome */}
+                        <div className="cf-chrome">
+                            <div className="cf-dots">
+                                <span className="cf-dot red" />
+                                <span className="cf-dot yellow" />
+                                <span className="cf-dot green" />
+                            </div>
+                            <div className="cf-chrome-title">
+                                <Terminal size={13} />
+                                <span>contact.json — Send Message</span>
+                            </div>
+                            <div className="cf-chrome-lang">JSON</div>
+                        </div>
+
+                        {/* Line-number gutter + form body */}
+                        <div className="cf-body">
+                            <div className="cf-gutter">
+                                {Array.from({ length: 14 }, (_, i) => (
+                                    <span key={i}>{i + 1}</span>
+                                ))}
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="cf-form" noValidate>
+
+                                {/* Row: name + email */}
+                                <div className="cf-row">
+                                    <div className={`cf-field ${fieldState('name')}`}>
+                                        <label className="cf-label">
+                                            <User size={12} />
+                                            name <span className="cf-required">*</span>
+                                        </label>
+                                        <div className="cf-input-wrap">
+                                            <input
+                                                type="text" name="name" autoComplete="name"
+                                                value={formData.name} onChange={handleChange} onBlur={handleBlur}
+                                                placeholder="Your full name"
+                                                className="cf-input" disabled={isSubmitting} />
+                                            {touched.name && (
+                                                <span className="cf-status-icon">
+                                                    {validate.name
+                                                        ? <CheckCircle2 size={14} className="cf-valid" />
+                                                        : <XCircle size={14} className="cf-invalid" />}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {touched.name && !validate.name && (
+                                            <span className="cf-error">Minimum 2 characters required</span>
+                                        )}
+                                    </div>
+
+                                    <div className={`cf-field ${fieldState('email')}`}>
+                                        <label className="cf-label">
+                                            <AtSign size={12} />
+                                            email <span className="cf-required">*</span>
+                                        </label>
+                                        <div className="cf-input-wrap">
+                                            <input
+                                                type="email" name="email" autoComplete="email"
+                                                value={formData.email} onChange={handleChange} onBlur={handleBlur}
+                                                placeholder="you@example.com"
+                                                className="cf-input" disabled={isSubmitting} />
+                                            {touched.email && (
+                                                <span className="cf-status-icon">
+                                                    {validate.email
+                                                        ? <CheckCircle2 size={14} className="cf-valid" />
+                                                        : <XCircle size={14} className="cf-invalid" />}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {touched.email && !validate.email && (
+                                            <span className="cf-error">Enter a valid email address</span>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="form-group">
-                                    <label htmlFor="email">Email *</label>
+
+                                {/* Subject */}
+                                <div className="cf-field idle">
+                                    <label className="cf-label">
+                                        <FileText size={12} />
+                                        subject <span className="cf-optional">(optional)</span>
+                                    </label>
                                     <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        required
-                                        disabled={isSubmitting}
-                                        className="form-input"
-                                    />
+                                        type="text" name="subject"
+                                        value={formData.subject} onChange={handleChange} onBlur={handleBlur}
+                                        placeholder="Project inquiry, collaboration, freelance…"
+                                        className="cf-input" disabled={isSubmitting} />
                                 </div>
-                            </div>
 
-                            <div className="form-group">
-                                <label htmlFor="subject">Subject</label>
-                                <input
-                                    type="text"
-                                    id="subject"
-                                    name="subject"
-                                    value={formData.subject}
-                                    onChange={handleInputChange}
+                                {/* Message */}
+                                <div className={`cf-field ${fieldState('message')}`}>
+                                    <label className="cf-label">
+                                        <MessageSquare size={12} />
+                                        message <span className="cf-required">*</span>
+                                    </label>
+                                    <div className="cf-input-wrap cf-textarea-wrap">
+                                        <textarea
+                                            name="message" rows={6}
+                                            value={formData.message} onChange={handleChange} onBlur={handleBlur}
+                                            placeholder={"Tell me about your project, idea, or just say hi...\n\n// I read every message and reply within 24 hours."}
+                                            className="cf-input cf-textarea" disabled={isSubmitting} />
+                                        {touched.message && (
+                                            <span className="cf-status-icon cf-status-textarea">
+                                                {validate.message
+                                                    ? <CheckCircle2 size={14} className="cf-valid" />
+                                                    : <XCircle size={14} className="cf-invalid" />}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="cf-meta-row">
+                                        {touched.message && !validate.message && (
+                                            <span className="cf-error">Minimum 10 characters required</span>
+                                        )}
+                                        <span className={`cf-char-count ${formData.message.length > MAX_MESSAGE * 0.9 ? 'warn' : ''}`}>
+                                            {formData.message.length} / {MAX_MESSAGE}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Submit */}
+                                <motion.button type="submit"
+                                    className={`cf-submit${isSubmitting ? ' loading' : ''}`}
                                     disabled={isSubmitting}
-                                    className="form-input"
-                                    placeholder="Project inquiry, collaboration, etc."
-                                />
-                            </div>
+                                    whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+                                    whileTap={!isSubmitting ? { scale: 0.98 } : {}}>
+                                    {isSubmitting ? (
+                                        <><Loader2 size={16} className="cf-spin" /> Sending…</>
+                                    ) : (
+                                        <><Send size={16} className="cf-send-icon" /> Send Message</>
+                                    )}
+                                </motion.button>
 
-                            <div className="form-group">
-                                <label htmlFor="message">Message *</label>
-                                <textarea
-                                    id="message"
-                                    name="message"
-                                    value={formData.message}
-                                    onChange={handleInputChange}
-                                    required
-                                    disabled={isSubmitting}
-                                    rows={5}
-                                    className="form-textarea"
-                                    placeholder="Tell me about your project or how we can work together..."
-                                />
-                            </div>
+                                {/* Feedback */}
+                                <AnimatePresence>
+                                    {submitStatus === 'success' && (
+                                        <motion.div className="cf-feedback success"
+                                            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0 }}>
+                                            <CheckCircle2 size={16} />
+                                            Message sent! I'll get back to you within 24 hours.
+                                        </motion.div>
+                                    )}
+                                    {submitStatus === 'error' && (
+                                        <motion.div className="cf-feedback error"
+                                            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0 }}>
+                                            <XCircle size={16} />
+                                            Failed to send. Please email me directly at{' '}
+                                            <a href={`mailto:${personalInfo?.email}`}>{personalInfo?.email}</a>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </form>
+                        </div>
 
-                            <motion.button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className={`form-submit ${isSubmitting ? 'submitting' : ''}`}
-                            >
-                                <Send className="w-5 h-5 send-icon" />
-                                {isSubmitting ? 'Sending...' : 'Send Message'}
-                            </motion.button>
-
-                            {submitStatus === 'success' && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="form-message success"
-                                >
-                                    ✅ Message sent successfully! I'll get back to you soon.
-                                </motion.div>
-                            )}
-
-                            {submitStatus === 'error' && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="form-message error"
-                                >
-                                    ❌ Failed to send message. Please try again or email me directly.
-                                </motion.div>
-                            )}
-                        </form>
+                        {/* Status bar */}
+                        <div className="cf-statusbar">
+                            <span className="cf-sb-item">
+                                <span className={`cf-sb-dot ${submitStatus === 'success' ? 'green' : submitStatus === 'error' ? 'red' : 'blue'}`} />
+                                {submitStatus === 'success' ? 'Sent' : submitStatus === 'error' ? 'Error' : 'Ready'}
+                            </span>
+                            <span className="cf-sb-item">contact.json</span>
+                            <span className="cf-sb-item">UTF-8</span>
+                            <span className="cf-sb-item">JSON</span>
+                        </div>
                     </motion.div>
+
                 </motion.section>
             )}
         </AnimatePresence>

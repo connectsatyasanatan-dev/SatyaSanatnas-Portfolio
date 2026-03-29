@@ -361,11 +361,11 @@ const HeroSection = () => {
                             </div>
 
                             <motion.div className="hero-actions" variants={itemVariants}>
-                                <button className="hero-btn primary" onClick={handleGithubClick}>
+                                {/* <button className="hero-btn primary" onClick={handleGithubClick}>
                                     <Github />
                                     <span className="btn-text-full">Browse Repo</span>
                                     <span className="btn-text-short">GitHub</span>
-                                </button>
+                                </button> */}
 
                                 <button className="hero-btn secondary" onClick={handleResumeClick}>
                                     <Download />

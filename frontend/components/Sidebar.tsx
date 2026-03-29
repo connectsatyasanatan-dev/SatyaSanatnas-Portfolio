@@ -10,14 +10,60 @@ import {
     Settings,
     ChevronRight,
     MoreHorizontal,
-    File,
     Folder,
-    FileText
+    FileText,
+    File,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { SidebarSkeleton } from './AppSkeletons'
 
-const Sidebar = () => {
+export interface SectionFile {
+    id: string
+    filename: string
+    icon: string
+    color: string
+    sectionId: string
+}
+
+export const SECTION_FILES: SectionFile[] = [
+    { id: 'hero', filename: 'index.tsx', icon: 'tsx', color: '#61dafb', sectionId: 'hero-section' },
+    { id: 'skills', filename: 'skills.ts', icon: 'ts', color: '#3178c6', sectionId: 'skills-section' },
+    { id: 'experience', filename: 'git-history.log', icon: 'log', color: '#f97316', sectionId: 'git-history-section' },
+    { id: 'education', filename: 'education.md', icon: 'md', color: '#a78bfa', sectionId: 'edu-root' },
+    { id: 'certifications', filename: 'certifications.json', icon: 'json', color: '#22c55e', sectionId: 'certifications-section' },
+    { id: 'projects', filename: 'projects.sh', icon: 'sh', color: '#f59e0b', sectionId: 'projects-section' },
+    { id: 'testimonials', filename: 'testimonials.md', icon: 'md', color: '#a78bfa', sectionId: 'testimonials-root' },
+    { id: 'blog', filename: 'blog.md', icon: 'md', color: '#a78bfa', sectionId: 'blog-section' },
+    { id: 'terminal', filename: 'terminal.sh', icon: 'sh', color: '#f59e0b', sectionId: 'terminal-section' },
+    { id: 'contact', filename: 'contact.json', icon: 'json', color: '#22c55e', sectionId: 'contact-section' },
+]
+
+const FILE_ICON_COLORS: Record<string, string> = {
+    tsx: '#61dafb',
+    ts: '#3178c6',
+    json: '#22c55e',
+    md: '#a78bfa',
+    sh: '#f59e0b',
+    log: '#f97316',
+}
+
+function FileIcon({ ext, size = 14 }: { ext: string; size?: number }) {
+    const color = FILE_ICON_COLORS[ext] || '#9ca3af'
+    return <File size={size} style={{ color, flexShrink: 0 }} />
+}
+
+function scrollToSection(sectionId: string) {
+    const el = document.getElementById(sectionId)
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+}
+
+interface SidebarProps {
+    activeSection?: string
+}
+
+const Sidebar = ({ activeSection }: SidebarProps) => {
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
@@ -44,7 +90,6 @@ const Sidebar = () => {
                 <div className="icon-wrapper" title="Extensions">
                     <Package size={24} />
                 </div>
-
                 <div className="icons-bottom">
                     <div className="icon-wrapper" title="Account">
                         <User size={24} />
@@ -54,7 +99,6 @@ const Sidebar = () => {
                     </div>
                 </div>
             </div>
-
 
             {/* File explorer */}
             <div className="sidebar-explorer">
@@ -67,10 +111,9 @@ const Sidebar = () => {
                     {/* Root folder */}
                     <div className="folder-root">
                         <ChevronRight style={{ transform: 'rotate(90deg)' }} />
-                        <span className="folder-name">PORTFOLIO-V2</span>
+                        <span className="folder-name">Satya’s Portfolio</span>
                     </div>
 
-                    {/* File structure */}
                     <div className="folder-contents">
                         <div className="file-item">
                             <ChevronRight />
@@ -80,11 +123,11 @@ const Sidebar = () => {
 
                         <div className="file-item">
                             <ChevronRight style={{ transform: 'rotate(90deg)' }} />
-                            <FolderOpen />
+                            <FolderOpen size={14} style={{ color: '#22c55e', flexShrink: 0 }} />
                             <span>src</span>
                         </div>
 
-                        {/* src folder contents */}
+                        {/* sections folder inside src */}
                         <div className="nested-folder">
                             <div className="file-item">
                                 <ChevronRight />
@@ -94,64 +137,33 @@ const Sidebar = () => {
 
                             <div className="file-item">
                                 <ChevronRight style={{ transform: 'rotate(90deg)' }} />
-                                <FolderOpen style={{ color: '#22c55e' }} />
-                                <span>components</span>
+                                <FolderOpen size={14} style={{ color: '#3b82f6', flexShrink: 0 }} />
+                                <span>Components</span>
                             </div>
 
-                            {/* components folder contents */}
+                            {/* Each section as a file */}
                             <div className="nested-folder">
-                                <div className="file-item">
-                                    <File style={{ color: '#61dafb' }} />
-                                    <span>Hero.tsx</span>
-                                </div>
-                                <div className="file-item">
-                                    <File style={{ color: '#61dafb' }} />
-                                    <span>Skills.tsx</span>
-                                </div>
-                                <div className="file-item">
-                                    <File style={{ color: '#61dafb' }} />
-                                    <span>Projects.tsx</span>
-                                </div>
-                                <div className="file-item">
-                                    <File style={{ color: '#61dafb' }} />
-                                    <span>Contact.tsx</span>
-                                </div>
-                            </div>
-
-                            <div className="file-item">
-                                <ChevronRight style={{ transform: 'rotate(90deg)' }} />
-                                <FolderOpen style={{ color: '#3b82f6' }} />
-                                <span>pages</span>
-                            </div>
-
-                            {/* pages folder contents */}
-                            <div className="nested-folder">
-                                <div className="file-item active">
-                                    <File style={{ color: '#61dafb' }} />
-                                    <span>index.tsx</span>
-                                </div>
-                                <div className="file-item">
-                                    <FileText style={{ color: '#e34c26' }} />
-                                    <span>about.html</span>
-                                </div>
+                                {SECTION_FILES.map((file) => (
+                                    <div
+                                        key={file.id}
+                                        className={`file-item${activeSection === file.id ? ' active' : ''}`}
+                                        onClick={() => scrollToSection(file.sectionId)}
+                                        title={`Go to ${file.filename}`}
+                                    >
+                                        <FileIcon ext={file.icon} />
+                                        <span>{file.filename}</span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
                         {/* Root level files */}
                         <div className="file-item">
-                            <File style={{ color: '#eab308' }} />
+                            <File size={14} style={{ color: '#eab308', flexShrink: 0 }} />
                             <span>package.json</span>
                         </div>
                         <div className="file-item">
-                            <File style={{ color: 'var(--secondary)' }} />
-                            <span>projects.sh</span>
-                        </div>
-                        <div className="file-item">
-                            <File style={{ color: '#22c55e' }} />
-                            <span>contact.json</span>
-                        </div>
-                        <div className="file-item">
-                            <FileText style={{ color: '#6b7280' }} />
+                            <FileText size={14} style={{ color: '#6b7280', flexShrink: 0 }} />
                             <span>README.md</span>
                         </div>
                     </div>

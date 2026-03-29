@@ -993,3 +993,17 @@ body.resizing * {
     display: none;
   }
 }
+
+/* Closed tab — ghost style, click to reopen */
+#portfolio-tabbar .tab-item.tab-closed {
+  opacity: 0.35;
+  border-top-color: transparent !important;
+  background: transparent !important;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+#portfolio-tabbar .tab-item.tab-closed:hover {
+  opacity: 0.7;
+  background-color: #1e2929 !important;
+}
