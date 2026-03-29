@@ -1,22 +1,22 @@
 # ─── Dependencies ────────────────────────────────────────────────────────────
-node_modules/
+frontend/node_modules/
 .pnp
 .pnp.js
 .yarn/install-state.gz
 
 # ─── Next.js build artifacts ─────────────────────────────────────────────────
-.next/
-out/
-build/
+frontend/.next/
+frontend/out/
+frontend/build/
 
 # ─── Testing ─────────────────────────────────────────────────────────────────
 coverage/
 
 # ─── Environment variables (NEVER commit real .env.local!) ───────────────────
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 # Keep .env.local.example in source control — it is the safe template
 
 # ─── Vercel ──────────────────────────────────────────────────────────────────
@@ -28,8 +28,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # ─── TypeScript ──────────────────────────────────────────────────────────────
-*.tsbuildinfo
-next-env.d.ts
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
 
 # ─── macOS / Windows ─────────────────────────────────────────────────────────
 .DS_Store

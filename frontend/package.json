@@ -9,8 +9,8 @@
         "start": "next start",
         "lint": "next lint",
         "type-check": "tsc --noEmit",
-        "backend:setup": "cd backend && python -m venv venv && .\\venv\\Scripts\\python -m pip install -r requirements.txt",
-        "backend:dev": "cd backend && .\\venv\\Scripts\\python wsgi.py",
+        "backend:setup": "cd ../backend && python -m venv venv && .\\venv\\Scripts\\python -m pip install -r requirements.txt",
+        "backend:dev": "cd ../backend && .\\venv\\Scripts\\python wsgi.py",
         "dev:all": "concurrently --kill-others-on-fail --names \"NEXT,FLASK\" --prefix-colors \"cyan,magenta\" \"npm run dev\" \"npm run backend:dev\""
     },
     "dependencies": {
