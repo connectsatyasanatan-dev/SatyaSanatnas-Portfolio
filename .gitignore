@@ -19,9 +19,6 @@ frontend/.env.test.local
 frontend/.env.production.local
 # Keep .env.local.example in source control — it is the safe template
 
-# ─── Vercel ──────────────────────────────────────────────────────────────────
-.vercel
-
 # ─── Debug / logs ────────────────────────────────────────────────────────────
 npm-debug.log*
 yarn-debug.log*

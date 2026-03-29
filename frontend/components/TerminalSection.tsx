@@ -38,10 +38,8 @@ const TerminalSection = () => {
         "  ├ chunks/main-app-4f41eed9b4f4b9b8.js  216 B",
         "  └ chunks/main-c67cccb185a5d5a3.js      42.1 kB",
         "",
-        "$ vercel deploy",
-        "🔗  Linked to portfolio-v2 (created .vercel)",
-        "🔍  Inspect: https://vercel.com/portfolio/deployments/abc123",
-        "✅  Production: https://portfolio-v2.vercel.app [copied to clipboard]",
+        "$ npm run type-check",
+        "✔ No TypeScript errors found",
         "",
         "$ echo 'Ready for new opportunities! 🚀'",
         "Ready for new opportunities! 🚀",
@@ -53,7 +51,7 @@ const TerminalSection = () => {
         "ls -la skills/",
         "cat experience.json",
         "git log --oneline",
-        "npm run deploy"
+        "npm run build"
     ]
 
     useEffect(() => {
@@ -102,7 +100,7 @@ const TerminalSection = () => {
     return (
         <AnimatePresence mode="wait">
             {isLoading ? (
-                <motion.div 
+                <motion.div
                     key="skeleton-terminal"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
@@ -111,8 +109,8 @@ const TerminalSection = () => {
                     <TerminalSectionSkeleton />
                 </motion.div>
             ) : (
-                <motion.section 
-                    key="terminal-content-root" 
+                <motion.section
+                    key="terminal-content-root"
                     id="terminal-section"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -207,7 +205,7 @@ const TerminalSection = () => {
                         </div>
                         <div className="stat-indicator">
                             <div className="status-dot warning"></div>
-                            <span>Deploy: Ready</span>
+                            <span>Build: Passing</span>
                         </div>
                     </motion.div>
                 </motion.section>

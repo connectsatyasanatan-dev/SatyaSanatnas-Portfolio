@@ -43,26 +43,7 @@ cp .env.example .env
 
 3. Run the application:
 ```bash
-python app.py
+python run.py
 ```
 
 The API will be available at `http://localhost:5000`
-
-## Contact Form
-
-Send POST request to `/api/contact` with JSON body:
-```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "subject": "Project Inquiry",
-  "message": "Hello, I'd like to discuss a project..."
-}
-```
-
-## Deployment
-
-For production deployment with Gunicorn:
-```bash
-gunicorn -w 4 -b 0.0.0.0:5000 app:create_app()
-```

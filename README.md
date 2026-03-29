@@ -43,7 +43,6 @@ portfolio-root/
 │   ├── wsgi.py                 # WSGI / dev entry point
 │   ├── config.py               # All config from env vars
 │   ├── requirements.txt        # Python dependencies
-│   ├── render.yaml             # Render.com deployment blueprint
 │   ├── .env.example            # Safe template — commit this
 │   ├── .env                    # Real secrets — NEVER commit
 │   │
@@ -182,31 +181,6 @@ const projects = await portfolioAPI.getProjects(/* featured= */ true);
 
 ---
 
-## 🚀 Production Deployment
-
-### Frontend → Vercel
-
-1. Push repo to GitHub.
-2. Go to [vercel.com](https://vercel.com) → **New Project** → import repo.
-3. Set **Root Directory** to `frontend`.
-4. Add environment variable:
-   ```
-   NEXT_PUBLIC_API_URL = https://your-flask-backend.onrender.com/api
-   ```
-5. Deploy.
-
-### Backend → Render
-
-1. Go to [render.com](https://render.com) → **New Web Service**.
-2. Connect repo, set **Root Directory** to `backend`.
-3. Settings:
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120`
-4. Add env vars from `backend/.env.example`.
-5. Copy the Render URL → update `NEXT_PUBLIC_API_URL` in Vercel and `CORS_ORIGINS` in Render.
-
----
-
 ## 🔐 Environment Variables
 
 ### Frontend (`frontend/.env.local`)
@@ -267,8 +241,6 @@ Run these from the `frontend/` folder:
 | CORS            | Flask-CORS              |
 | Database        | SQLite                  |
 | Server          | Gunicorn (production)   |
-| Frontend Deploy | Vercel                  |
-| Backend Deploy  | Render                  |
 
 ---
 

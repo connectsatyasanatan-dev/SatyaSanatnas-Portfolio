@@ -223,51 +223,6 @@ CORS_ORIGINS=http://localhost:3000
 3. Use App Password in `.env`
 4. Check spam folder
 
-## 📦 Production Deployment
-
-### Backend Deployment (Heroku Example)
-
-1. **Create Heroku App:**
-```cmd
-heroku create your-portfolio-backend
-```
-
-2. **Add Environment Variables:**
-```cmd
-heroku config:set SECRET_KEY=your-secret-key
-heroku config:set MAIL_USERNAME=your-email@gmail.com
-heroku config:set MAIL_PASSWORD=your-app-password
-heroku config:set CORS_ORIGINS=https://your-frontend-domain.com
-```
-
-3. **Create Procfile:**
-```
-web: gunicorn -w 4 -b 0.0.0.0:$PORT "app:create_app()"
-```
-
-4. **Deploy:**
-```cmd
-cd backend
-git init
-git add .
-git commit -m "Initial backend commit"
-heroku git:remote -a your-portfolio-backend
-git push heroku main
-```
-
-### Frontend Deployment (Vercel)
-
-1. **Update Environment:**
-```env
-NEXT_PUBLIC_API_URL=https://your-portfolio-backend.herokuapp.com/api
-```
-
-2. **Deploy:**
-```cmd
-npm run build
-vercel --prod
-```
-
 ## 🔮 Future-Proof Architecture
 
 ### ✅ Current Structure Benefits:
@@ -275,7 +230,7 @@ vercel --prod
 1. **Modular Design:**
    - Backend completely separate from frontend
    - Easy to scale independently
-   - Can deploy on different servers
+   - Can run on different servers
 
 2. **Technology Flexibility:**
    - Can switch from Flask to FastAPI/Django
@@ -402,7 +357,6 @@ def log_response_info(response):
 - [x] **Security** - CORS, validation, environment variables
 - [x] **Documentation** - Complete API documentation
 - [x] **Testing** - Easy to test endpoints
-- [x] **Deployment** - Production-ready configuration
 - [x] **Monitoring** - Logging and health checks
 - [x] **Scalability** - Easy to add features
 - [x] **Maintainability** - Clean code structure
@@ -413,7 +367,6 @@ Your portfolio now has:
 - ✅ Professional Flask backend
 - ✅ Working contact form with email
 - ✅ RESTful API for all portfolio data
-- ✅ Production-ready deployment setup
 - ✅ Future-proof architecture
 - ✅ Complete documentation
 
@@ -421,6 +374,5 @@ Your portfolio now has:
 1. Run both servers
 2. Test the contact form
 3. Customize the data in `backend/models/portfolio_data.py`
-4. Deploy to production when ready
 
 Happy coding! 🚀
