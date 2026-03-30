@@ -23,7 +23,7 @@ import { SkillsSectionSkeleton } from './AppSkeletons'
 
 const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
         opacity: 1,
         transition: { staggerChildren: 0.05 }
     }
@@ -52,7 +52,7 @@ const SkillsSection = () => {
                     portfolioAPI.getStats()
                 ])
                 setSkills(skillsData)
-                
+
                 // Set first category with skills as active
                 const firstValidCategory = skillCategories.find(cat => skillsData[cat.key]?.skills.length > 0)
                 if (firstValidCategory) {
@@ -145,16 +145,10 @@ const SkillsSection = () => {
     const activeSkillData = skills[activeCategory as keyof typeof skills]
     const activeCategoryData = skillCategories.find(cat => cat.key === activeCategory)
 
-    // Derived stats
-    const yearsExp = portfolioStats?.experience_years ?? achievements?.stats.yearsOfExperience ?? 0
-    const projectsCount = portfolioStats?.projects_count ?? achievements?.stats.projectsCompleted ?? 0
-    const codeCommits = portfolioStats?.code_commits ?? achievements?.stats.codeCommits ?? 0
-    const hackathonsWon = achievements?.stats.hackathonsWon ?? 0
-
     return (
         <AnimatePresence mode="wait">
             {loading ? (
-                <motion.div 
+                <motion.div
                     key="skeleton-skills"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
@@ -163,9 +157,9 @@ const SkillsSection = () => {
                     <SkillsSectionSkeleton />
                 </motion.div>
             ) : (
-                <motion.section 
+                <motion.section
                     key="skills-content"
-                    id="skills-section" 
+                    id="skills-section"
                     className="skills-modern-section"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -191,95 +185,6 @@ const SkillsSection = () => {
                             {isAnimating ? <Pause size={16} /> : <Play size={16} />}
                         </button>
                     </div>
-
-                    {/* Stats Dashboard */}
-                    <motion.div 
-                        className="stats-dashboard"
-                        variants={containerVariants}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                    >
-                        {yearsExp > 0 && (
-                            <motion.div className="stat-card-modern" variants={itemVariants}>
-                                <div className="stat-icon">
-                                    <Rocket />
-                                </div>
-                                <div className="stat-content">
-                                    <div className="stat-number">{yearsExp}+</div>
-                                    <div className="stat-label">Years Experience</div>
-                                </div>
-                                <div className="stat-progress">
-                                    <motion.div 
-                                        className="progress-bar" 
-                                        initial={{ width: 0 }}
-                                        whileInView={{ width: '85%' }}
-                                        transition={{ duration: 1, delay: 0.5 }}
-                                    ></motion.div>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {projectsCount > 0 && (
-                            <motion.div className="stat-card-modern" variants={itemVariants}>
-                                <div className="stat-icon">
-                                    <Target />
-                                </div>
-                                <div className="stat-content">
-                                    <div className="stat-number">{projectsCount}+</div>
-                                    <div className="stat-label">Projects Delivered</div>
-                                </div>
-                                <div className="stat-progress">
-                                    <motion.div 
-                                        className="progress-bar" 
-                                        initial={{ width: 0 }}
-                                        whileInView={{ width: '92%' }}
-                                        transition={{ duration: 1, delay: 0.6 }}
-                                    ></motion.div>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {codeCommits > 0 && (
-                            <motion.div className="stat-card-modern" variants={itemVariants}>
-                                <div className="stat-icon">
-                                    <Zap />
-                                </div>
-                                <div className="stat-content">
-                                    <div className="stat-number">{Math.floor(codeCommits / 1000)}K+</div>
-                                    <div className="stat-label">Code Commits</div>
-                                </div>
-                                <div className="stat-progress">
-                                    <motion.div 
-                                        className="progress-bar" 
-                                        initial={{ width: 0 }}
-                                        whileInView={{ width: '78%' }}
-                                        transition={{ duration: 1, delay: 0.7 }}
-                                    ></motion.div>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {hackathonsWon > 0 && (
-                            <motion.div className="stat-card-modern" variants={itemVariants}>
-                                <div className="stat-icon">
-                                    <Award />
-                                </div>
-                                <div className="stat-content">
-                                    <div className="stat-number">{hackathonsWon}</div>
-                                    <div className="stat-label">Hackathons Won</div>
-                                </div>
-                                <div className="stat-progress">
-                                    <motion.div 
-                                        className="progress-bar" 
-                                        initial={{ width: 0 }}
-                                        whileInView={{ width: '100%' }}
-                                        transition={{ duration: 1, delay: 0.8 }}
-                                    ></motion.div>
-                                </div>
-                            </motion.div>
-                        )}
-                    </motion.div>
 
                     {/* Interactive Skills Explorer */}
                     <div className="skills-explorer">
@@ -336,7 +241,7 @@ const SkillsSection = () => {
                                         </div>
                                     </div>
 
-                                    <motion.div 
+                                    <motion.div
                                         className="skills-grid-modern"
                                         variants={containerVariants}
                                         initial="hidden"

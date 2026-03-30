@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen, Clock, Tag, ArrowRight, TrendingUp } from 'lucide-react'
 import portfolioAPI, { BlogPost } from '@/lib/api'
@@ -9,26 +9,28 @@ import { BlogSectionSkeleton } from './AppSkeletons'
 const BlogSection = () => {
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
     const [loading, setLoading] = useState(true)
+    const [hasError, setHasError] = useState(false)
 
-    useEffect(() => {
-        const fetchBlogPosts = async () => {
-            try {
-                const data = await portfolioAPI.getBlogPosts()
-                setBlogPosts(data)
-            } catch (error) {
-                console.error('Failed to fetch blog posts:', error)
-            } finally {
-                setLoading(false)
-            }
+    const load = useCallback(async () => {
+        setLoading(true)
+        setHasError(false)
+        try {
+            const data = await portfolioAPI.getBlogPosts()
+            setBlogPosts(data)
+        } catch (error) {
+            console.error('Failed to fetch blog posts:', error)
+            setHasError(true)
+        } finally {
+            setLoading(false)
         }
-
-        fetchBlogPosts()
     }, [])
+
+    useEffect(() => { load() }, [load])
 
     return (
         <AnimatePresence mode="wait">
             {loading ? (
-                <motion.div 
+                <motion.div
                     key="skeleton-blog"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
@@ -36,9 +38,9 @@ const BlogSection = () => {
                 >
                     <BlogSectionSkeleton />
                 </motion.div>
-            ) : blogPosts.length === 0 ? null : (
-                <motion.section 
-                    key="blog-content" 
+            ) : hasError ? null : blogPosts.length === 0 ? null : (
+                <motion.section
+                    key="blog-content"
                     id="blog-section"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

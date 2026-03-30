@@ -56,6 +56,8 @@ function scrollToSection(sectionId: string) {
     const el = document.getElementById(sectionId)
     if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        // Close mobile sidebar after navigation
+        document.querySelector('.app-body')?.classList.remove('mobile-sidebar-open')
     }
 }
 
@@ -142,12 +144,34 @@ const Sidebar = ({ activeSection }: SidebarProps) => {
                             </div>
 
                             {/* Each section as a file */}
-                            <div className="nested-folder">
-                                {SECTION_FILES.map((file) => (
+                            <div className="nested-folder" role="tree" aria-label="Portfolio sections">
+                                {SECTION_FILES.map((file, idx) => (
                                     <div
                                         key={file.id}
+                                        role="treeitem"
+                                        tabIndex={0}
+                                        aria-selected={activeSection === file.id}
+                                        aria-label={`Navigate to ${file.filename}`}
                                         className={`file-item${activeSection === file.id ? ' active' : ''}`}
                                         onClick={() => scrollToSection(file.sectionId)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault()
+                                                scrollToSection(file.sectionId)
+                                            }
+                                            if (e.key === 'ArrowDown') {
+                                                e.preventDefault()
+                                                const next = e.currentTarget.parentElement
+                                                    ?.querySelectorAll('[role="treeitem"]')[idx + 1] as HTMLElement
+                                                next?.focus()
+                                            }
+                                            if (e.key === 'ArrowUp') {
+                                                e.preventDefault()
+                                                const prev = e.currentTarget.parentElement
+                                                    ?.querySelectorAll('[role="treeitem"]')[idx - 1] as HTMLElement
+                                                prev?.focus()
+                                            }
+                                        }}
                                         title={`Go to ${file.filename}`}
                                     >
                                         <FileIcon ext={file.icon} />

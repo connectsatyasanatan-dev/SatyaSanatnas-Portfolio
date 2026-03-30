@@ -2,7 +2,7 @@
 
 import { Terminal, Download, Star, GitFork, ExternalLink, Grid3X3, List, Eye, Github } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import portfolioAPI, { Project } from '@/lib/api'
 import { ProjectsSectionSkeleton } from './AppSkeletons'
 
@@ -10,21 +10,23 @@ const ProjectsSection = () => {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
     const [projects, setProjects] = useState<Project[]>([])
     const [loading, setLoading] = useState(true)
+    const [hasError, setHasError] = useState(false)
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const data = await portfolioAPI.getProjects()
-                setProjects(data)
-            } catch (error) {
-                console.error('Failed to fetch projects:', error)
-            } finally {
-                setLoading(false)
-            }
+    const load = useCallback(async () => {
+        setLoading(true)
+        setHasError(false)
+        try {
+            const data = await portfolioAPI.getProjects()
+            setProjects(data)
+        } catch (error) {
+            console.error('Failed to fetch projects:', error)
+            setHasError(true)
+        } finally {
+            setLoading(false)
         }
-
-        fetchProjects()
     }, [])
+
+    useEffect(() => { load() }, [load])
 
     const handleProjectClick = (url: string) => {
         if (!url) return
@@ -42,7 +44,7 @@ const ProjectsSection = () => {
     return (
         <AnimatePresence mode="wait">
             {loading ? (
-                <motion.div 
+                <motion.div
                     key="skeleton-projects"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
@@ -50,8 +52,8 @@ const ProjectsSection = () => {
                 >
                     <ProjectsSectionSkeleton />
                 </motion.div>
-            ) : projects.length === 0 ? null : (
-                <motion.section 
+            ) : hasError ? null : projects.length === 0 ? null : (
+                <motion.section
                     key="projects-content"
                     id="projects-section"
                     initial={{ opacity: 0, y: 20 }}

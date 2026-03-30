@@ -1,29 +1,31 @@
- 'use client'
+'use client'
 
 import { GitCommit, GitMerge, Play, Pause, Diff, Activity } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import portfolioAPI, { Experience } from '@/lib/api'
 import { ExperienceSectionSkeleton } from './AppSkeletons'
 
 const GitHistory = () => {
     const [experiences, setExperiences] = useState<Experience[]>([])
     const [loading, setLoading] = useState(true)
+    const [hasError, setHasError] = useState(false)
 
-    useEffect(() => {
-        const fetch = async () => {
-            try {
-                const data = await portfolioAPI.getExperience()
-                setExperiences(data)
-            } catch (e) {
-                console.error('Failed to load experience', e)
-            } finally {
-                setLoading(false)
-            }
+    const load = useCallback(async () => {
+        setLoading(true)
+        setHasError(false)
+        try {
+            const data = await portfolioAPI.getExperience()
+            setExperiences(data)
+        } catch (e) {
+            console.error('Failed to load experience', e)
+            setHasError(true)
+        } finally {
+            setLoading(false)
         }
-
-        fetch()
     }, [])
+
+    useEffect(() => { load() }, [load])
 
     const changedFiles = [
         { status: "A", file: "src/components/Header.tsx", statusClass: "added" },
@@ -35,7 +37,7 @@ const GitHistory = () => {
     return (
         <AnimatePresence mode="wait">
             {loading ? (
-                <motion.div 
+                <motion.div
                     key="skeleton-experience"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
@@ -43,8 +45,8 @@ const GitHistory = () => {
                 >
                     <ExperienceSectionSkeleton />
                 </motion.div>
-            ) : (
-                <motion.section 
+            ) : hasError ? null : (
+                <motion.section
                     key="experience-content"
                     id="git-history-section"
                     initial={{ opacity: 0, y: 20 }}

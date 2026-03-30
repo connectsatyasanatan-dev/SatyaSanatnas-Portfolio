@@ -23,6 +23,8 @@ const ResizableSidebar = ({
     const sidebarRef = useRef<HTMLDivElement>(null)
     const resizeHandleRef = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
+    const touchStartX = useRef<number>(0)
+    const touchStartY = useRef<number>(0)
 
     const startResizing = useCallback((e: React.MouseEvent) => {
         e.preventDefault()
@@ -100,6 +102,42 @@ const ResizableSidebar = ({
 
         document.addEventListener('keydown', handleKeyDown)
         return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [])
+
+    // Mobile swipe gesture — swipe right to open, swipe left to close
+    useEffect(() => {
+        const SWIPE_THRESHOLD = 50   // min px horizontal travel
+        const ANGLE_LIMIT = 35       // max degrees off horizontal
+
+        function onTouchStart(e: TouchEvent) {
+            touchStartX.current = e.touches[0].clientX
+            touchStartY.current = e.touches[0].clientY
+        }
+
+        function onTouchEnd(e: TouchEvent) {
+            const dx = e.changedTouches[0].clientX - touchStartX.current
+            const dy = e.changedTouches[0].clientY - touchStartY.current
+            const angle = Math.abs(Math.atan2(dy, dx) * (180 / Math.PI))
+            const isHorizontal = angle < ANGLE_LIMIT || angle > 180 - ANGLE_LIMIT
+
+            if (!isHorizontal || Math.abs(dx) < SWIPE_THRESHOLD) return
+
+            const appBody = document.querySelector('.app-body')
+            if (dx > 0 && touchStartX.current < 40) {
+                // Swipe right from left edge → open
+                appBody?.classList.add('mobile-sidebar-open')
+            } else if (dx < 0) {
+                // Swipe left → close
+                appBody?.classList.remove('mobile-sidebar-open')
+            }
+        }
+
+        document.addEventListener('touchstart', onTouchStart, { passive: true })
+        document.addEventListener('touchend', onTouchEnd, { passive: true })
+        return () => {
+            document.removeEventListener('touchstart', onTouchStart)
+            document.removeEventListener('touchend', onTouchEnd)
+        }
     }, [])
 
     return (

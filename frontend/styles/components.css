@@ -1007,3 +1007,92 @@ body.resizing * {
   opacity: 0.7;
   background-color: #1e2929 !important;
 }
+
+/* ── Tab overflow: scroll with hidden scrollbar, active tab auto-scrolls ── */
+#portfolio-tabbar .tab-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Show thin scrollbar on hover for desktop */
+#portfolio-tabbar .tab-container:hover::-webkit-scrollbar {
+  height: 3px;
+}
+#portfolio-tabbar .tab-container:hover::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+/* ── Empty State ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.empty-state-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.empty-state-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.empty-state-msg {
+  font-size: 12px;
+  color: var(--text-dim);
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+.empty-state-retry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 7px 16px;
+  background: rgba(6,249,249,0.08);
+  border: 1px solid rgba(6,249,249,0.25);
+  border-radius: 6px;
+  color: var(--primary);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.empty-state-retry:hover {
+  background: rgba(6,249,249,0.15);
+  border-color: var(--primary);
+}
+
+/* ── Sidebar file-item focus ring (keyboard nav) ── */
+#portfolio-sidebar .file-tree .file-item:focus-visible {
+  outline: 1px solid var(--primary);
+  outline-offset: -1px;
+  border-radius: 4px;
+  color: white;
+}
+
+/* ── Tab focus ring ── */
+#portfolio-tabbar .tab-item:focus-visible {
+  outline: 1px solid var(--primary);
+  outline-offset: -2px;
+}

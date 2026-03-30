@@ -27,11 +27,26 @@ const typingSpeed = 70
 const Header = () => {
     const [seqIndex, setSeqIndex] = useState(0)
     const [displayText, setDisplayText] = useState('')
-    const [phase, setPhase] = useState<'typing' | 'waiting' | 'fading'>('typing')
+    const [phase, setPhase] = useState<'waiting-fonts' | 'typing' | 'waiting' | 'fading'>('waiting-fonts')
 
     const current = languageSequences[seqIndex]
 
+    // Wait for fonts before starting typewriter — prevents FOUT
     useEffect(() => {
+        if (typeof document === 'undefined') return
+        const start = () => setPhase('typing')
+        if (document.fonts?.ready) {
+            document.fonts.ready.then(start)
+        } else {
+            // Fallback: small delay to let fonts load
+            const t = setTimeout(start, 800)
+            return () => clearTimeout(t)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (phase === 'waiting-fonts') return
+
         let timeout: ReturnType<typeof setTimeout>
         let interval: ReturnType<typeof setInterval>
 
@@ -68,7 +83,7 @@ const Header = () => {
     }, [phase, seqIndex])
 
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    
+
     // Toggle class on app-container which can then control the sidebar visibility
     const toggleSidebar = () => {
         const isOpen = !isMenuOpen
@@ -86,31 +101,30 @@ const Header = () => {
     return (
         <header id="portfolio-header">
             <div className="header-left">
-                <button 
-                    className="mobile-menu-btn" 
+                <button
+                    className="mobile-menu-btn"
                     onClick={toggleSidebar}
                     aria-label="Toggle Sidebar"
                 >
                     {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
-                
+
                 {/* Title Container replaces hardcoded width/display */}
                 <div className="header-title-container">
                     <AnimatePresence mode="wait">
-                        <motion.h2 
+                        <motion.h2
                             key={`header-title-${seqIndex}`}
-                            className="header-title" 
+                            className="header-title"
                             lang={current.lang}
                             initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: phase === 'fading' ? 0 : 1, y: phase === 'fading' ? -5 : 0 }}
-                            exit={{ opacity: 0 }}
+                            animate={{ opacity: phase === 'fading' ? 0 : 1, y: phase === 'fading' ? -5 : 0 }} exit={{ opacity: 0 }}
                             transition={{ duration: 0.4 }}
                             style={{ fontFamily: current.fontFamily }}
                         >
                             {displayText}
                         </motion.h2>
                     </AnimatePresence>
-                    
+
                     {/* Blinking cursor via CSS class */}
                     <motion.span
                         animate={{ opacity: phase === 'fading' ? 0 : [0, 1, 0] }}
