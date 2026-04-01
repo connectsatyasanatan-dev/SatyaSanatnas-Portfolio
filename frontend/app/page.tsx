@@ -1,4 +1,5 @@
 import '@/styles/responsive.css'
+import '@/styles/chatbot.css'
 import HeroSection from '@/components/HeroSection'
 import SkillsSection from '@/components/SkillsSection'
 import GitHistory from '@/components/GitHistory'
@@ -10,6 +11,7 @@ import BlogSection from '@/components/BlogSection'
 import TerminalSection from '@/components/TerminalSection'
 import ContactSection from '@/components/ContactSection'
 import AppContainer from '@/components/AppContainer'
+import ChatBot from '@/components/ChatBot'
 
 export default async function Home() {
     return (
@@ -24,6 +26,7 @@ export default async function Home() {
             <BlogSection />
             <TerminalSection />
             <ContactSection />
+            <ChatBot />
         </AppContainer>
     )
 }

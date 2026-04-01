@@ -542,10 +542,10 @@ textarea:focus {
 /* Scroll To Top Button                                */
 /* ═══════════════════════════════════════════════════ */
 .scroll-to-top-btn {
-  position: absolute;
-  bottom: 24px;
-  right: 24px;
-  z-index: 100;
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9997;
   width: 52px;
   height: 52px;
   border-radius: 50%;
