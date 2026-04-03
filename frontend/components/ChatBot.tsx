@@ -107,6 +107,7 @@ export default function ChatBot() {
     const [hasOpened, setHasOpened] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const [charCount, setCharCount] = useState(0);
+    const [userSentiment, setUserSentiment] = useState<'frustrated' | 'neutral' | 'positive'>('neutral');
 
     // Tooltip state
     const [showTooltip, setShowTooltip] = useState(false);
@@ -159,9 +160,16 @@ export default function ChatBot() {
         if (isOpen && inputRef.current) inputRef.current.focus();
         if (isOpen && !hasOpened) {
             setHasOpened(true);
+            const hour = new Date().getHours();
+            let timeGreeting = 'Hey';
+            if (hour >= 5 && hour < 12) timeGreeting = 'Good morning';
+            else if (hour >= 12 && hour < 17) timeGreeting = 'Good afternoon';
+            else if (hour >= 17 && hour < 21) timeGreeting = 'Good evening';
+            else timeGreeting = 'Good night';
+
             setTimeout(() => {
                 streamBotMessage(
-                    "Hey! 👋 I'm **Zentara**, Satya's personal AI assistant — here to give you the full picture on his work, skills, and how to collaborate.\n\nWhat would you like to explore?",
+                    `${timeGreeting}! 👋 I'm **Zentara**, Satya's personal AI assistant — here to give you the full picture on his work, skills, and how to collaborate.\n\nWhat would you like to explore?`,
                     []
                 );
             }, 350);
@@ -192,10 +200,10 @@ export default function ChatBot() {
     };
 
     // ── API call ──────────────────────────────────────────
-    const getBotResponse = async (userMsg: string): Promise<{ response: string; suggestions: string[]; isFallback: boolean }> => {
+    const getBotResponse = async (userMsg: string): Promise<{ response: string; suggestions: string[]; isFallback: boolean; sentiment: string }> => {
         if (!navigator.onLine) return {
             response: "📡 You appear to be offline. Please check your connection and try again.",
-            suggestions: [], isFallback: true,
+            suggestions: [], isFallback: true, sentiment: 'neutral',
         };
         try {
             const controller = new AbortController();
@@ -203,20 +211,20 @@ export default function ChatBot() {
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMsg, history }),
+                body: JSON.stringify({ message: userMsg, history, hour: new Date().getHours() }),
                 signal: controller.signal,
             });
             clearTimeout(timeout);
             if (res.ok) {
                 const data = await res.json();
-                return { response: data.response, suggestions: extractSuggestions(data.response), isFallback: data.fallback === true };
+                return { response: data.response, suggestions: extractSuggestions(data.response), isFallback: data.fallback === true, sentiment: data.sentiment || 'neutral' };
             }
-            return { response: "Something went wrong. Please try again!", suggestions: [], isFallback: true };
+            return { response: "Something went wrong. Please try again!", suggestions: [], isFallback: true, sentiment: 'neutral' };
         } catch (err) {
             const isAbort = err instanceof Error && err.name === 'AbortError';
             return {
                 response: isAbort ? "⏱️ Took too long to respond. Please try again!" : "📡 Couldn't reach the server. Check your connection.",
-                suggestions: [], isFallback: true,
+                suggestions: [], isFallback: true, sentiment: 'neutral',
             };
         }
     };
@@ -233,7 +241,8 @@ export default function ChatBot() {
         setCharCount(0);
         setIsTyping(true);
 
-        const { response, suggestions, isFallback } = await getBotResponse(msg);
+        const { response, suggestions, isFallback, sentiment } = await getBotResponse(msg);
+        setUserSentiment(sentiment as 'frustrated' | 'neutral' | 'positive');
         setHistory(prev => [...prev, { role: 'assistant', content: response }]);
         streamBotMessage(response, suggestions, isFallback, msg);
     };
@@ -359,7 +368,11 @@ export default function ChatBot() {
                             </div>
                             <div className="cb-header-status">
                                 <span className="cb-status-dot" />
-                                Online · Satya's AI Assistant
+                                {userSentiment === 'frustrated'
+                                    ? 'Here to help 💙'
+                                    : userSentiment === 'positive'
+                                        ? 'Loving the energy! ✨'
+                                        : 'Online · Satya\'s AI Assistant'}
                             </div>
                         </div>
                     </div>

@@ -75,7 +75,7 @@ async function fetchPortfolioData(): Promise<PortfolioData> {
 }
 
 // ── Build AI system prompt from portfolio data ────────────
-function buildSystemPrompt(d: PortfolioData): string {
+function buildSystemPrompt(d: PortfolioData, sentiment: string = 'neutral', greeting: string = ''): string {
     const allSkills = Object.values(d.skills)
         .map(cat => `${cat.title}: ${cat.skills.map(s => s.name).join(', ')}`)
         .filter(Boolean).join('\n');
@@ -98,6 +98,9 @@ function buildSystemPrompt(d: PortfolioData): string {
 
     return `You are Zentara, an intelligent AI assistant representing ${d.name || "this developer"}.
 You are calm, smart, and helpful. Your role is to warmly help visitors learn about ${d.name || "this developer"} and encourage them to connect or hire.
+${greeting ? `\nThe user's local time suggests it is ${greeting.toLowerCase()} — you may use this naturally in your first response if appropriate.` : ''}
+${sentiment === 'frustrated' ? '\nIMPORTANT: The user seems frustrated or upset. Be extra empathetic, patient, and calm. Acknowledge their frustration briefly before helping.' : ''}
+${sentiment === 'positive' ? '\nThe user seems enthusiastic! Match their positive energy warmly.' : ''}
 
 === PORTFOLIO DATA ===
 NAME: ${d.name}
@@ -139,9 +142,13 @@ STATS: ${d.stats.projectsCompleted} projects completed | ${d.stats.yearsOfExperi
 }
 
 // ── Smart data-rich fallback (no AI needed) ───────────────
-function buildSmartFallback(msg: string, d: PortfolioData): string {
+function buildSmartFallback(msg: string, d: PortfolioData, sentiment: string = 'neutral'): string {
     const m = msg.toLowerCase();
     const name = d.name || 'this developer';
+
+    const empathyPrefix = sentiment === 'frustrated'
+        ? "I understand your frustration — let me help you out. 😊\n\n"
+        : '';
 
     // Projects
     if (m.includes('project') || m.includes('work') || m.includes('built') || m.includes('portfolio') || m.includes('app')) {
@@ -235,22 +242,42 @@ function buildSmartFallback(msg: string, d: PortfolioData): string {
 
     // Hello / greeting
     if (m.includes('hello') || m.includes('hi') || m.includes('hey') || m.includes('hii') || m.includes('helo')) {
-        return `Hey there! 👋 Welcome to ${name}'s portfolio.\n\nI'm here to help you learn all about ${name}'s work and skills. You can ask me about:\n\n• **Projects** — what's been built\n• **Skills** — the full tech stack\n• **Experience** — career background\n• **Hiring** — availability & contact\n\nWhat would you like to explore?`;
+        return `${empathyPrefix}Hey there! 👋 Welcome to ${name}'s portfolio.\n\nI'm here to help you learn all about ${name}'s work and skills. You can ask me about:\n\n• **Projects** — what's been built\n• **Skills** — the full tech stack\n• **Experience** — career background\n• **Hiring** — availability & contact\n\nWhat would you like to explore?`;
     }
 
     // Default
-    return `Great question! I'd love to help you learn more about ${name}.\n\nYou can ask me about:\n• **Projects** — what's been built\n• **Skills** — tech stack & expertise\n• **Experience** — career background\n• **Education** & certifications\n• **Hiring** — availability & how to connect\n\nWhat would you like to know?`;
+    return `${empathyPrefix}Great question! I'd love to help you learn more about ${name}.\n\nYou can ask me about:\n• **Projects** — what's been built\n• **Skills** — tech stack & expertise\n• **Experience** — career background\n• **Education** & certifications\n• **Hiring** — availability & how to connect\n\nWhat would you like to know?`;
+}
+
+// ── Sentiment detection ───────────────────────────────────
+function detectSentiment(message: string): 'frustrated' | 'neutral' | 'positive' {
+    const m = message.toLowerCase();
+    const frustratedWords = ['not working', 'broken', 'useless', 'stupid', 'hate', 'worst', 'terrible', 'awful', 'bad', 'wrong', 'error', 'fail', 'failed', 'ugh', 'wtf', 'damn', 'frustrated', 'annoying', 'waste', 'garbage', 'trash', 'ridiculous', 'pathetic'];
+    const positiveWords = ['great', 'awesome', 'amazing', 'love', 'excellent', 'fantastic', 'wonderful', 'perfect', 'brilliant', 'impressive', 'nice', 'good', 'cool', 'wow'];
+    if (frustratedWords.some(w => m.includes(w))) return 'frustrated';
+    if (positiveWords.some(w => m.includes(w))) return 'positive';
+    return 'neutral';
+}
+
+// ── Time-based greeting ───────────────────────────────────
+function getTimeGreeting(hour: number): string {
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 21) return 'Good evening';
+    return 'Good night';
 }
 
 // ── Main POST handler ─────────────────────────────────────
 export async function POST(request: NextRequest) {
     let message = '';
     let history: { role: string; content: string }[] = [];
+    let clientHour = -1;
 
     try {
         const body = await request.json();
         message = body.message || '';
         history = body.history || [];
+        clientHour = typeof body.hour === 'number' ? body.hour : -1;
     } catch {
         return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
@@ -258,6 +285,9 @@ export async function POST(request: NextRequest) {
     if (!message || typeof message !== 'string') {
         return NextResponse.json({ error: 'Invalid message' }, { status: 400 });
     }
+
+    const sentiment = detectSentiment(message);
+    const greeting = clientHour >= 0 ? getTimeGreeting(clientHour) : '';
 
     // Always fetch portfolio data first — used by both AI and fallback
     const portfolioData = await fetchPortfolioData();
@@ -267,7 +297,7 @@ export async function POST(request: NextRequest) {
     // Try Groq AI first
     if (apiKey && apiKey !== 'your_groq_api_key_here') {
         try {
-            const systemPrompt = buildSystemPrompt(portfolioData);
+            const systemPrompt = buildSystemPrompt(portfolioData, sentiment, greeting);
             const recentHistory = history.slice(-6).map(m => ({
                 role: m.role as 'user' | 'assistant',
                 content: m.content,
@@ -290,6 +320,7 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({
                     response,
                     fallback: false,
+                    sentiment,
                     timestamp: new Date().toISOString(),
                 });
             }
@@ -301,6 +332,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Smart fallback — uses real portfolio data, seamless to user
-    const response = buildSmartFallback(message, portfolioData);
-    return NextResponse.json({ response, fallback: true });
+    const response = buildSmartFallback(message, portfolioData, sentiment);
+    return NextResponse.json({ response, fallback: true, sentiment });
 }
