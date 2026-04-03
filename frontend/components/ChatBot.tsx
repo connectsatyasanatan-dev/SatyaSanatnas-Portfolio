@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-    Send, X, User, ChevronDown,
-    Zap, Code2, Briefcase, Mail, Star, Brain
+    Send, X, ChevronDown, User,
+    Zap, Code2, Briefcase, Mail, Star, Brain,
+    Mic, MicOff, RotateCcw, Copy, Check, Sparkles
 } from 'lucide-react';
 
 interface Message {
@@ -12,6 +13,13 @@ interface Message {
     isBot: boolean;
     timestamp: Date;
     isStreaming?: boolean;
+    suggestions?: string[];
+    copied?: boolean;
+}
+
+interface HistoryItem {
+    role: 'user' | 'assistant';
+    content: string;
 }
 
 interface Chip {
@@ -22,29 +30,37 @@ interface Chip {
 
 const CHIPS: Chip[] = [
     { label: 'Projects', icon: <Code2 size={12} />, query: 'Tell me about your projects' },
-    { label: 'Skills', icon: <Zap size={12} />, query: 'What are your skills?' },
+    { label: 'Skills', icon: <Zap size={12} />, query: 'What is your tech stack?' },
     { label: 'Experience', icon: <Briefcase size={12} />, query: 'Tell me about your experience' },
-    { label: 'Hire Me', icon: <Star size={12} />, query: 'I want to hire you' },
+    { label: 'Hire Me', icon: <Star size={12} />, query: 'Are you available for hire?' },
     { label: 'Contact', icon: <Mail size={12} />, query: 'How can I contact you?' },
     { label: 'AI Work', icon: <Brain size={12} />, query: 'Tell me about your AI projects' },
 ];
 
-// Renders markdown-like text with bold, bullets, line breaks
+// Smart follow-up suggestions based on response content
+function extractSuggestions(text: string): string[] {
+    const suggestions: string[] = [];
+    if (text.toLowerCase().includes('project')) suggestions.push('Show me your best project');
+    if (text.toLowerCase().includes('skill') || text.toLowerCase().includes('tech')) suggestions.push('What is your strongest skill?');
+    if (text.toLowerCase().includes('experience') || text.toLowerCase().includes('company')) suggestions.push('Tell me more about your experience');
+    if (text.toLowerCase().includes('ai') || text.toLowerCase().includes('ml')) suggestions.push('What AI tools do you use?');
+    if (text.toLowerCase().includes('contact') || text.toLowerCase().includes('hire')) suggestions.push('What is your availability?');
+    return suggestions.slice(0, 2);
+}
+
+// Markdown renderer — bold, bullets, line breaks
 function RenderMessage({ text }: { text: string }) {
     const lines = text.split('\n');
     return (
         <div className="cb-msg-body">
             {lines.map((line, i) => {
                 if (!line.trim()) return <br key={i} />;
-                // Bold: **text**
                 const parts = line.split(/(\*\*[^*]+\*\*)/g);
-                const rendered = parts.map((part, j) => {
-                    if (part.startsWith('**') && part.endsWith('**')) {
-                        return <strong key={j}>{part.slice(2, -2)}</strong>;
-                    }
-                    return <span key={j}>{part}</span>;
-                });
-                // Bullet lines
+                const rendered = parts.map((part, j) =>
+                    part.startsWith('**') && part.endsWith('**')
+                        ? <strong key={j}>{part.slice(2, -2)}</strong>
+                        : <span key={j}>{part}</span>
+                );
                 if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
                     return <div key={i} className="cb-bullet">{rendered}</div>;
                 }
@@ -57,32 +73,35 @@ function RenderMessage({ text }: { text: string }) {
 export default function ChatBot() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
+    const [history, setHistory] = useState<HistoryItem[]>([]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [showScrollBtn, setShowScrollBtn] = useState(false);
     const [hasOpened, setHasOpened] = useState(false);
     const [pulseBtn, setPulseBtn] = useState(true);
+    const [isListening, setIsListening] = useState(false);
+    const [charCount, setCharCount] = useState(0);
 
     const messagesRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const streamRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const recognitionRef = useRef<SpeechRecognition | null>(null);
 
-    // Stop pulse after 6s
+    const MAX_CHARS = 300;
+
     useEffect(() => {
         const t = setTimeout(() => setPulseBtn(false), 6000);
         return () => clearTimeout(t);
     }, []);
 
-    const scrollToBottom = (smooth = true) => {
+    const scrollToBottom = useCallback((smooth = true) => {
         messagesRef.current?.scrollTo({
             top: messagesRef.current.scrollHeight,
             behavior: smooth ? 'smooth' : 'auto',
         });
-    };
+    }, []);
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages, isTyping]);
+    useEffect(() => { scrollToBottom(); }, [messages, isTyping, scrollToBottom]);
 
     useEffect(() => {
         if (isOpen && inputRef.current) inputRef.current.focus();
@@ -90,9 +109,10 @@ export default function ChatBot() {
             setHasOpened(true);
             setTimeout(() => {
                 streamBotMessage(
-                    "Hey! 👋 I'm **Satya's AI assistant** — here to give you the full picture on his work, skills, and how to collaborate.\n\nWhat would you like to explore?"
+                    "Hey! 👋 I'm an **AI assistant** powered by Groq — here to give you the full picture on this developer's work, skills, and how to collaborate.\n\nWhat would you like to explore?",
+                    []
                 );
-            }, 300);
+            }, 350);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen]);
@@ -103,67 +123,52 @@ export default function ChatBot() {
         setShowScrollBtn(scrollHeight - scrollTop - clientHeight > 80);
     };
 
-    // Stream text character by character for AI feel
-    const streamBotMessage = (fullText: string) => {
+    const streamBotMessage = (fullText: string, suggestions: string[] = []) => {
         const id = Date.now().toString();
-        setMessages(prev => [...prev, { id, text: '', isBot: true, timestamp: new Date(), isStreaming: true }]);
+        setMessages(prev => [...prev, {
+            id, text: '', isBot: true, timestamp: new Date(), isStreaming: true, suggestions: []
+        }]);
         setIsTyping(false);
 
         let i = 0;
-        const speed = 12; // ms per char
+        const speed = 10;
 
         const tick = () => {
             i++;
+            const done = i >= fullText.length;
             setMessages(prev =>
                 prev.map(m =>
                     m.id === id
-                        ? { ...m, text: fullText.slice(0, i), isStreaming: i < fullText.length }
+                        ? { ...m, text: fullText.slice(0, i), isStreaming: !done, suggestions: done ? suggestions : [] }
                         : m
                 )
             );
-            if (i < fullText.length) {
-                streamRef.current = setTimeout(tick, speed);
-            }
+            if (!done) streamRef.current = setTimeout(tick, speed);
         };
         streamRef.current = setTimeout(tick, speed);
     };
 
-    const getBotResponse = async (userMsg: string): Promise<string> => {
+    const getBotResponse = async (userMsg: string): Promise<{ response: string; suggestions: string[] }> => {
         try {
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMsg }),
+                body: JSON.stringify({ message: userMsg, history }),
             });
             if (res.ok) {
                 const data = await res.json();
-                return data.response;
+                return {
+                    response: data.response,
+                    suggestions: extractSuggestions(data.response),
+                };
             }
         } catch (_) { }
-        return getFallbackResponse(userMsg);
-    };
-
-    const getFallbackResponse = (msg: string): string => {
-        const m = msg.toLowerCase();
-        if (m.includes('project') || m.includes('portfolio') || m.includes('work'))
-            return `Here's a snapshot of Satya's key projects:\n\n**🤖 AI Chatbot Platform**\n• React + Flask + NLP\n• Context-aware conversations\n• Real-time streaming responses\n\n**🌐 Portfolio Website** *(you're on it!)*\n• Next.js 14 + TypeScript\n• Flask REST API backend\n• Admin dashboard + analytics\n\n**⚙️ Full-Stack Web Apps**\n• Auth systems, REST APIs\n• Database design & optimization\n• Cloud deployment pipelines\n\nWant a deep dive into any of these?`;
-        if (m.includes('skill') || m.includes('tech') || m.includes('stack'))
-            return `Satya's tech stack is broad and modern:\n\n**Frontend**\n• React, Next.js, TypeScript\n• Tailwind CSS, Framer Motion\n\n**Backend**\n• Python, Flask, FastAPI\n• Node.js, REST APIs\n\n**AI / ML**\n• NLP, LLM integrations\n• scikit-learn, pandas\n\n**DevOps**\n• Docker, AWS, Vercel, Git CI/CD\n\n**Databases**\n• PostgreSQL, MongoDB, SQLite\n\nAlways learning — what area interests you most?`;
-        if (m.includes('experience') || m.includes('background') || m.includes('about'))
-            return `Satya is a full-stack developer with a strong focus on AI-integrated web experiences.\n\n**What sets him apart:**\n• Builds end-to-end — from UI to deployment\n• Obsessed with clean, performant code\n• Fast learner who ships quickly\n• Strong eye for modern UI/UX\n\nHe's worked across personal projects, freelance clients, and open-source contributions — always pushing the quality bar higher.\n\nCurious about anything specific?`;
-        if (m.includes('hire') || m.includes('job') || m.includes('opportunity') || m.includes('recruit'))
-            return `Satya is open to exciting opportunities! 🚀\n\n**Available for:**\n• Full-time roles (remote/hybrid)\n• Freelance & contract projects\n• Technical consulting\n• Startup collaborations\n\n**He brings:**\n• Fast onboarding & communication\n• Full-stack + AI expertise\n• Ownership mindset\n• Clean, documented code\n\nBest move? Hit the **Contact** section below — he typically responds within 24 hours. Want me to tell you more about his work first?`;
-        if (m.includes('contact') || m.includes('reach') || m.includes('email'))
-            return `Getting in touch with Satya is easy:\n\n**📬 Contact Section** — scroll to the bottom of this page\n**⚡ Response time** — usually within 24 hours\n**💬 Open to** — any project size or collaboration type\n\nWhen you reach out, mention:\n• What you're building\n• Timeline & scope\n• Tech stack (if you have one in mind)\n\nHe loves ambitious ideas — don't hold back!`;
-        if (m.includes('ai') || m.includes('machine learning') || m.includes('nlp') || m.includes('llm'))
-            return `AI is one of Satya's strongest areas:\n\n**🧠 What he's built:**\n• Conversational AI assistants (like this one!)\n• NLP pipelines for text classification\n• LLM API integrations (OpenAI, etc.)\n• Intelligent recommendation systems\n\n**🔧 Tools & frameworks:**\n• Python, scikit-learn, pandas\n• LangChain, OpenAI API\n• Vector databases & embeddings\n• FastAPI for AI microservices\n\nHe believes AI should feel natural and useful — not gimmicky. Want to know about a specific AI project?`;
-        return `Good question! I can tell you about:\n\n• **Projects** — what Satya has built\n• **Skills** — his full tech stack\n• **Experience** — his background\n• **AI Work** — ML and LLM projects\n• **Hiring** — how to bring him on board\n\nJust ask — or tap one of the chips below!`;
+        return { response: "I'm having trouble connecting right now. Please try again!", suggestions: [] };
     };
 
     const sendMessage = async (text?: string) => {
         const msg = (text ?? input).trim();
         if (!msg || isTyping) return;
-
         if (streamRef.current) clearTimeout(streamRef.current);
 
         const userMsg: Message = {
@@ -174,18 +179,79 @@ export default function ChatBot() {
         };
 
         setMessages(prev => [...prev, userMsg]);
+        setHistory(prev => [...prev, { role: 'user', content: msg }]);
         setInput('');
+        setCharCount(0);
         setIsTyping(true);
 
-        const response = await getBotResponse(msg);
-        streamBotMessage(response);
+        const { response, suggestions } = await getBotResponse(msg);
+        setHistory(prev => [...prev, { role: 'assistant', content: response }]);
+        streamBotMessage(response, suggestions);
     };
 
-    const handleChip = (query: string) => sendMessage(query);
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        if (val.length <= MAX_CHARS) {
+            setInput(val);
+            setCharCount(val.length);
+        }
+    };
+
+    const clearChat = () => {
+        if (streamRef.current) clearTimeout(streamRef.current);
+        setMessages([]);
+        setHistory([]);
+        setIsTyping(false);
+        setTimeout(() => {
+            streamBotMessage(
+                "Chat cleared! 🔄 I'm ready for a fresh conversation.\n\nWhat would you like to know?",
+                []
+            );
+        }, 200);
+    };
+
+    const copyMessage = (id: string, text: string) => {
+        navigator.clipboard.writeText(text).then(() => {
+            setMessages(prev => prev.map(m => m.id === id ? { ...m, copied: true } : m));
+            setTimeout(() => {
+                setMessages(prev => prev.map(m => m.id === id ? { ...m, copied: false } : m));
+            }, 2000);
+        });
+    };
+
+    // Voice input
+    const toggleVoice = () => {
+        if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) return;
+
+        if (isListening) {
+            recognitionRef.current?.stop();
+            setIsListening(false);
+            return;
+        }
+
+        const SR = (window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition: typeof SpeechRecognition }).webkitSpeechRecognition);
+        const recognition = new SR();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.onresult = (e: SpeechRecognitionEvent) => {
+            const transcript = e.results[0][0].transcript;
+            setInput(transcript);
+            setCharCount(transcript.length);
+            setIsListening(false);
+        };
+        recognition.onerror = () => setIsListening(false);
+        recognition.onend = () => setIsListening(false);
+        recognitionRef.current = recognition;
+        recognition.start();
+        setIsListening(true);
+    };
+
+    const hasSpeech = typeof window !== 'undefined' &&
+        ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
     return (
         <>
-            {/* Floating Button */}
+            {/* FAB Button */}
             <button
                 className={`cb-fab ${isOpen ? 'cb-fab--open' : ''} ${pulseBtn ? 'cb-fab--pulse' : ''}`}
                 onClick={() => setIsOpen(v => !v)}
@@ -210,16 +276,24 @@ export default function ChatBot() {
                             <span className="cb-avatar-dot" />
                         </div>
                         <div>
-                            <div className="cb-header-name">Satya's AI</div>
+                            <div className="cb-header-name">
+                                <Sparkles size={12} style={{ display: 'inline', marginRight: 4 }} />
+                                AI Assistant
+                            </div>
                             <div className="cb-header-status">
                                 <span className="cb-status-dot" />
-                                Online · Powered by AI
+                                Groq · llama3.3-70b · Ultra-fast
                             </div>
                         </div>
                     </div>
-                    <button className="cb-close" onClick={() => setIsOpen(false)} aria-label="Close">
-                        <X size={16} />
-                    </button>
+                    <div className="cb-header-actions">
+                        <button className="cb-icon-btn" onClick={clearChat} aria-label="Clear chat" title="Clear chat">
+                            <RotateCcw size={14} />
+                        </button>
+                        <button className="cb-close" onClick={() => setIsOpen(false)} aria-label="Close">
+                            <X size={16} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Messages */}
@@ -227,7 +301,8 @@ export default function ChatBot() {
                     {messages.length === 0 && (
                         <div className="cb-empty">
                             <div className="cb-empty-icon"><Brain size={28} /></div>
-                            <p>Ask me anything about Satya</p>
+                            <p>Powered by Groq AI</p>
+                            <span>Ask me anything about this developer</span>
                         </div>
                     )}
 
@@ -236,12 +311,35 @@ export default function ChatBot() {
                             {msg.isBot && (
                                 <div className="cb-msg-avatar"><Brain size={14} /></div>
                             )}
-                            <div className="cb-msg-bubble">
-                                {msg.isBot ? <RenderMessage text={msg.text} /> : <span>{msg.text}</span>}
-                                {msg.isStreaming && <span className="cb-cursor" />}
-                                <div className="cb-msg-time">
-                                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            <div className="cb-msg-wrap">
+                                <div className="cb-msg-bubble">
+                                    {msg.isBot ? <RenderMessage text={msg.text} /> : <span>{msg.text}</span>}
+                                    {msg.isStreaming && <span className="cb-cursor" />}
+                                    <div className="cb-msg-footer">
+                                        <span className="cb-msg-time">
+                                            {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                        {msg.isBot && !msg.isStreaming && msg.text && (
+                                            <button
+                                                className="cb-copy-btn"
+                                                onClick={() => copyMessage(msg.id, msg.text)}
+                                                aria-label="Copy message"
+                                            >
+                                                {msg.copied ? <Check size={11} /> : <Copy size={11} />}
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
+                                {/* Smart suggestions */}
+                                {msg.isBot && !msg.isStreaming && msg.suggestions && msg.suggestions.length > 0 && (
+                                    <div className="cb-suggestions">
+                                        {msg.suggestions.map((s, i) => (
+                                            <button key={i} className="cb-suggestion" onClick={() => sendMessage(s)}>
+                                                {s}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             {!msg.isBot && (
                                 <div className="cb-msg-avatar cb-msg-avatar--user"><User size={14} /></div>
@@ -259,7 +357,6 @@ export default function ChatBot() {
                     )}
                 </div>
 
-                {/* Scroll to bottom */}
                 {showScrollBtn && (
                     <button className="cb-scroll-btn" onClick={() => scrollToBottom()} aria-label="Scroll to bottom">
                         <ChevronDown size={16} />
@@ -269,25 +366,42 @@ export default function ChatBot() {
                 {/* Chips */}
                 <div className="cb-chips">
                     {CHIPS.map(chip => (
-                        <button key={chip.label} className="cb-chip" onClick={() => handleChip(chip.query)}>
-                            {chip.icon}
-                            {chip.label}
+                        <button key={chip.label} className="cb-chip" onClick={() => sendMessage(chip.query)}>
+                            {chip.icon}{chip.label}
                         </button>
                     ))}
                 </div>
 
                 {/* Input */}
                 <div className="cb-input-row">
-                    <input
-                        ref={inputRef}
-                        className="cb-input"
-                        type="text"
-                        value={input}
-                        onChange={e => setInput(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                        placeholder="Ask me anything..."
-                        aria-label="Chat input"
-                    />
+                    {hasSpeech && (
+                        <button
+                            className={`cb-voice-btn ${isListening ? 'cb-voice-btn--active' : ''}`}
+                            onClick={toggleVoice}
+                            aria-label={isListening ? 'Stop listening' : 'Voice input'}
+                            title="Voice input"
+                        >
+                            {isListening ? <MicOff size={15} /> : <Mic size={15} />}
+                        </button>
+                    )}
+                    <div className="cb-input-wrap">
+                        <input
+                            ref={inputRef}
+                            className="cb-input"
+                            type="text"
+                            value={input}
+                            onChange={handleInputChange}
+                            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                            placeholder={isListening ? 'Listening...' : 'Ask me anything...'}
+                            aria-label="Chat input"
+                            disabled={isListening}
+                        />
+                        {charCount > 200 && (
+                            <span className={`cb-char-count ${charCount > 270 ? 'cb-char-count--warn' : ''}`}>
+                                {MAX_CHARS - charCount}
+                            </span>
+                        )}
+                    </div>
                     <button
                         className="cb-send"
                         onClick={() => sendMessage()}

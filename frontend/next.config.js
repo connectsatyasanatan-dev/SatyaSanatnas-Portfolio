@@ -7,7 +7,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
+        // Only forward non-chat API routes to Flask backend
+        source: '/api/((?!chat).*)',
         destination: 'http://localhost:5000/api/:path*',
       },
     ]

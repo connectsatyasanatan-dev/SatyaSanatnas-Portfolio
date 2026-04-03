@@ -1,69 +1,177 @@
 import { NextRequest, NextResponse } from 'next/server';
+import Groq from 'groq-sdk';
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// Fetch portfolio data from Flask backend (server-side)
+async function fetchPortfolioContext(): Promise<string> {
+    const BASE = 'http://localhost:5000/api';
+    try {
+        const [personal, skills, projects, experience, education, certs, achievements] =
+            await Promise.allSettled([
+                fetch(`${BASE}/personal-info`, { cache: 'no-store' }).then(r => r.json()),
+                fetch(`${BASE}/skills`, { cache: 'no-store' }).then(r => r.json()),
+                fetch(`${BASE}/projects`, { cache: 'no-store' }).then(r => r.json()),
+                fetch(`${BASE}/experience`, { cache: 'no-store' }).then(r => r.json()),
+                fetch(`${BASE}/education`, { cache: 'no-store' }).then(r => r.json()),
+                fetch(`${BASE}/certifications`, { cache: 'no-store' }).then(r => r.json()),
+                fetch(`${BASE}/achievements`, { cache: 'no-store' }).then(r => r.json()),
+            ]);
+
+        const p = personal.status === 'fulfilled' ? personal.value : {};
+        const sk = skills.status === 'fulfilled' ? skills.value : {};
+        const pr = projects.status === 'fulfilled' ? projects.value : [];
+        const ex = experience.status === 'fulfilled' ? experience.value : [];
+        const ed = education.status === 'fulfilled' ? education.value : [];
+        const ce = certs.status === 'fulfilled' ? certs.value : [];
+        const ac = achievements.status === 'fulfilled' ? achievements.value : {};
+
+        const allSkills = Object.values(sk as Record<string, { title: string; skills: { name: string }[] }>)
+            .map(cat => `${cat.title}: ${cat.skills?.map((s: { name: string }) => s.name).join(', ')}`)
+            .filter(Boolean)
+            .join('\n');
+
+        const topProjects = (Array.isArray(pr) ? pr : []).slice(0, 6)
+            .map((proj: { name: string; description: string; technologies: string[]; status: string }) =>
+                `- ${proj.name}: ${proj.description} [Tech: ${proj.technologies?.join(', ')}] [Status: ${proj.status}]`)
+            .join('\n');
+
+        const expText = (Array.isArray(ex) ? ex : [])
+            .map((e: { title: string; company: string; period: string; description: string }) =>
+                `- ${e.title} at ${e.company} (${e.period}): ${e.description}`)
+            .join('\n');
+
+        const eduText = (Array.isArray(ed) ? ed : [])
+            .map((e: { degree: string; school: string; period: string }) =>
+                `- ${e.degree} from ${e.school} (${e.period})`)
+            .join('\n');
+
+        const certText = (Array.isArray(ce) ? ce : [])
+            .map((c: { name: string; issuer: string; date: string }) =>
+                `- ${c.name} by ${c.issuer} (${c.date})`)
+            .join('\n');
+
+        const stats = ac?.stats || {};
+
+        return `
+PERSON: ${p.name || 'Developer'} | ${p.role || 'Full Stack Developer'} | ${p.location || ''}
+BIO: ${p.bio || ''}
+AVAILABILITY: ${p.availability || 'Open to opportunities'}
+EMAIL: ${p.email || ''} | GITHUB: ${p.github || ''} | LINKEDIN: ${p.linkedin || ''}
+
+SKILLS:
+${allSkills || 'Not specified'}
+
+PROJECTS:
+${topProjects || 'No projects listed'}
+
+EXPERIENCE:
+${expText || 'Not specified'}
+
+EDUCATION:
+${eduText || 'Not specified'}
+
+CERTIFICATIONS:
+${certText || 'None listed'}
+
+STATS: ${stats.projectsCompleted || 0} projects | ${stats.yearsOfExperience || 0} yrs exp | ${stats.clientsSatisfied || 0} clients | ${stats.codeCommits || 0} commits
+        `.trim();
+    } catch (e) {
+        console.error('[Portfolio fetch error]', e);
+        return 'Portfolio data temporarily unavailable.';
+    }
+}
 
 export async function POST(request: NextRequest) {
+    // Parse body ONCE — store it
+    let message = '';
+    let history: { role: string; content: string }[] = [];
+
     try {
-        const { message } = await request.json();
-        if (!message || typeof message !== 'string') {
-            return NextResponse.json({ error: 'Invalid message' }, { status: 400 });
-        }
-
-        const response = generateResponse(message.toLowerCase().trim());
-        return NextResponse.json({ response, timestamp: new Date().toISOString() });
+        const body = await request.json();
+        message = body.message || '';
+        history = body.history || [];
     } catch {
-        return NextResponse.json({ error: 'Server error' }, { status: 500 });
+        return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    if (!message || typeof message !== 'string') {
+        return NextResponse.json({ error: 'Invalid message' }, { status: 400 });
+    }
+
+    const apiKey = process.env.GROQ_API_KEY;
+
+    // No API key — return fallback
+    if (!apiKey || apiKey === 'your_groq_api_key_here') {
+        console.warn('[Chat] No GROQ_API_KEY set — using fallback');
+        return NextResponse.json({ response: getFallback(message) });
+    }
+
+    try {
+        const portfolioContext = await fetchPortfolioContext();
+
+        const systemPrompt = `You are an intelligent, friendly AI assistant embedded in a developer portfolio website.
+Your job is to help visitors learn about this developer and encourage them to connect or hire them.
+
+PORTFOLIO DATA:
+${portfolioContext}
+
+RULES:
+- Answer questions about this developer's skills, projects, experience, education, certifications, and hiring
+- Be concise, warm, and professional
+- Use bullet points and **bold** for clarity
+- If portfolio data is empty/missing for a field, say "I don't have that detail right now — feel free to reach out directly!"
+- Never fabricate information not in the portfolio data
+- Keep responses under 250 words unless a detailed breakdown is requested
+- End with a natural follow-up question or call-to-action`;
+
+        const recentHistory = history.slice(-6).map(m => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+        }));
+
+        const completion = await groq.chat.completions.create({
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+                { role: 'system', content: systemPrompt },
+                ...recentHistory,
+                { role: 'user', content: message },
+            ],
+            max_tokens: 450,
+            temperature: 0.7,
+            top_p: 0.9,
+        });
+
+        const response = completion.choices[0]?.message?.content;
+        if (!response) throw new Error('Empty response from Groq');
+
+        return NextResponse.json({
+            response,
+            timestamp: new Date().toISOString(),
+            model: 'llama-3.3-70b-versatile',
+        });
+
+    } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        console.error('[Groq API error]', errMsg);
+
+        // Return the actual error in dev so you can debug
+        return NextResponse.json({
+            response: getFallback(message),
+            _debug: process.env.NODE_ENV === 'development' ? errMsg : undefined,
+        });
     }
 }
 
-function generateResponse(m: string): string {
-    // ── Projects ──────────────────────────────────────────────
-    if (match(m, ['project', 'portfolio', 'built', 'made', 'created', 'work'])) {
-        return `Here's a snapshot of Satya's key projects:\n\n**🤖 AI Chatbot Platform**\n• React + Flask + NLP pipeline\n• Context-aware streaming responses\n• Glassmorphism dark UI (you're using it!)\n\n**🌐 Portfolio Website**\n• Next.js 14 + TypeScript + Flask REST API\n• Admin dashboard with analytics\n• SEO optimized, fully responsive\n\n**⚙️ Full-Stack Web Apps**\n• Auth systems, REST APIs, DB design\n• Cloud deployment on AWS & Vercel\n• CI/CD pipelines with Docker\n\nWant a deep dive into any of these?`;
-    }
-
-    // ── Skills / Tech ─────────────────────────────────────────
-    if (match(m, ['skill', 'tech', 'stack', 'language', 'framework', 'tool', 'know', 'use'])) {
-        return `Satya's tech stack is broad and modern:\n\n**Frontend**\n• React, Next.js 14, TypeScript\n• Tailwind CSS, Framer Motion\n\n**Backend**\n• Python, Flask, FastAPI, Node.js\n• REST APIs, WebSockets\n\n**AI / ML**\n• NLP, LLM integrations, OpenAI API\n• scikit-learn, pandas, LangChain\n\n**DevOps & Cloud**\n• Docker, AWS, Vercel, Git CI/CD\n\n**Databases**\n• PostgreSQL, MongoDB, SQLite, Redis\n\nAlways learning — what area interests you most?`;
-    }
-
-    // ── AI / ML ───────────────────────────────────────────────
-    if (match(m, ['ai', 'ml', 'machine learning', 'nlp', 'llm', 'gpt', 'openai', 'model', 'neural', 'deep learning', 'chatbot'])) {
-        return `AI is one of Satya's strongest areas:\n\n**🧠 What he's built:**\n• Conversational AI assistants (like this one!)\n• NLP pipelines for text classification\n• LLM API integrations (OpenAI, Gemini)\n• Intelligent recommendation systems\n• Semantic search with vector embeddings\n\n**🔧 Tools & frameworks:**\n• Python, scikit-learn, pandas, NumPy\n• LangChain, OpenAI API, HuggingFace\n• FastAPI for AI microservices\n• Pinecone / ChromaDB for vector search\n\nHe believes AI should feel natural and useful — not gimmicky. Want to know about a specific project?`;
-    }
-
-    // ── Experience / About ────────────────────────────────────
-    if (match(m, ['experience', 'background', 'about', 'who', 'bio', 'yourself', 'satya', 'tell me'])) {
-        return `Satya is a full-stack developer with a strong focus on AI-integrated web experiences.\n\n**What sets him apart:**\n• Builds end-to-end — from UI to deployment\n• Obsessed with clean, performant code\n• Fast learner who ships quickly\n• Strong eye for modern UI/UX design\n• Communicates clearly with clients & teams\n\nHe's worked across personal projects, freelance clients, and open-source contributions — always pushing the quality bar higher.\n\nCurious about anything specific?`;
-    }
-
-    // ── Hire / Job ────────────────────────────────────────────
-    if (match(m, ['hire', 'job', 'opportunity', 'recruit', 'position', 'role', 'work with', 'team', 'onboard', 'available'])) {
-        return `Satya is open to exciting opportunities! 🚀\n\n**Available for:**\n• Full-time roles (remote / hybrid)\n• Freelance & contract projects\n• Technical consulting\n• Startup collaborations\n\n**He brings:**\n• Fast onboarding & clear communication\n• Full-stack + AI expertise\n• Ownership mindset — ships with quality\n• Clean, documented, maintainable code\n\nBest move? Hit the **Contact** section below — he typically responds within 24 hours.\n\nWant me to tell you more about his work first?`;
-    }
-
-    // ── Contact ───────────────────────────────────────────────
-    if (match(m, ['contact', 'reach', 'email', 'message', 'connect', 'get in touch', 'dm', 'linkedin'])) {
-        return `Getting in touch with Satya is easy:\n\n**📬 Contact Section** — scroll to the bottom of this page\n**⚡ Response time** — usually within 24 hours\n**💬 Open to** — any project size or collaboration type\n\nWhen you reach out, mention:\n• What you're building or need help with\n• Timeline & scope\n• Tech stack (if you have one in mind)\n\nHe loves ambitious ideas — don't hold back!`;
-    }
-
-    // ── React / Frontend ──────────────────────────────────────
-    if (match(m, ['react', 'next', 'nextjs', 'frontend', 'ui', 'ux', 'css', 'tailwind', 'typescript'])) {
-        return `Satya excels at modern frontend development:\n\n**⚛️ React Ecosystem**\n• Next.js 14 App Router, Server Components\n• TypeScript for full type safety\n• Zustand, React Query for state & data\n• Framer Motion for smooth animations\n\n**🎨 UI/UX Focus**\n• Glassmorphism, neumorphism, modern design\n• Responsive-first, mobile-optimized\n• Accessibility (ARIA, keyboard nav)\n• Performance — Core Web Vitals optimized\n\n**🚀 Deployment**\n• Vercel, Netlify, custom servers\n• SSR, SSG, ISR strategies\n• Image optimization, lazy loading\n\nThis portfolio is a live example — what do you think?`;
-    }
-
-    // ── Python / Backend ──────────────────────────────────────
-    if (match(m, ['python', 'flask', 'fastapi', 'backend', 'api', 'server', 'database', 'sql'])) {
-        return `Satya's backend skills are solid:\n\n**🐍 Python Ecosystem**\n• Flask, FastAPI for REST APIs\n• SQLAlchemy ORM, Alembic migrations\n• JWT auth, OAuth2, rate limiting\n• Async programming with asyncio\n\n**🗄️ Databases**\n• PostgreSQL, SQLite, MongoDB\n• Redis for caching & sessions\n• Query optimization & indexing\n\n**☁️ DevOps**\n• Docker containerization\n• AWS (EC2, S3, Lambda)\n• CI/CD with GitHub Actions\n• Environment & secrets management\n\nHis portfolio API is a clean example — well-structured and documented!`;
-    }
-
-    // ── Default ───────────────────────────────────────────────
-    const defaults = [
-        `Good question! I can tell you about:\n\n• **Projects** — what Satya has built\n• **Skills** — his full tech stack\n• **AI Work** — ML and LLM projects\n• **Experience** — his background\n• **Hiring** — how to bring him on board\n• **Contact** — how to reach him\n\nJust ask — or tap one of the chips below!`,
-        `I'm here to give you the full picture on Satya's work.\n\nTry asking:\n• "What projects have you built?"\n• "Tell me about your AI experience"\n• "Are you available for hire?"\n• "What's your tech stack?"\n\nWhat would you like to know?`,
-    ];
-
-    return defaults[Math.floor(Math.random() * defaults.length)];
-}
-
-function match(msg: string, keywords: string[]): boolean {
-    return keywords.some(k => msg.includes(k));
+function getFallback(msg: string): string {
+    const m = msg.toLowerCase();
+    if (m.includes('project') || m.includes('work') || m.includes('built'))
+        return `Check out the **Projects** section on this page for a full breakdown — each one includes tech stack, live demo, and GitHub links.\n\nAnything specific you're curious about?`;
+    if (m.includes('skill') || m.includes('tech') || m.includes('stack'))
+        return `The **Skills** section has the full tech stack breakdown. From frontend to backend, cloud to AI — it's all there.\n\nWant to know about a specific technology?`;
+    if (m.includes('hire') || m.includes('job') || m.includes('available'))
+        return `Open to exciting opportunities! 🚀 Full-time, freelance, or consulting — hit the **Contact** section to start a conversation.`;
+    if (m.includes('contact') || m.includes('reach') || m.includes('email'))
+        return `Scroll to the **Contact** section at the bottom — response time is usually within 24 hours!`;
+    return `I can help you explore this portfolio! Ask me about:\n\n• **Projects** built\n• **Skills** & tech stack\n• **Experience** & background\n• **Hiring** availability\n\nWhat would you like to know?`;
 }
