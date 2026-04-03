@@ -12,6 +12,7 @@ import TerminalSection from '@/components/TerminalSection'
 import ContactSection from '@/components/ContactSection'
 import AppContainer from '@/components/AppContainer'
 import ChatBot from '@/components/ChatBot'
+import Footer from '@/components/Footer'
 
 export default async function Home() {
     return (
@@ -26,6 +27,7 @@ export default async function Home() {
             <BlogSection />
             <TerminalSection />
             <ContactSection />
+            <Footer />
             <ChatBot />
         </AppContainer>
     )

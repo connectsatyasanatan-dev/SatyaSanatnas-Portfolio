@@ -139,6 +139,7 @@ export interface PortfolioStats {
     code_commits: number
     lines_of_code: number
     coffee_consumed: number
+    unique_visitors: number
 }
 
 

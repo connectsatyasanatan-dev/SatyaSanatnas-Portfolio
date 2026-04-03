@@ -114,7 +114,9 @@ def contact_form():
         message_text = data["message"].strip()
 
         # 1. Save to database
-        db.add_contact_message(name=name, email=email, subject=subject, message=message_text)
+        db.add_contact_message(
+            name=name, email=email, subject=subject, message=message_text
+        )
 
         # 2. Send email to portfolio owner (if mail is configured and owner has email)
         personal_info = db.get_personal_info()
@@ -123,7 +125,11 @@ def contact_form():
             try:
                 mail = current_app.extensions["mail"]
                 msg = Message(
-                    subject=f"[Portfolio] {subject}" if subject else "[Portfolio] New contact message",
+                    subject=(
+                        f"[Portfolio] {subject}"
+                        if subject
+                        else "[Portfolio] New contact message"
+                    ),
                     recipients=[owner_email],
                     body=(
                         f"New message from your portfolio contact form\n\n"
@@ -135,7 +141,9 @@ def contact_form():
                 mail.send(msg)
             except Exception as mail_err:
                 # Log but don't fail the request; message is already saved
-                current_app.logger.warning(f"Contact form: email send failed: {mail_err}")
+                current_app.logger.warning(
+                    f"Contact form: email send failed: {mail_err}"
+                )
 
         response_data = {
             "success": True,
@@ -165,6 +173,16 @@ def get_stats():
     achievements = db.get_achievements()
     stats_data = achievements.get("stats", {})
 
+    # Public visitor count from analytics table
+    try:
+        conn = db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(DISTINCT visitor_id) FROM analytics")
+        unique_visitors = cursor.fetchone()[0]
+        conn.close()
+    except Exception:
+        unique_visitors = 0
+
     stats = {
         "projects_count": stats_data.get("projectsCompleted", len(projects)),
         "featured_projects": len([p for p in projects if p.get("featured", False)]),
@@ -177,7 +195,8 @@ def get_stats():
         "clients_satisfied": stats_data.get("clientsSatisfied", 0),
         "code_commits": stats_data.get("codeCommits", 0),
         "lines_of_code": stats_data.get("linesOfCode", 0),
-        "coffee_consumed": stats_data.get("coffeeConsumed", 0)
+        "coffee_consumed": stats_data.get("coffeeConsumed", 0),
+        "unique_visitors": unique_visitors,
     }
     return jsonify(stats)
 
@@ -186,13 +205,13 @@ def get_location_from_ip(ip):
     """Get location info from IP address using ip-api.com"""
     try:
         # Skip local IP
-        if ip == '127.0.0.1' or ip.startswith('192.168.') or ip.startswith('10.'):
+        if ip == "127.0.0.1" or ip.startswith("192.168.") or ip.startswith("10."):
             return "Local", "Local"
-        
+
         response = requests.get(f"http://ip-api.com/json/{ip}", timeout=5)
         data = response.json()
-        if data.get('status') == 'success':
-            return data.get('country'), data.get('city')
+        if data.get("status") == "success":
+            return data.get("country"), data.get("city")
     except Exception as e:
         print(f"GeoIP error: {e}")
     return "Unknown", "Unknown"
@@ -207,12 +226,12 @@ def track_visit():
             return jsonify({"error": "Missing visitorId or sessionId"}), 400
 
         # Get IP address
-        ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-        if ip and ',' in ip:
-            ip = ip.split(',')[0].strip()
-            
+        ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+        if ip and "," in ip:
+            ip = ip.split(",")[0].strip()
+
         country, city = get_location_from_ip(ip) if ip else ("Unknown", "Unknown")
-        
+
         visit_data = {
             "visitor_id": data.get("visitorId"),
             "session_id": data.get("sessionId"),
@@ -222,9 +241,9 @@ def track_visit():
             "referrer": data.get("referrer"),
             "page_path": data.get("pagePath", "/"),
             "location_country": country,
-            "location_city": city
+            "location_city": city,
         }
-        
+
         db.track_visit(visit_data)
         return jsonify({"success": True})
     except Exception as e:
@@ -238,10 +257,10 @@ def track_duration():
         data = request.get_json()
         session_id = data.get("sessionId")
         duration = data.get("duration")
-        
+
         if not session_id:
             return jsonify({"error": "Missing sessionId"}), 400
-            
+
         db.update_duration(session_id, duration)
         return jsonify({"success": True})
     except Exception as e:
@@ -252,5 +271,7 @@ def track_duration():
 def serve_uploaded_file(filename):
     """Serve files uploaded via the admin panel"""
     # Use UPLOAD_FOLDER from config or fallback to relative path
-    upload_dir = current_app.config.get("UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads"))
+    upload_dir = current_app.config.get(
+        "UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads")
+    )
     return send_from_directory(upload_dir, filename)
