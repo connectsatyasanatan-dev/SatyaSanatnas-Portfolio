@@ -54,11 +54,21 @@ function FileIcon({ ext, size = 14 }: { ext: string; size?: number }) {
 
 function scrollToSection(sectionId: string) {
     const el = document.getElementById(sectionId)
-    if (el) {
+    if (!el) return
+
+    // Scroll within .main-content container (body is overflow:hidden)
+    const container = document.querySelector('.main-content') as HTMLElement
+    if (container) {
+        const containerTop = container.getBoundingClientRect().top
+        const elTop = el.getBoundingClientRect().top
+        const offset = elTop - containerTop + container.scrollTop - 16
+        container.scrollTo({ top: offset, behavior: 'smooth' })
+    } else {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        // Close mobile sidebar after navigation
-        document.querySelector('.app-body')?.classList.remove('mobile-sidebar-open')
     }
+
+    // Close mobile sidebar after navigation
+    document.querySelector('.app-body')?.classList.remove('mobile-sidebar-open')
 }
 
 interface SidebarProps {

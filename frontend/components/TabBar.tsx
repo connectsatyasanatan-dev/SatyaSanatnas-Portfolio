@@ -39,7 +39,14 @@ const TabBar = ({ activeSection }: TabBarProps) => {
             setOpenTabs((prev) => [...prev, file.id])
         }
         const el = document.getElementById(file.sectionId)
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        if (!el) return
+        const container = document.querySelector('.main-content') as HTMLElement
+        if (container) {
+            const offset = el.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - 16
+            container.scrollTo({ top: offset, behavior: 'smooth' })
+        } else {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
     }
 
     // Keyboard: arrow keys to move between tabs, Enter to navigate

@@ -1,54 +1,960 @@
+/* ============================================================
+   RESPONSIVE.CSS — Complete responsive overrides
+   Breakpoints: 480px | 640px | 768px | 1024px | 1280px
+   ============================================================ */
 
-@media (max-width: 481px) {
-/* hero section responsive */
- #portfolio-header .header-right{
-    display: none;
- }
-
- #portfolio-header .mobile-menu-btn{
-    width: 30px;
-    height: 30px;
- }
-
- #hero-section .hero-name{
-    font-size: 25px;
- }
-
- #hero-section .hero-title{
-    font-size: 14px;
- }
-
-  #hero-section .hero-description{
-    font-size: 12px;
-  }
-
-}
-
-@media (max-width: 768px) {
-   
-
-    
-}
-
-
-@media (max-width: 1024px) {
-   #portfolio-sidebar .sidebar-icons .icons-bottom {
-    padding-bottom: 38px;
+/* ── 480px and below (small phones) ─────────────────────── */
+@media (max-width: 480px) {
+   /* ── Layout ── */
+   .main-content {
+      padding: 10px 8px;
    }
+
+   .resizable-sidebar-container {
+      display: none !important;
+   }
+
+   /* ── Header ── */
+   #portfolio-header .header-right {
+      display: none;
+   }
+
+   #portfolio-header .mobile-menu-btn {
+      width: 30px;
+      height: 30px;
+   }
+
+   #portfolio-header .header-title-container {
+      max-width: 150px;
+   }
+
+   /* ── TabBar ── */
+   #portfolio-tabbar .tab-item {
+      padding: 5px 6px;
+      font-size: 10px;
+      gap: 3px;
+   }
+
+   #portfolio-tabbar .tab-item .tab-name {
+      display: none;
+   }
+
+   /* ── Hero ── */
+   #hero-section {
+      padding: 0 4px;
+      margin-bottom: 24px;
+   }
+
+   #hero-section .hero-name {
+      font-size: 22px;
+      line-height: 1.2;
+   }
+
+   #hero-section .hero-title {
+      font-size: 13px;
+   }
+
+   #hero-section .hero-description {
+      font-size: 12px;
+   }
+
+   #hero-section .hero-actions {
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+   }
+
+   #hero-section .hero-btn {
+      width: 100%;
+      padding: 10px 16px;
+      font-size: 12px;
+      justify-content: center;
+   }
+
+   #hero-section .hero-btn .btn-text-full {
+      display: none;
+   }
+
+   #hero-section .hero-btn .btn-text-short {
+      display: inline;
+   }
+
+   #hero-section .hero-stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 20px;
+   }
+
+   #hero-section .stat-item {
+      padding: 10px 6px;
+   }
+
+   #hero-section .stat-value {
+      font-size: 15px;
+   }
+
+   #hero-section .stat-label {
+      font-size: 9px;
+   }
+
+   #hero-section .code-content {
+      font-size: 9px;
+      padding: 8px 6px;
+   }
+
+   #hero-section .execute-btn {
+      font-size: 11px;
+      padding: 5px 10px;
+   }
+
+   #hero-section .execute-btn .btn-text-full {
+      display: none;
+   }
+
+   #hero-section .execute-btn .btn-text-short {
+      display: inline;
+   }
+
+   /* ── Skills ── */
+   #skills-section {
+      padding: 0 4px;
+   }
+
+   #skills-section .stats-overview {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+   }
+
+   #skills-section .stat-card {
+      padding: 12px 8px;
+   }
+
+   #skills-section .stat-number {
+      font-size: 18px;
+   }
+
+   #skills-section .stat-description {
+      font-size: 10px;
+   }
+
+   #skills-section .skills-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+   }
+
+   #skills-section .skill-category {
+      padding: 14px;
+   }
+
+   #skills-section .category-title {
+      font-size: 14px;
+   }
+
+   #skills-section .skill-name {
+      font-size: 12px;
+   }
+
+   #skills-section .achievements-grid {
+      grid-template-columns: 1fr;
+   }
+
+   /* ── Git History / Experience ── */
+   #git-history-section {
+      padding: 0 4px;
+   }
+
+   #git-history-section .timeline-main {
+      padding-left: 20px;
+   }
+
+   #git-history-section .timeline-item {
+      gap: 12px;
+   }
+
+   #git-history-section .timeline-dot-inner {
+      width: 28px;
+      height: 28px;
+   }
+
+   #git-history-section .timeline-dot {
+      left: -33px;
+   }
+
+   #git-history-section .timeline-line {
+      left: 8px;
+   }
+
+   /* ── Projects ── */
+   #projects-section {
+      padding: 0 4px;
+   }
+
+   #projects-section .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+   }
+
+   #projects-section .projects-grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
+   }
+
+   #projects-section .project-terminal {
+      height: 120px;
+      padding: 10px;
+      font-size: 10px;
+   }
+
+   #projects-section .project-content {
+      padding: 12px;
+   }
+
+   #projects-section .project-name {
+      font-size: 14px;
+   }
+
+   #projects-section .project-description {
+      font-size: 12px;
+   }
+
+   #projects-section .project-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+   }
+
+   /* ── Testimonials (inline styles in component) ── */
+   #testimonials-section {
+      padding: 0 4px;
+   }
+
+   #testimonials-root {
+      margin: 40px auto 56px auto !important;
+      padding: 0 6px !important;
+   }
+
+   .testi-header-title {
+      font-size: 20px !important;
+   }
+
+   .testi-slide {
+      padding: 24px 16px 80px 16px !important;
+   }
+
+   .testi-slider {
+      min-height: 340px !important;
+   }
+
+   .testi-name {
+      font-size: 15px !important;
+   }
+
+   .testi-quote-text {
+      font-size: 15px !important;
+      margin-bottom: 20px !important;
+   }
+
+   .testi-btn {
+      width: 36px !important;
+      height: 36px !important;
+   }
+
+   .testi-nav {
+      right: 12px !important;
+      bottom: 14px !important;
+      gap: 6px !important;
+   }
+
+   .testi-dots {
+      left: 16px !important;
+      bottom: 20px !important;
+   }
+
+   /* ── Blog ── */
+   #blog-section {
+      padding: 0 4px;
+   }
+
+   #blog-section .articles-grid {
+      grid-template-columns: 1fr !important;
+   }
+
+   #blog-section .blog-footer-grid {
+      grid-template-columns: 1fr !important;
+   }
+
+   #blog-section .newsletter-form {
+      flex-direction: column;
+      gap: 8px;
+   }
+
+   #blog-section .newsletter-input {
+      width: 100%;
+   }
+
+   #blog-section .newsletter-btn {
+      width: 100%;
+   }
+
+   /* ── Terminal ── */
+   #terminal-section {
+      padding: 0 4px;
+   }
+
+   #terminal-section .terminal-window {
+      font-size: 10px;
+   }
+
+   #terminal-section .terminal-stats {
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-start;
+   }
+
+   /* ── Contact ── */
+   #contact-section {
+      padding: 0 4px;
+   }
+
+   #contact-section .contact-grid {
+      grid-template-columns: 1fr !important;
+      gap: 16px;
+   }
+
+   #contact-section .cf-row {
+      grid-template-columns: 1fr !important;
+   }
+
+   #contact-section .cf-gutter {
+      display: none;
+   }
+
+   #contact-section .cf-body {
+      padding: 12px;
+   }
+
+   #contact-section .cf-wrapper {
+      font-size: 12px;
+   }
+
+   #contact-section .contact-cta {
+      padding: 12px;
+   }
+
+   #contact-section .cta-button {
+      font-size: 13px;
+      padding: 12px 20px;
+   }
+
+   /* ── Project Modal ── */
+   .pm-overlay {
+      padding: 8px;
+   }
+
+   .pm-modal {
+      max-height: 95vh;
+      border-radius: 10px;
+   }
+
+   .pm-title {
+      font-size: 16px;
+   }
+
+   .pm-body {
+      padding: 14px;
+      gap: 12px;
+   }
+
+   .pm-footer {
+      padding: 10px 14px;
+      gap: 8px;
+      flex-wrap: wrap;
+   }
+
+   .pm-btn {
+      padding: 7px 12px;
+      font-size: 12px;
+   }
+
+   .pm-btn--ext {
+      margin-left: 0;
+   }
+
+   .pm-stats {
+      gap: 8px;
+      font-size: 11px;
+   }
+
+   /* ── Footer ── */
+   .site-footer {
+      padding: 12px 10px;
+   }
+
+   .site-footer__inner {
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+   }
+
+   /* ── Chatbot ── */
+   .cb-window {
+      width: calc(100vw - 16px);
+      right: 8px;
+      bottom: 68px;
+      max-height: 72vh;
+      border-radius: 12px;
+   }
+
+   .cb-fab {
+      right: 10px;
+      bottom: 10px;
+      width: 48px;
+      height: 48px;
+   }
+
+   .cb-chips {
+      gap: 4px;
+      padding: 6px 8px;
+   }
+
+   .cb-chip {
+      font-size: 10px;
+      padding: 4px 8px;
+   }
+
+   .cb-input {
+      font-size: 13px;
+   }
+}
+
+/* ── 481px – 640px (large phones) ────────────────────────── */
+@media (min-width: 481px) and (max-width: 640px) {
+
+   .main-content {
+      padding: 14px 12px;
+   }
+
+   #hero-section .hero-name {
+      font-size: 26px;
+   }
+
+   #hero-section .hero-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+   }
+
+   #hero-section .hero-btn {
+      width: auto;
+   }
+
+   #hero-section .hero-stats {
+      grid-template-columns: repeat(2, 1fr);
+   }
+
+   #skills-section .stats-overview {
+      grid-template-columns: repeat(2, 1fr);
+   }
+
+   #skills-section .skills-grid {
+      grid-template-columns: 1fr;
+   }
+
+   #projects-section .projects-grid {
+      grid-template-columns: 1fr;
+   }
+
+   #projects-section .project-terminal {
+      height: 140px;
+   }
+
+   #projects-section .project-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+   }
+
+   #contact-section .contact-grid {
+      grid-template-columns: 1fr !important;
+   }
+
+   #contact-section .cf-row {
+      grid-template-columns: 1fr !important;
+   }
+
+   .cb-window {
+      width: 340px;
+      right: 12px;
+      bottom: 72px;
+   }
+}
+
+/* ── max-width: 768px (shared mobile/tablet rules) ───────── */
+@media (max-width: 768px) {
+
+   /* Sidebar hidden */
+   .resizable-sidebar-container {
+      display: none !important;
+   }
+
+   /* Main content */
+   .main-content {
+      padding: 14px 12px;
+   }
+
+   /* Tab bar */
+   #portfolio-tabbar .tab-item {
+      padding: 6px 8px;
+      font-size: 11px;
+   }
+
+   /* Section titles */
+   .section-title {
+      font-size: 16px !important;
+   }
+
+   /* Hero */
+   #hero-section .hero-stats {
+      grid-template-columns: repeat(2, 1fr);
+   }
+
+   /* Skills */
+   #skills-section .stats-overview {
+      grid-template-columns: repeat(2, 1fr);
+   }
+
+   #skills-section .skills-grid {
+      grid-template-columns: 1fr;
+   }
+
+   /* Git history */
+   #git-history-section .timeline-container {
+      grid-template-columns: 1fr;
+   }
+
+   #git-history-section .timeline-main {
+      padding-left: 28px;
+   }
+
+   /* Projects */
+   #projects-section .projects-grid.grid-view {
+      grid-template-columns: 1fr;
+   }
+
+   #projects-section .project-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+   }
+
+   /* Testimonials */
+   #testimonials-root {
+      margin: 56px auto 80px auto !important;
+      padding: 0 12px !important;
+   }
+
+   .testi-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+   }
+
+   .testi-header-title {
+      font-size: 24px !important;
+   }
+
+   .testi-slide {
+      padding: 32px 24px 80px 24px !important;
+   }
+
+   .testi-quote-text {
+      font-size: 18px !important;
+   }
+
+   /* Blog */
+   #blog-section .articles-grid {
+      grid-template-columns: 1fr !important;
+   }
+
+   #blog-section .blog-footer-grid {
+      grid-template-columns: 1fr !important;
+   }
+
+   /* Terminal */
+   #terminal-section .terminal-window {
+      font-size: 11px;
+   }
+
+   #terminal-section .terminal-stats {
+      flex-wrap: wrap;
+      gap: 8px;
+   }
+
+   /* Contact */
+   #contact-section .contact-grid {
+      grid-template-columns: 1fr !important;
+   }
+
+   #contact-section .cf-row {
+      grid-template-columns: 1fr !important;
+   }
+
+   /* Execution modal */
+   .execution-modal-content {
+      max-width: 100%;
+      margin: 0 8px;
+   }
+
+   .profile-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+   }
+
+   .terminal-wrapper {
+      font-size: 12px;
+      padding: 12px;
+      max-height: 220px;
+   }
+
+   /* Project modal */
+   .pm-modal {
+      max-width: calc(100vw - 24px);
+   }
+
+   .pm-title {
+      font-size: 18px;
+   }
+
+   .pm-title-row {
+      flex-direction: column;
+      gap: 8px;
+   }
+
+   /* Footer */
+   .site-footer__inner {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+   }
+}
+
+/* ── 641px – 768px (tablets portrait) ───────────────────── */
+@media (min-width: 641px) and (max-width: 768px) {
+
+   .main-content {
+      padding: 20px 16px;
+   }
+
+   #hero-section .hero-stats {
+      grid-template-columns: repeat(4, 1fr);
+   }
+
+   #hero-section .hero-actions {
+      flex-direction: row;
+   }
+
+   #hero-section .hero-btn {
+      width: auto;
+   }
+
+   #skills-section .stats-overview {
+      grid-template-columns: repeat(2, 1fr);
+   }
+
+   #projects-section .projects-grid.grid-view {
+      grid-template-columns: repeat(2, 1fr);
+   }
+
+   #projects-section .project-terminal {
+      height: 150px;
+   }
+
+   #projects-section .project-footer {
+      flex-direction: row;
+      align-items: center;
+   }
+}
+
+/* ── 769px – 1023px (tablets landscape / small laptops) ─── */
+@media (min-width: 769px) and (max-width: 1023px) {
+
+   .main-content {
+      padding: 24px 20px;
+   }
+
+   .resizable-sidebar-container {
+      display: none !important;
+   }
+
+   #hero-section .hero-stats {
+      grid-template-columns: repeat(4, 1fr);
+   }
+
+   #hero-section .hero-actions {
+      flex-direction: row;
+   }
+
+   #hero-section .hero-btn {
+      width: auto;
+   }
+
+   #hero-section .hero-btn .btn-text-full {
+      display: inline;
+   }
+
+   #hero-section .hero-btn .btn-text-short {
+      display: none;
+   }
+
+   #skills-section .stats-overview {
+      grid-template-columns: repeat(4, 1fr);
+   }
+
+   #skills-section .skills-grid {
+      grid-template-columns: repeat(2, 1fr);
+   }
+
+   #projects-section .projects-grid.grid-view {
+      grid-template-columns: repeat(2, 1fr);
+   }
+
+   #projects-section .project-terminal {
+      height: 160px;
+   }
+
+   #projects-section .project-footer {
+      flex-direction: row;
+      align-items: center;
+   }
+
+   #contact-section .contact-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+   }
+
+   #contact-section .cf-row {
+      grid-template-columns: repeat(2, 1fr) !important;
+   }
+}
+
+/* ── max-width: 1024px (sidebar hidden) ─────────────────── */
+@media (max-width: 1024px) {
+
+   #portfolio-sidebar .sidebar-icons .icons-bottom {
+      padding-bottom: 38px;
+   }
+
    .sidebar-icons .icon-wrapper svg {
       width: 20px;
       height: 20px;
    }
-    
+
+   /* Tab names visible on tablet */
+   #portfolio-tabbar .tab-item .tab-name {
+      display: inline;
+   }
 }
 
+/* ── min-width: 1024px (desktop — sidebar visible) ──────── */
+@media (min-width: 1024px) {
 
+   .resizable-sidebar-container {
+      display: flex !important;
+   }
 
-@media (max-width: 1440px) {
-    
+   .main-content {
+      padding: var(--space-8);
+   }
+
+   #hero-section .execute-btn .btn-text-full {
+      display: inline;
+   }
+
+   #hero-section .execute-btn .btn-text-short {
+      display: none;
+   }
+
+   #hero-section .hero-btn .btn-text-full {
+      display: inline;
+   }
+
+   #hero-section .hero-btn .btn-text-short {
+      display: none;
+   }
+
+   #hero-section .hero-stats {
+      grid-template-columns: repeat(4, 1fr);
+   }
+
+   #hero-section .hero-actions {
+      flex-direction: row;
+   }
+
+   #hero-section .hero-btn {
+      width: auto;
+   }
+
+   #skills-section .skills-grid {
+      grid-template-columns: repeat(2, 1fr);
+   }
+
+   #skills-section .stats-overview {
+      grid-template-columns: repeat(4, 1fr);
+   }
+
+   #projects-section .projects-grid.grid-view {
+      grid-template-columns: repeat(3, 1fr);
+   }
+
+   #projects-section .project-terminal {
+      height: 192px;
+   }
+
+   #projects-section .project-footer {
+      flex-direction: row;
+      align-items: center;
+   }
+
+   #contact-section .contact-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+   }
+
+   #contact-section .cf-row {
+      grid-template-columns: repeat(2, 1fr) !important;
+   }
+
+   .site-footer__inner {
+      flex-direction: row;
+   }
 }
 
-@media (max-width: 1920px) {
-    
+/* ── min-width: 1280px (large desktop) ──────────────────── */
+@media (min-width: 1280px) {
+   .main-content {
+      padding: var(--space-8);
+   }
+
+   #skills-section .skills-grid {
+      grid-template-columns: repeat(2, 1fr);
+   }
+
+   #projects-section .projects-grid.grid-view {
+      grid-template-columns: repeat(3, 1fr);
+   }
 }
 
+/* ── min-width: 1536px (ultra wide) ─────────────────────── */
+@media (min-width: 1536px) {
+   .main-content {
+      padding: var(--space-12);
+   }
+}
+
+/* ── Touch device improvements ───────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+
+   /* Larger tap targets */
+   #portfolio-header .header-btn {
+      min-width: 40px;
+      min-height: 40px;
+   }
+
+   #portfolio-tabbar .tab-item {
+      min-height: 40px;
+   }
+
+   .project-link {
+      min-height: 36px;
+      padding: 4px 8px;
+   }
+
+   .pm-btn {
+      min-height: 40px;
+   }
+
+   .toggle-btn {
+      min-height: 36px;
+   }
+
+   #hero-section .hero-btn {
+      min-height: 44px;
+   }
+
+   .testi-btn {
+      min-width: 44px !important;
+      min-height: 44px !important;
+   }
+
+   /* Remove sticky hover states on touch */
+   #projects-section .project-card:hover {
+      transform: none;
+   }
+
+   #hero-section .hero-btn:hover {
+      transform: none;
+   }
+
+   .cert-card:hover {
+      transform: none !important;
+   }
+}
+
+/* ── Landscape phone fix ─────────────────────────────────── */
+@media (max-height: 500px) and (orientation: landscape) {
+   .main-content {
+      padding: 8px 12px;
+   }
+
+   #hero-section .hero-stats {
+      grid-template-columns: repeat(4, 1fr);
+   }
+
+   #hero-section .hero-actions {
+      flex-direction: row;
+   }
+
+   #hero-section .hero-btn {
+      width: auto;
+   }
+
+   .cb-window {
+      max-height: 85vh;
+      bottom: 60px;
+   }
+
+   .pm-modal {
+      max-height: 90vh;
+   }
+
+   #testimonials-root {
+      margin: 24px auto 40px auto !important;
+   }
+}
+
+/* ── Scrollbar — thinner on mobile ──────────────────────── */
+@media (max-width: 768px) {
+   ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+   }
+}
+
+/* ── Print ───────────────────────────────────────────────── */
+@media print {
+
+   .resizable-sidebar-container,
+   #portfolio-header,
+   #portfolio-tabbar,
+   .cb-fab,
+   .cb-window,
+   .site-footer {
+      display: none !important;
+   }
+
+   .main-content {
+      padding: 0;
+      overflow: visible;
+   }
+}

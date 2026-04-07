@@ -851,3 +851,18 @@
     align-self: flex-start;
   }
 }
+
+/* ── Extra small (480px) skills fixes ───────────────────── */
+@media (max-width: 480px) {
+  .skills-modern-section { padding: 0.75rem 0 !important; }
+  .section-title-modern { font-size: 1.25rem; }
+  .stats-dashboard { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-card-modern { padding: 12px 8px; }
+  .stat-number { font-size: 1.25rem; }
+  .stat-label { font-size: 10px; }
+  .category-btn { min-width: 130px; padding: 0.6rem 0.75rem; font-size: 12px; }
+  .skills-display { padding: 1rem; }
+  .skill-card-modern { padding: 0.75rem; }
+  .skills-grid-modern { grid-template-columns: 1fr; gap: 0.75rem; }
+  .achievements-grid-modern { grid-template-columns: 1fr; gap: 0.75rem; }
+}
