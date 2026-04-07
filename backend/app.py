@@ -12,6 +12,7 @@ from flask_mail import Mail
 from config import Config
 from routes.api import api
 from routes.admin import admin
+from limiter import limiter
 
 # Structured logging
 logging.basicConfig(
@@ -20,10 +21,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Rate limiter — shared instance, attached to app in factory
+# (defined in limiter.py to avoid circular imports)
+
 
 def create_app(config_class: type = Config) -> Flask:
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Validate secrets in production — raises RuntimeError if misconfigured
+    config_class.validate_production_secrets()
 
     # ------------------------------------------------------------------
     # Extensions
@@ -36,6 +43,7 @@ def create_app(config_class: type = Config) -> Flask:
         supports_credentials=True,
     )
     Mail(app)
+    limiter.init_app(app)
 
     # ------------------------------------------------------------------
     # Blueprints
@@ -111,9 +119,11 @@ def create_app(config_class: type = Config) -> Flask:
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
-        # Cache public GET endpoints for 5 minutes
-        if response.status_code == 200 and hasattr(response, "direct_passthrough"):
-            pass
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        # HSTS — only meaningful over HTTPS; safe to set always
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains"
+        )
         return response
 
     logger.info("Flask app created successfully")

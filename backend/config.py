@@ -15,11 +15,36 @@ class Config:
     # ------------------------------------------------------------------ #
     # Core Flask
     # ------------------------------------------------------------------ #
-    SECRET_KEY: str = os.environ.get(
-        "SECRET_KEY", "dev-secret-key-change-in-production"
-    )
+    SECRET_KEY: str = os.environ.get("SECRET_KEY", "")
     FLASK_ENV: str = os.environ.get("FLASK_ENV", "development")
     DEBUG: bool = FLASK_ENV == "development"
+
+    # Warn at import time if insecure defaults are detected in production
+    @classmethod
+    def validate_production_secrets(cls):
+        import logging as _logging
+
+        _log = _logging.getLogger(__name__)
+        if cls.FLASK_ENV == "production":
+            if (
+                not cls.SECRET_KEY
+                or cls.SECRET_KEY == "dev-secret-key-change-in-production"
+            ):
+                raise RuntimeError(
+                    "FATAL: SECRET_KEY is not set or is using the default dev value. "
+                    "Set a strong random SECRET_KEY environment variable before deploying."
+                )
+            jwt_key = os.environ.get("JWT_SECRET_KEY", "")
+            if not jwt_key or jwt_key == "dev-jwt-secret-change-in-production":
+                raise RuntimeError(
+                    "FATAL: JWT_SECRET_KEY is not set or is using the default dev value. "
+                    "Set a strong random JWT_SECRET_KEY environment variable before deploying."
+                )
+        elif not cls.SECRET_KEY:
+            cls.SECRET_KEY = "dev-secret-key-change-in-production"
+            _log.warning(
+                "SECRET_KEY not set — using insecure dev default. Set it before production."
+            )
 
     # ------------------------------------------------------------------ #
     # CORS — comma-separated list of allowed origins
@@ -57,7 +82,7 @@ class Config:
     # ------------------------------------------------------------------ #
     # JWT
     # ------------------------------------------------------------------ #
-    JWT_SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY", SECRET_KEY)
+    JWT_SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY", "") or SECRET_KEY
     JWT_EXPIRY_HOURS: int = int(os.environ.get("JWT_EXPIRY_HOURS", 24))
 
     # ------------------------------------------------------------------ #

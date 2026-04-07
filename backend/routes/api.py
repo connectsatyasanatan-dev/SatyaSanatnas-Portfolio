@@ -5,6 +5,7 @@ import requests
 import os
 import logging
 from flask import Blueprint, jsonify, request, current_app, send_from_directory
+from limiter import limiter
 
 api = Blueprint("api", __name__)
 logger = logging.getLogger(__name__)
@@ -144,6 +145,7 @@ def get_blog_posts():
 
 
 @api.route("/contact", methods=["POST"])
+@limiter.limit("5 per minute; 20 per hour")
 def contact_form():
     """Handle contact form submission: validate, save to DB, send email."""
     try:
@@ -268,6 +270,7 @@ def get_location_from_ip(ip):
 
 
 @api.route("/track-visit", methods=["POST"])
+@limiter.limit("30 per minute")
 def track_visit():
     """Track a new visit session"""
     try:
@@ -301,6 +304,7 @@ def track_visit():
 
 
 @api.route("/track-duration", methods=["POST"])
+@limiter.limit("60 per minute")
 def track_duration():
     """Update session duration"""
     try:

@@ -1,31 +1,39 @@
-import hashlib
 import jwt
 import datetime
 import os
 import logging
 from functools import wraps
 from flask import request, jsonify, current_app
+from werkzeug.security import generate_password_hash, check_password_hash
 
 logger = logging.getLogger(__name__)
 
-ADMIN_CREDENTIALS = {
-    "username": os.getenv("ADMIN_USERNAME", "Admin"),
-    # Store hashed password — hash of env var password
-    "password_hash": hashlib.sha256(
-        os.getenv("ADMIN_PASSWORD", "Admin@123").encode()
-    ).hexdigest(),
-    "email": os.getenv("ADMIN_EMAIL", "admin@portfolio.dev"),
-}
+
+def _build_credentials():
+    """Build admin credentials at startup — hashes password with bcrypt via werkzeug."""
+    username = os.getenv("ADMIN_USERNAME", "Admin")
+    password = os.getenv("ADMIN_PASSWORD", "Admin@123")
+    email = os.getenv("ADMIN_EMAIL", "admin@portfolio.dev")
+
+    # Warn loudly if default insecure values are still in use
+    if password == "Admin@123":
+        logger.warning(
+            "SECURITY WARNING: Default ADMIN_PASSWORD is in use. "
+            "Set a strong password in your environment before deploying to production."
+        )
+    return {
+        "username": username,
+        "password_hash": generate_password_hash(password),
+        "email": email,
+    }
 
 
-def hash_password(password: str) -> str:
-    """Hash password using SHA256"""
-    return hashlib.sha256(password.encode()).hexdigest()
+ADMIN_CREDENTIALS = _build_credentials()
 
 
 def verify_password(plain: str) -> bool:
-    """Verify plain password against stored hash"""
-    return hash_password(plain) == ADMIN_CREDENTIALS["password_hash"]
+    """Verify plain password against bcrypt hash."""
+    return check_password_hash(ADMIN_CREDENTIALS["password_hash"], plain)
 
 
 def generate_token(username: str) -> str:

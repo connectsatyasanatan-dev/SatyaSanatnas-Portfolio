@@ -17,8 +17,6 @@ interface Message {
     suggestions?: string[];
     copied?: boolean;
     isFallback?: boolean;
-    canRetry?: boolean;
-    retryQuery?: string;
 }
 
 interface HistoryItem {
@@ -50,6 +48,26 @@ const CHIPS: Chip[] = [
     { label: 'Contact', icon: <Mail size={12} />, query: 'How can I contact you?' },
     { label: 'AI Work', icon: <Sparkles size={12} />, query: 'Tell me about your AI projects' },
 ];
+
+// ── Client-side fallback (when API is unreachable) ────────
+function buildClientFallback(msg: string): string {
+    const m = msg.toLowerCase();
+    if (m.includes('project') || m.includes('work') || m.includes('built'))
+        return "Satya has worked on some really exciting projects! Head over to the **Projects** section on this page to explore them all — each one includes the tech stack, live demo, and GitHub link.\n\nAnything specific you're looking for?";
+    if (m.includes('skill') || m.includes('tech') || m.includes('stack'))
+        return "Satya has a strong and diverse tech stack — from frontend to backend, cloud, and AI/ML. Check out the **Skills** section for the full breakdown!\n\nAny specific technology you're curious about?";
+    if (m.includes('experience') || m.includes('career') || m.includes('job'))
+        return "Satya has a solid professional background! The **Experience** section covers the full career timeline with roles, companies, and key achievements.";
+    if (m.includes('contact') || m.includes('reach') || m.includes('email') || m.includes('hire'))
+        return "Getting in touch is easy — just scroll down to the **Contact** section at the bottom of this page. Satya usually responds within 24 hours!";
+    if (m.includes('education') || m.includes('degree') || m.includes('university'))
+        return "You can find Satya's academic background in the **Education** section on this page.";
+    if (m.includes('certif'))
+        return "Satya's professional certifications are listed in the **Certifications** section — go check them out!";
+    if (m.includes('hello') || m.includes('hi') || m.includes('hey'))
+        return "Hey there! 👋 I'm Zentara, Satya's personal AI assistant.\n\nYou can ask me about his **projects**, **skills**, **experience**, or how to **get in touch**. What would you like to explore?";
+    return "Great question! Feel free to explore the portfolio sections — **Projects**, **Skills**, **Experience**, and **Contact** are all just a scroll away.\n\nWhat would you like to know about Satya?";
+}
 
 // ── Smart follow-up suggestions ───────────────────────────
 function extractSuggestions(text: string): string[] {
@@ -178,11 +196,11 @@ export default function ChatBot() {
     }, [isOpen]);
 
     // ── Stream message ────────────────────────────────────
-    const streamBotMessage = (fullText: string, suggestions: string[] = [], isFallback = false, retryQuery = '') => {
+    const streamBotMessage = (fullText: string, suggestions: string[] = [], isFallback = false) => {
         const id = Date.now().toString();
         setMessages(prev => [...prev, {
             id, text: '', isBot: true, timestamp: new Date(),
-            isStreaming: true, suggestions: [], isFallback, canRetry: isFallback, retryQuery,
+            isStreaming: true, suggestions: [], isFallback, canRetry: false,
         }]);
         setIsTyping(false);
         let i = 0;
@@ -201,10 +219,6 @@ export default function ChatBot() {
 
     // ── API call ──────────────────────────────────────────
     const getBotResponse = async (userMsg: string): Promise<{ response: string; suggestions: string[]; isFallback: boolean; sentiment: string }> => {
-        if (!navigator.onLine) return {
-            response: "📡 You appear to be offline. Please check your connection and try again.",
-            suggestions: [], isFallback: true, sentiment: 'neutral',
-        };
         try {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 15000);
@@ -217,16 +231,13 @@ export default function ChatBot() {
             clearTimeout(timeout);
             if (res.ok) {
                 const data = await res.json();
-                return { response: data.response, suggestions: extractSuggestions(data.response), isFallback: data.fallback === true, sentiment: data.sentiment || 'neutral' };
+                return { response: data.response, suggestions: extractSuggestions(data.response), isFallback: false, sentiment: data.sentiment || 'neutral' };
             }
-            return { response: "Something went wrong. Please try again!", suggestions: [], isFallback: true, sentiment: 'neutral' };
-        } catch (err) {
-            const isAbort = err instanceof Error && err.name === 'AbortError';
-            return {
-                response: isAbort ? "⏱️ Took too long to respond. Please try again!" : "📡 Couldn't reach the server. Check your connection.",
-                suggestions: [], isFallback: true, sentiment: 'neutral',
-            };
+        } catch {
+            // silently fall through to smart fallback
         }
+        // Always return a helpful response — never expose errors to user
+        return { response: '', suggestions: [], isFallback: true, sentiment: 'neutral' };
     };
 
     // ── Send message ──────────────────────────────────────
@@ -243,8 +254,13 @@ export default function ChatBot() {
 
         const { response, suggestions, isFallback, sentiment } = await getBotResponse(msg);
         setUserSentiment(sentiment as 'frustrated' | 'neutral' | 'positive');
-        setHistory(prev => [...prev, { role: 'assistant', content: response }]);
-        streamBotMessage(response, suggestions, isFallback, msg);
+
+        // If API failed entirely, use client-side smart fallback
+        const finalResponse = response || buildClientFallback(msg);
+        const finalSuggestions = response ? suggestions : extractSuggestions(finalResponse);
+
+        setHistory(prev => [...prev, { role: 'assistant', content: finalResponse }]);
+        streamBotMessage(finalResponse, finalSuggestions, isFallback);
     };
 
     // ── Input ─────────────────────────────────────────────
@@ -420,11 +436,6 @@ export default function ChatBot() {
                                         )}
                                     </div>
                                 </div>
-                                {msg.isBot && !msg.isStreaming && msg.canRetry && msg.retryQuery && (
-                                    <button className="cb-retry-btn" onClick={() => sendMessage(msg.retryQuery)} disabled={isTyping}>
-                                        ↺ Retry
-                                    </button>
-                                )}
                                 {msg.isBot && !msg.isStreaming && msg.suggestions && msg.suggestions.length > 0 && (
                                     <div className="cb-suggestions">
                                         {msg.suggestions.map((s, i) => (
