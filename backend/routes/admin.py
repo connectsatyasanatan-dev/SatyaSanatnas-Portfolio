@@ -4,35 +4,80 @@ from models.admin import (
     verify_password,
     generate_token,
     admin_required,
-    hash_password,
 )
 from models.database import db
+from cache import invalidate_cache as _invalidate_cache
 import json
 import os
+import time
+import logging
 import secrets
 from werkzeug.utils import secure_filename
 
 admin = Blueprint("admin", __name__)
+logger = logging.getLogger(__name__)
+
+# Simple in-memory brute-force protection
+_login_attempts: dict = {}
+_MAX_ATTEMPTS = 5
+_LOCKOUT_SECONDS = 300  # 5 minutes
+
+
+def _check_rate_limit(ip: str) -> tuple[bool, int]:
+    """Returns (is_allowed, seconds_remaining)"""
+    now = time.time()
+    record = _login_attempts.get(ip, {"count": 0, "first": now, "locked_until": 0})
+
+    if now < record.get("locked_until", 0):
+        return False, int(record["locked_until"] - now)
+
+    # Reset window after 15 minutes
+    if now - record["first"] > 900:
+        _login_attempts[ip] = {"count": 0, "first": now, "locked_until": 0}
+        return True, 0
+
+    return True, 0
+
+
+def _record_failed_attempt(ip: str):
+    now = time.time()
+    record = _login_attempts.get(ip, {"count": 0, "first": now, "locked_until": 0})
+    record["count"] = record.get("count", 0) + 1
+    if record["count"] >= _MAX_ATTEMPTS:
+        record["locked_until"] = now + _LOCKOUT_SECONDS
+        logger.warning(f"Admin login locked for IP {ip} after {_MAX_ATTEMPTS} attempts")
+    _login_attempts[ip] = record
+
+
+def _clear_attempts(ip: str):
+    _login_attempts.pop(ip, None)
 
 
 @admin.route("/login", methods=["POST"])
 def admin_login():
-    """Admin login endpoint"""
+    """Admin login with brute-force protection"""
+    ip = (
+        request.headers.get("X-Forwarded-For", request.remote_addr or "unknown")
+        .split(",")[0]
+        .strip()
+    )
+
+    allowed, wait = _check_rate_limit(ip)
+    if not allowed:
+        return jsonify({"error": f"Too many attempts. Try again in {wait}s"}), 429
+
     try:
-        data = request.get_json()
-        username = data.get("username")
-        password = data.get("password")
+        data = request.get_json() or {}
+        username = (data.get("username") or "").strip()
+        password = data.get("password") or ""
 
         if not username or not password:
             return jsonify({"error": "Username and password required"}), 400
 
-        # Verify credentials
-        if (
-            username == ADMIN_CREDENTIALS["username"]
-            and password == ADMIN_CREDENTIALS["password"]
-        ):
-
+        if username == ADMIN_CREDENTIALS["username"] and verify_password(password):
+            _clear_attempts(ip)
             token = generate_token(username)
+            logger.info(f"Admin login success for {username}")
             return jsonify(
                 {
                     "success": True,
@@ -40,11 +85,16 @@ def admin_login():
                     "user": {"username": username, "email": ADMIN_CREDENTIALS["email"]},
                 }
             )
-        else:
-            return jsonify({"error": "Invalid credentials"}), 401
+
+        _record_failed_attempt(ip)
+        logger.warning(
+            f"Failed admin login attempt for username='{username}' from {ip}"
+        )
+        return jsonify({"error": "Invalid credentials"}), 401
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Admin login error: {e}")
+        return jsonify({"error": "Login failed"}), 500
 
 
 @admin.route("/verify", methods=["GET"])
@@ -69,6 +119,7 @@ def update_personal_info():
     try:
         data = request.get_json()
         db.update_personal_info(data)
+        _invalidate_cache("personal_info")
 
         return jsonify(
             {
@@ -155,6 +206,7 @@ def add_project():
     try:
         data = request.get_json()
         project_id = db.add_project(data)
+        _invalidate_cache("projects")
 
         # Get the newly created project
         projects = db.get_projects()
@@ -179,6 +231,7 @@ def update_project(project_id):
     try:
         data = request.get_json()
         db.update_project(project_id, data)
+        _invalidate_cache("projects")
 
         # Get updated project
         projects = db.get_projects()
@@ -202,6 +255,7 @@ def delete_project(project_id):
     """Delete project"""
     try:
         db.delete_project(project_id)
+        _invalidate_cache("projects")
         return jsonify({"success": True, "message": "Project deleted successfully"})
 
     except Exception as e:
@@ -294,11 +348,17 @@ def add_education():
     try:
         data = request.get_json()
         edu_id = db.add_education(data)
-        
+
         # Get newly created
         edu_list = db.get_education()
         new_edu = next((e for e in edu_list if e["id"] == edu_id), None)
-        return jsonify({"success": True, "message": "Education added successfully", "data": new_edu})
+        return jsonify(
+            {
+                "success": True,
+                "message": "Education added successfully",
+                "data": new_edu,
+            }
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -310,10 +370,16 @@ def update_education(edu_id):
     try:
         data = request.get_json()
         db.update_education(edu_id, data)
-        
+
         edu_list = db.get_education()
         updated_edu = next((e for e in edu_list if e["id"] == edu_id), None)
-        return jsonify({"success": True, "message": "Education updated successfully", "data": updated_edu})
+        return jsonify(
+            {
+                "success": True,
+                "message": "Education updated successfully",
+                "data": updated_edu,
+            }
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -344,10 +410,16 @@ def add_certification():
     try:
         data = request.get_json()
         cert_id = db.add_certification(data)
-        
+
         cert_list = db.get_certifications()
         new_cert = next((c for c in cert_list if c["id"] == cert_id), None)
-        return jsonify({"success": True, "message": "Certification added successfully", "data": new_cert})
+        return jsonify(
+            {
+                "success": True,
+                "message": "Certification added successfully",
+                "data": new_cert,
+            }
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -359,10 +431,16 @@ def update_certification(cert_id):
     try:
         data = request.get_json()
         db.update_certification(cert_id, data)
-        
+
         cert_list = db.get_certifications()
         updated_cert = next((c for c in cert_list if c["id"] == cert_id), None)
-        return jsonify({"success": True, "message": "Certification updated successfully", "data": updated_cert})
+        return jsonify(
+            {
+                "success": True,
+                "message": "Certification updated successfully",
+                "data": updated_cert,
+            }
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -373,7 +451,9 @@ def delete_certification(cert_id):
     """Delete certification"""
     try:
         db.delete_certification(cert_id)
-        return jsonify({"success": True, "message": "Certification deleted successfully"})
+        return jsonify(
+            {"success": True, "message": "Certification deleted successfully"}
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -393,7 +473,13 @@ def update_achievements(category):
     try:
         data = request.get_json()
         db.update_achievements(category, data)
-        return jsonify({"success": True, "message": f"{category} updated successfully", "data": data})
+        return jsonify(
+            {
+                "success": True,
+                "message": f"{category} updated successfully",
+                "data": data,
+            }
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -608,38 +694,42 @@ def upload_file():
     try:
         if "file" not in request.files:
             return jsonify({"error": "No file part in the request"}), 400
-        
+
         file = request.files["file"]
         if file.filename == "":
             return jsonify({"error": "No file selected"}), 400
-        
+
         if file:
             filename = secure_filename(file.filename)
             # Add a random prefix to prevent filename collisions
             random_prefix = secrets.token_hex(4)
             filename = f"{random_prefix}_{filename}"
-            
+
             # Use UPLOAD_FOLDER from config
-            upload_dir = current_app.config.get("UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads"))
-            
+            upload_dir = current_app.config.get(
+                "UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads")
+            )
+
             if not os.path.exists(upload_dir):
                 os.makedirs(upload_dir, exist_ok=True)
-            
+
             file_path = os.path.join(upload_dir, filename)
             file.save(file_path)
-            
+
             # The static URL the frontend can use to access this file
             # Assuming the backend serves files from /static/uploads
             # (If not, we might need a dedicated route or use send_from_directory)
             file_url = f"/api/static/uploads/{filename}"
-            
-            return jsonify({
-                "success": True,
-                "message": "File uploaded successfully",
-                "url": file_url,
-                "filename": filename
-            })
-            
+
+            return jsonify(
+                {
+                    "success": True,
+                    "message": "File uploaded successfully",
+                    "url": file_url,
+                    "filename": filename,
+                }
+            )
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -648,5 +738,8 @@ def upload_file():
 def serve_uploaded_file(filename):
     """Fallback route to serve static files if the main app isn't configured for it"""
     from flask import send_from_directory
-    upload_dir = current_app.config.get("UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads"))
+
+    upload_dir = current_app.config.get(
+        "UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads")
+    )
     return send_from_directory(upload_dir, filename)

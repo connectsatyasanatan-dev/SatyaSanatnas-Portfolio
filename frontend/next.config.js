@@ -1,17 +1,47 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // App directory is now stable in Next.js 14
-  // experimental: {
-  //   appDir: true,
-  // },
+  compress: true,
+
   async rewrites() {
     return [
       {
-        // Only forward non-chat API routes to Flask backend
         source: '/api/((?!chat).*)',
         destination: 'http://localhost:5000/api/:path*',
       },
     ]
+  },
+
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
+      {
+        // Cache static assets aggressively
+        source: '/images/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        // Cache public API responses briefly on CDN
+        source: '/api/(personal-info|skills|projects|experience|education|certifications|achievements|testimonials|blog|stats)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, s-maxage=300, stale-while-revalidate=60' },
+        ],
+      },
+    ]
+  },
+
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 3600,
   },
 }
 

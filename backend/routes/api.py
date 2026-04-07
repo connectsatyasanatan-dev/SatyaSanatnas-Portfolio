@@ -1,28 +1,53 @@
 from models.database import db
 from flask_mail import Message
+from cache import get_cached, set_cache, invalidate_cache
 import requests
 import os
+import logging
 from flask import Blueprint, jsonify, request, current_app, send_from_directory
 
 api = Blueprint("api", __name__)
+logger = logging.getLogger(__name__)
 
 
 @api.route("/health", methods=["GET"])
 def health_check():
-    """Health check endpoint"""
-    return jsonify({"status": "healthy", "message": "Flask backend is running!"})
+    """Health check — verifies DB connectivity"""
+    try:
+        conn = db.get_connection()
+        conn.execute("SELECT 1")
+        conn.close()
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {e}"
+
+    return jsonify(
+        {
+            "status": "healthy" if db_status == "connected" else "degraded",
+            "database": db_status,
+            "message": "Flask backend is running!",
+        }
+    ), (200 if db_status == "connected" else 503)
 
 
 @api.route("/personal-info", methods=["GET"])
 def get_personal_info():
-    """Get personal information"""
-    return jsonify(db.get_personal_info())
+    cached = get_cached("personal_info")
+    if cached:
+        return jsonify(cached)
+    data = db.get_personal_info()
+    set_cache("personal_info", data)
+    return jsonify(data)
 
 
 @api.route("/skills", methods=["GET"])
 def get_skills():
-    """Get all skills data"""
-    return jsonify(db.get_skills())
+    cached = get_cached("skills")
+    if cached:
+        return jsonify(cached)
+    data = db.get_skills()
+    set_cache("skills", data)
+    return jsonify(data)
 
 
 @api.route("/skills/<category>", methods=["GET"])
@@ -36,13 +61,14 @@ def get_skills_by_category(category):
 
 @api.route("/projects", methods=["GET"])
 def get_projects():
-    """Get all projects"""
-    projects = db.get_projects()
+    cached = get_cached("projects")
+    if cached is None:
+        cached = db.get_projects()
+        set_cache("projects", cached)
     featured_only = request.args.get("featured", "false").lower() == "true"
     if featured_only:
-        featured_projects = [p for p in projects if p.get("featured", False)]
-        return jsonify(featured_projects)
-    return jsonify(projects)
+        return jsonify([p for p in cached if p.get("featured", False)])
+    return jsonify(cached)
 
 
 @api.route("/projects/<int:project_id>", methods=["GET"])
@@ -57,79 +83,109 @@ def get_project(project_id):
 
 @api.route("/experience", methods=["GET"])
 def get_experience():
-    """Get work experience"""
-    return jsonify(db.get_experience())
+    cached = get_cached("experience")
+    if cached:
+        return jsonify(cached)
+    data = db.get_experience()
+    set_cache("experience", data)
+    return jsonify(data)
 
 
 @api.route("/education", methods=["GET"])
 def get_education():
-    """Get education"""
-    return jsonify(db.get_education())
+    cached = get_cached("education")
+    if cached:
+        return jsonify(cached)
+    data = db.get_education()
+    set_cache("education", data)
+    return jsonify(data)
 
 
 @api.route("/certifications", methods=["GET"])
 def get_certifications():
-    """Get certifications"""
-    return jsonify(db.get_certifications())
+    cached = get_cached("certifications")
+    if cached:
+        return jsonify(cached)
+    data = db.get_certifications()
+    set_cache("certifications", data)
+    return jsonify(data)
 
 
 @api.route("/achievements", methods=["GET"])
 def get_achievements():
-    """Get achievements"""
-    return jsonify(db.get_achievements())
+    cached = get_cached("achievements")
+    if cached:
+        return jsonify(cached)
+    data = db.get_achievements()
+    set_cache("achievements", data)
+    return jsonify(data)
 
 
 @api.route("/testimonials", methods=["GET"])
 def get_testimonials():
-    """Get testimonials"""
-    return jsonify(db.get_testimonials())
+    cached = get_cached("testimonials")
+    if cached:
+        return jsonify(cached)
+    data = db.get_testimonials()
+    set_cache("testimonials", data)
+    return jsonify(data)
 
 
 @api.route("/blog", methods=["GET"])
 def get_blog_posts():
-    """Get blog posts"""
-    posts = db.get_blog_posts()
+    cached = get_cached("blog")
+    if cached is None:
+        cached = db.get_blog_posts()
+        set_cache("blog", cached)
     featured_only = request.args.get("featured", "false").lower() == "true"
     if featured_only:
-        featured_posts = [p for p in posts if p.get("featured", False)]
-        return jsonify(featured_posts)
-    return jsonify(posts)
+        return jsonify([p for p in cached if p.get("featured", False)])
+    return jsonify(cached)
 
 
 @api.route("/contact", methods=["POST"])
 def contact_form():
-    """Handle contact form submission: save to DB, send email to portfolio owner."""
+    """Handle contact form submission: validate, save to DB, send email."""
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
 
-        # Validate required fields
-        required_fields = ["name", "email", "message"]
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({"error": f"Missing required field: {field}"}), 400
-
-        name = data["name"].strip()
-        email = data["email"].strip()
+        name = (data.get("name") or "").strip()
+        email = (data.get("email") or "").strip()
         subject = (data.get("subject") or "Portfolio Contact Form").strip()
-        message_text = data["message"].strip()
+        message_text = (data.get("message") or "").strip()
 
-        # 1. Save to database
+        # Validation
+        import re
+
+        errors = []
+        if not name or len(name) < 2:
+            errors.append("Name must be at least 2 characters")
+        if len(name) > 100:
+            errors.append("Name too long (max 100 chars)")
+        if not email or not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", email):
+            errors.append("Valid email required")
+        if not message_text or len(message_text) < 10:
+            errors.append("Message must be at least 10 characters")
+        if len(message_text) > 2000:
+            errors.append("Message too long (max 2000 chars)")
+        if errors:
+            return jsonify({"error": "; ".join(errors)}), 400
+
+        # Truncate subject
+        subject = subject[:200]
+
         db.add_contact_message(
             name=name, email=email, subject=subject, message=message_text
         )
 
-        # 2. Send email to portfolio owner (if mail is configured and owner has email)
+        # Send email (non-blocking failure)
         personal_info = db.get_personal_info()
         owner_email = (personal_info.get("email") or "").strip()
         if owner_email and current_app.extensions.get("mail"):
             try:
                 mail = current_app.extensions["mail"]
                 msg = Message(
-                    subject=(
-                        f"[Portfolio] {subject}"
-                        if subject
-                        else "[Portfolio] New contact message"
-                    ),
+                    subject=f"[Portfolio] {subject}",
                     recipients=[owner_email],
                     body=(
                         f"New message from your portfolio contact form\n\n"
@@ -140,27 +196,21 @@ def contact_form():
                 )
                 mail.send(msg)
             except Exception as mail_err:
-                # Log but don't fail the request; message is already saved
-                current_app.logger.warning(
-                    f"Contact form: email send failed: {mail_err}"
-                )
+                logger.warning(f"Contact form email failed: {mail_err}")
 
-        response_data = {
-            "success": True,
-            "message": "Thank you for your message! I'll get back to you soon.",
-            "data": {
-                "name": name,
-                "email": email,
-                "subject": subject,
-            },
-        }
-        return jsonify(response_data), 200
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "message": "Thank you! I'll get back to you soon.",
+                }
+            ),
+            200,
+        )
 
     except Exception as e:
-        return (
-            jsonify({"error": "Failed to process contact form", "details": str(e)}),
-            500,
-        )
+        logger.error(f"Contact form error: {e}")
+        return jsonify({"error": "Failed to process contact form"}), 500
 
 
 @api.route("/stats", methods=["GET"])

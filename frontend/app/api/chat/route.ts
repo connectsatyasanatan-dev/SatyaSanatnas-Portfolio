@@ -22,8 +22,16 @@ interface PortfolioData {
 }
 
 // ── Fetch all portfolio data from Flask ───────────────────
+// Module-level cache — refreshes every 10 minutes
+let _portfolioCache: { data: PortfolioData; expires: number } | null = null;
+
 async function fetchPortfolioData(): Promise<PortfolioData> {
-    const BASE = 'http://localhost:5000/api';
+    // Return cached data if still fresh
+    if (_portfolioCache && Date.now() < _portfolioCache.expires) {
+        return _portfolioCache.data;
+    }
+
+    const BASE = process.env.FLASK_API_URL || 'http://localhost:5000/api';
     const empty: PortfolioData = {
         name: '', role: '', bio: '', location: '', email: '',
         github: '', linkedin: '', availability: '',
@@ -32,16 +40,19 @@ async function fetchPortfolioData(): Promise<PortfolioData> {
         stats: { projectsCompleted: 0, yearsOfExperience: 0, clientsSatisfied: 0, codeCommits: 0 },
     };
 
+    const fetchWithTimeout = (url: string) =>
+        fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(6000) }).then(r => r.json());
+
     try {
         const [personal, skills, projects, experience, education, certs, achievements] =
             await Promise.allSettled([
-                fetch(`${BASE}/personal-info`, { cache: 'no-store' }).then(r => r.json()),
-                fetch(`${BASE}/skills`, { cache: 'no-store' }).then(r => r.json()),
-                fetch(`${BASE}/projects`, { cache: 'no-store' }).then(r => r.json()),
-                fetch(`${BASE}/experience`, { cache: 'no-store' }).then(r => r.json()),
-                fetch(`${BASE}/education`, { cache: 'no-store' }).then(r => r.json()),
-                fetch(`${BASE}/certifications`, { cache: 'no-store' }).then(r => r.json()),
-                fetch(`${BASE}/achievements`, { cache: 'no-store' }).then(r => r.json()),
+                fetchWithTimeout(`${BASE}/personal-info`),
+                fetchWithTimeout(`${BASE}/skills`),
+                fetchWithTimeout(`${BASE}/projects`),
+                fetchWithTimeout(`${BASE}/experience`),
+                fetchWithTimeout(`${BASE}/education`),
+                fetchWithTimeout(`${BASE}/certifications`),
+                fetchWithTimeout(`${BASE}/achievements`),
             ]);
 
         const p = personal.status === 'fulfilled' ? personal.value : {};
@@ -52,7 +63,7 @@ async function fetchPortfolioData(): Promise<PortfolioData> {
         const ce = certs.status === 'fulfilled' ? certs.value : [];
         const ac = achievements.status === 'fulfilled' ? achievements.value : {};
 
-        return {
+        const result: PortfolioData = {
             name: p.name || empty.name,
             role: p.role || empty.role,
             bio: p.bio || empty.bio,
@@ -68,6 +79,10 @@ async function fetchPortfolioData(): Promise<PortfolioData> {
             certifications: Array.isArray(ce) ? ce : [],
             stats: ac?.stats || empty.stats,
         };
+
+        // Cache for 10 minutes
+        _portfolioCache = { data: result, expires: Date.now() + 10 * 60 * 1000 };
+        return result;
     } catch (e) {
         console.error('[Portfolio fetch error]', e);
         return empty;
