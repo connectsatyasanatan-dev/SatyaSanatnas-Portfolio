@@ -1,0 +1,63 @@
+services:
+  # ── Flask Backend ──────────────────────────────────────────
+  - type: web
+    name: portfolio-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: PORT
+        value: 10000
+      - key: CORS_ORIGINS
+        value: https://portfolio-frontend.onrender.com  # update with your actual frontend URL
+      - key: ADMIN_USERNAME
+        value: Admin
+      - key: ADMIN_PASSWORD
+        sync: false   # set manually in Render dashboard
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: MAIL_SERVER
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USE_TLS
+        value: true
+      - key: MAIL_USERNAME
+        sync: false   # set manually in Render dashboard
+      - key: MAIL_PASSWORD
+        sync: false   # set manually in Render dashboard
+      - key: MAIL_DEFAULT_SENDER
+        sync: false   # set manually in Render dashboard
+    disk:
+      name: sqlite-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DB_PATH
+        value: /data/portfolio.db
+
+  # ── Next.js Frontend ───────────────────────────────────────
+  - type: web
+    name: portfolio-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://portfolio-backend.onrender.com/api  # update with your actual backend URL
+      - key: BACKEND_URL
+        value: https://portfolio-backend.onrender.com
+      - key: FLASK_API_URL
+        value: https://portfolio-backend.onrender.com/api
+      - key: GROQ_API_KEY
+        sync: false   # set manually in Render dashboard — NEVER commit this

@@ -10,7 +10,9 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional
 
 # Database file path
-DB_PATH = os.path.join(os.path.dirname(__file__), "..", "portfolio.db")
+# On Render, use /data mount for persistence. Locally, use the backend folder.
+_default_db_path = os.path.join(os.path.dirname(__file__), "..", "portfolio.db")
+DB_PATH = os.environ.get("DB_PATH", _default_db_path)
 
 
 class Database:
@@ -398,7 +400,7 @@ class Database:
                     INSERT INTO achievements (category, data)
                     VALUES (?, ?)
                 """,
-                    (category, json.dumps(data))
+                    (category, json.dumps(data)),
                 )
 
         # Check if blog posts exist
@@ -683,7 +685,9 @@ class Database:
                     "technologies": (
                         json.loads(row["technologies"]) if row["technologies"] else []
                     ),
-                    "commit": row["commit_hash"] if "commit_hash" in row.keys() else None,
+                    "commit": (
+                        row["commit_hash"] if "commit_hash" in row.keys() else None
+                    ),
                     "color": row["color"] if "color" in row.keys() else None,
                     "badge": row["badge"] if "badge" in row.keys() else None,
                 }
@@ -754,12 +758,16 @@ class Database:
                 data.get("duration"),
                 data.get("type"),
                 data.get("description"),
-                json.dumps(data.get("achievements"))
-                if data.get("achievements") is not None
-                else None,
-                json.dumps(data.get("technologies"))
-                if data.get("technologies") is not None
-                else None,
+                (
+                    json.dumps(data.get("achievements"))
+                    if data.get("achievements") is not None
+                    else None
+                ),
+                (
+                    json.dumps(data.get("technologies"))
+                    if data.get("technologies") is not None
+                    else None
+                ),
                 data.get("commit"),
                 data.get("color"),
                 data.get("badge"),
@@ -872,12 +880,16 @@ class Database:
                 data.get("location"),
                 data.get("period"),
                 data.get("gpa"),
-                json.dumps(data.get("relevant_courses"))
-                if data.get("relevant_courses") is not None
-                else None,
-                json.dumps(data.get("achievements"))
-                if data.get("achievements") is not None
-                else None,
+                (
+                    json.dumps(data.get("relevant_courses"))
+                    if data.get("relevant_courses") is not None
+                    else None
+                ),
+                (
+                    json.dumps(data.get("achievements"))
+                    if data.get("achievements") is not None
+                    else None
+                ),
                 data.get("focus"),
                 data.get("certification"),
                 data.get("duration"),
@@ -1010,27 +1022,27 @@ class Database:
                 achievements["stats"] = data
             elif category == "highlights":
                 achievements["highlights"] = data
-        
+
         return achievements
 
     def update_achievements(self, category: str, data: Any) -> bool:
         """Update achievements category"""
         conn = self.get_connection()
         cursor = conn.cursor()
-        
+
         # Check if category exists
         cursor.execute("SELECT id FROM achievements WHERE category = ?", (category,))
         row = cursor.fetchone()
-        
+
         if row:
             cursor.execute(
                 "UPDATE achievements SET data = ?, updated_at = CURRENT_TIMESTAMP WHERE category = ?",
-                (json.dumps(data), category)
+                (json.dumps(data), category),
             )
         else:
             cursor.execute(
                 "INSERT INTO achievements (category, data) VALUES (?, ?)",
-                (category, json.dumps(data))
+                (category, json.dumps(data)),
             )
 
         conn.commit()
@@ -1208,7 +1220,9 @@ class Database:
         return True
 
     # Contact Messages Methods (from portfolio Send Message form)
-    def add_contact_message(self, name: str, email: str, subject: str, message: str) -> int:
+    def add_contact_message(
+        self, name: str, email: str, subject: str, message: str
+    ) -> int:
         """Save a contact form submission"""
         conn = self.get_connection()
         cursor = conn.cursor()
@@ -1328,12 +1342,21 @@ class Database:
         active_users = cursor.fetchone()[0]
 
         # 4. Device Breakdown
-        cursor.execute("SELECT device_type, COUNT(*) as count FROM analytics GROUP BY device_type")
-        device_breakdown = {row["device_type"] or "Unknown": row["count"] for row in cursor.fetchall()}
+        cursor.execute(
+            "SELECT device_type, COUNT(*) as count FROM analytics GROUP BY device_type"
+        )
+        device_breakdown = {
+            row["device_type"] or "Unknown": row["count"] for row in cursor.fetchall()
+        }
 
         # 5. Top Visited Pages
-        cursor.execute("SELECT page_path, COUNT(*) as count FROM analytics GROUP BY page_path ORDER BY count DESC LIMIT 10")
-        top_pages = [{"path": row["page_path"], "visits": row["count"]} for row in cursor.fetchall()]
+        cursor.execute(
+            "SELECT page_path, COUNT(*) as count FROM analytics GROUP BY page_path ORDER BY count DESC LIMIT 10"
+        )
+        top_pages = [
+            {"path": row["page_path"], "visits": row["count"]}
+            for row in cursor.fetchall()
+        ]
 
         # 6. Daily Traffic (Last 30 days)
         cursor.execute(
@@ -1346,12 +1369,18 @@ class Database:
         """
         )
         daily_traffic = [
-            {"date": row["visit_date"], "visits": row["visits"], "unique": row["unique_visitors"]}
+            {
+                "date": row["visit_date"],
+                "visits": row["visits"],
+                "unique": row["unique_visitors"],
+            }
             for row in cursor.fetchall()
         ]
 
         # 7. Countries breakdown
-        cursor.execute("SELECT location_country, COUNT(*) as count FROM analytics WHERE location_country IS NOT NULL GROUP BY location_country ORDER BY count DESC LIMIT 10")
+        cursor.execute(
+            "SELECT location_country, COUNT(*) as count FROM analytics WHERE location_country IS NOT NULL GROUP BY location_country ORDER BY count DESC LIMIT 10"
+        )
         countries = {row["location_country"]: row["count"] for row in cursor.fetchall()}
 
         # 8. New vs Returning (Visitor count)
@@ -1368,22 +1397,23 @@ class Database:
         """
         )
         visitor_stats = cursor.fetchone()
-        
+
         # Handle case with no data
         total_unique = (visitor_stats["total"] if visitor_stats else 0) or 0
         returning = (visitor_stats["returning_count"] if visitor_stats else 0) or 0
-        
-        new_vs_returning = {
-            "new": total_unique - returning,
-            "returning": returning
-        }
+
+        new_vs_returning = {"new": total_unique - returning, "returning": returning}
 
         # 9. Bounce Rate (Visits under 5 seconds)
         cursor.execute(
             "SELECT (CAST(COUNT(CASE WHEN duration < 5 THEN 1 END) AS FLOAT) / COUNT(*)) * 100 as bounce_rate FROM analytics"
         )
         row = cursor.fetchone()
-        bounce_rate = round(row["bounce_rate"], 2) if row and row["bounce_rate"] is not None else 0
+        bounce_rate = (
+            round(row["bounce_rate"], 2)
+            if row and row["bounce_rate"] is not None
+            else 0
+        )
 
         conn.close()
 
@@ -1396,7 +1426,7 @@ class Database:
             "dailyTraffic": daily_traffic,
             "countries": countries,
             "newVsReturning": new_vs_returning,
-            "bounceRate": bounce_rate
+            "bounceRate": bounce_rate,
         }
 
 
