@@ -58,7 +58,8 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
 
         try {
             const token = localStorage.getItem('admin_token')
-            const response = await fetch('/api/admin/upload', {
+            const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+            const response = await fetch(`${backendUrl}/admin/upload`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -271,10 +272,10 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
                                 </div>
                                 <label className="admin-btn admin-btn-gray" style={{ margin: 0, padding: '8px 12px', cursor: 'pointer' }}>
                                     {uploading === 'new' ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
-                                    <input 
-                                        type="file" 
-                                        hidden 
-                                        accept="image/*" 
+                                    <input
+                                        type="file"
+                                        hidden
+                                        accept="image/*"
                                         onChange={(e) => handleFileUpload(e, false)}
                                         disabled={!!uploading}
                                     />
@@ -453,10 +454,10 @@ const CertificationsTab = ({ certifications, onAddCertification, onUpdateCertifi
                                             </div>
                                             <label className="admin-btn admin-btn-gray" style={{ margin: 0, padding: '8px 12px', cursor: 'pointer' }}>
                                                 {uploading === 'edit' ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
-                                                <input 
-                                                    type="file" 
-                                                    hidden 
-                                                    accept="image/*" 
+                                                <input
+                                                    type="file"
+                                                    hidden
+                                                    accept="image/*"
                                                     onChange={(e) => handleFileUpload(e, true)}
                                                     disabled={!!uploading}
                                                 />
