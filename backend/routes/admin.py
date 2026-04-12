@@ -690,53 +690,67 @@ def get_analytics():
 @admin.route("/upload", methods=["POST"])
 @admin_required
 def upload_file():
-    """Handle image uploads for profile pictures, certification badges, etc."""
+    """
+    Upload handler — best practice:
+    - Production: Cloudinary (permanent, CDN-backed)
+    - Local dev:  local filesystem fallback
+    Set CLOUDINARY_URL env var to enable Cloudinary.
+    """
     try:
         if "file" not in request.files:
             return jsonify({"error": "No file part in the request"}), 400
-
         file = request.files["file"]
-        if file.filename == "":
+        if not file or file.filename == "":
             return jsonify({"error": "No file selected"}), 400
 
-        if file:
-            filename = secure_filename(file.filename)
-            # Add a random prefix to prevent filename collisions
-            random_prefix = secrets.token_hex(4)
-            filename = f"{random_prefix}_{filename}"
+        cloudinary_url = os.environ.get(
+            "CLOUDINARY_URL"
+        )  # cloudinary://key:secret@cloud
 
-            # Use UPLOAD_FOLDER from config
-            upload_dir = current_app.config.get(
-                "UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads")
+        if cloudinary_url:
+            # ── Production: Cloudinary ──────────────────────────────
+            import cloudinary
+            import cloudinary.uploader
+
+            cloudinary.config(cloudinary_url=cloudinary_url)
+            result = cloudinary.uploader.upload(
+                file,
+                folder="portfolio",
+                resource_type="auto",  # handles images, PDFs, etc.
             )
-
-            if not os.path.exists(upload_dir):
-                os.makedirs(upload_dir, exist_ok=True)
-
-            file_path = os.path.join(upload_dir, filename)
-            file.save(file_path)
-
-            # The static URL the frontend can use to access this file
-            # Assuming the backend serves files from /static/uploads
-            # (If not, we might need a dedicated route or use send_from_directory)
-            file_url = f"/api/static/uploads/{filename}"
-
             return jsonify(
                 {
                     "success": True,
                     "message": "File uploaded successfully",
-                    "url": file_url,
-                    "filename": filename,
+                    "url": result["secure_url"],
+                    "filename": result["public_id"],
                 }
             )
 
+        # ── Local dev: filesystem fallback ──────────────────────────
+        filename = f"{secrets.token_hex(4)}_{secure_filename(file.filename)}"
+        upload_dir = current_app.config.get(
+            "UPLOAD_FOLDER", os.path.join(current_app.root_path, "static/uploads")
+        )
+        os.makedirs(upload_dir, exist_ok=True)
+        file.save(os.path.join(upload_dir, filename))
+        return jsonify(
+            {
+                "success": True,
+                "message": "File uploaded successfully",
+                "url": f"/api/static/uploads/{filename}",
+                "filename": filename,
+            }
+        )
+
     except Exception as e:
+        logger.error(f"Upload error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
 @admin.route("/static/uploads/<filename>", methods=["GET"])
 def serve_uploaded_file(filename):
-    """Fallback route to serve static files if the main app isn't configured for it"""
+    """Serve locally uploaded files (dev only)."""
     from flask import send_from_directory
 
     upload_dir = current_app.config.get(
