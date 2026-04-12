@@ -153,7 +153,7 @@ const ProjectsTab = ({ projects, onAddProject, onUpdateProject, onDeleteProject 
                     <div>
                         <h4 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '4px', color: '#fff' }}>Portfolio Stats Tip</h4>
                         <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: '1.5' }}>
-                            Working with actual projects here? Great! Note that the <strong>"Projects Delivered"</strong> counter shown on your public site (e.g. "10+") is a marketing number managed in the <strong>Achievements & Stats</strong> tab.
+                            Working with actual projects here? Great! Note that the <strong>&quot;Projects Delivered&quot;</strong> counter shown on your public site (e.g. &quot;10+&quot;) is a marketing number managed in the <strong>Achievements &amp; Stats</strong> tab.
                         </p>
                     </div>
                 </div>

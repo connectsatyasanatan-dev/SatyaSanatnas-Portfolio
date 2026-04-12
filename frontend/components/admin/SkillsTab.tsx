@@ -139,7 +139,7 @@ const SkillsTab = ({ skills, onUpdateCategory, onAddSkill }: SkillsTabProps) => 
                 >
                     <h3 className="admin-card-title">Add New Skill Category</h3>
                     <div className="admin-form-group">
-                        <label className="admin-form-label">Category Key (e.g., "tools", "frontend")</label>
+                        <label className="admin-form-label">Category Key (e.g., &quot;tools&quot;, &quot;frontend&quot;)</label>
                         <input
                             type="text"
                             value={newCategory.key}
