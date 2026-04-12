@@ -21,7 +21,8 @@ This application is built using a modern **full-stack decoupled architecture**, 
 - **Email**: [Flask-Mail](https://pythonhosted.org/Flask-Mail/) for automated contact form notifications.
 
 ### Database & Storage
-- **Database**: [SQLite](https://sqlite.org/) for a portable, file-based relational storage.
+- **Database**: [PostgreSQL](https://www.postgresql.org/) for reliable, production-grade relational storage.
+- **Driver**: [psycopg2](https://www.psycopg.org/) for direct PostgreSQL connectivity.
 - **Model Logic**: Decoupled `models/database.py` for all CRUD operations, ensuring a clean separation of concerns.
 - **File Storage**: Local filesystem-based storage for uploaded media (e.g., certification badges) located in `backend/static/uploads`.
 

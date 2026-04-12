@@ -16,10 +16,6 @@ ENV/
 .env
 # Keep .env.example in source control — it is the safe template
 
-# ─── SQLite databases (local dev data) ───────────────────────────────────────
-*.db
-*.sqlite3
-
 # ─── Build artifacts ─────────────────────────────────────────────────────────
 dist/
 build/

@@ -48,4 +48,3 @@ __pycache__/
 backend/.env
 backend/venv/
 backend/__pycache__/
-backend/portfolio.db
