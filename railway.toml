@@ -3,7 +3,7 @@ builder = "nixpacks"
 buildCommand = "pip install -r requirements.txt"
 
 [build.nixpacksPlan.phases.setup]
-nixPkgs = ["postgresql"]
+nixPkgs = ["python311", "postgresql"]
 
 [deploy]
 startCommand = "gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
