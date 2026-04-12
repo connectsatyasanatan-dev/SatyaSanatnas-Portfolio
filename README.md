@@ -14,52 +14,133 @@ portfolio-root/
 │   ├── app/                    # App Router pages
 │   │   ├── layout.tsx          # Root layout (fonts, global CSS)
 │   │   ├── page.tsx            # Main portfolio page
-│   │   └── admin/              # Admin dashboard
+│   │   ├── error.tsx           # Global error boundary
+│   │   ├── providers.tsx       # Client-side context providers
+│   │   ├── robots.ts           # Robots.txt generator
+│   │   ├── sitemap.ts          # Sitemap generator
+│   │   ├── favicon.ico         # Site favicon
+│   │   ├── admin/              # Admin dashboard
+│   │   │   ├── layout.tsx      # Admin layout wrapper
+│   │   │   ├── page.tsx        # Admin dashboard page
+│   │   │   └── test-page.tsx   # Admin test/debug page
+│   │   └── api/                # Next.js API routes
+│   │       └── chat/           # AI chatbot API
+│   │           └── route.ts    # Chat route handler
 │   │
 │   ├── components/             # Reusable React components
-│   │   ├── HeroSection.tsx
-│   │   ├── SkillsSection.tsx
-│   │   ├── ProjectsSection.tsx
-│   │   ├── BlogSection.tsx
-│   │   ├── ContactSection.tsx
-│   │   └── admin/              # Admin-specific components
+│   │   ├── HeroSection.tsx     # Hero / intro section
+│   │   ├── SkillsSection.tsx   # Skills display
+│   │   ├── ProjectsSection.tsx # Projects showcase
+│   │   ├── BlogSection.tsx     # Blog posts section
+│   │   ├── ContactSection.tsx  # Contact form
+│   │   ├── EducationSection.tsx        # Education history
+│   │   ├── CertificationsSection.tsx   # Certifications
+│   │   ├── TestimonialsSection.tsx     # Testimonials
+│   │   ├── TerminalSection.tsx         # Interactive terminal UI
+│   │   ├── ChatBot.tsx                 # AI chatbot widget
+│   │   ├── Header.tsx                  # Site header / nav
+│   │   ├── Footer.tsx                  # Site footer
+│   │   ├── Sidebar.tsx                 # VS Code-style sidebar
+│   │   ├── ResizableSidebar.tsx        # Draggable sidebar
+│   │   ├── TabBar.tsx                  # VS Code-style tab bar
+│   │   ├── AppContainer.tsx            # Main layout container
+│   │   ├── AppSkeletons.tsx            # App-level skeleton loaders
+│   │   ├── Skeleton.tsx                # Generic skeleton component
+│   │   ├── GlobalBackground.tsx        # Animated background
+│   │   ├── PreLoader.tsx               # Initial page preloader
+│   │   ├── ScrollToTop.tsx             # Scroll-to-top button
+│   │   ├── ResumeModal.tsx             # Resume viewer modal
+│   │   ├── GitHistory.tsx              # Git history display
+│   │   ├── AnalyticsTracker.tsx        # Analytics event tracker
+│   │   └── admin/                      # Admin-specific components
+│   │       ├── DashboardTab.tsx        # Admin dashboard overview
+│   │       ├── PersonalInfoTab.tsx     # Edit personal info
+│   │       ├── SkillsTab.tsx           # Manage skills
+│   │       ├── ProjectsTab.tsx         # Manage projects
+│   │       ├── ExperienceTab.tsx       # Manage experience
+│   │       ├── EducationTab.tsx        # Manage education
+│   │       ├── CertificationsTab.tsx   # Manage certifications
+│   │       ├── AchievementsTab.tsx     # Manage achievements
+│   │       ├── TestimonialsTab.tsx     # Manage testimonials
+│   │       ├── BlogTab.tsx             # Manage blog posts
+│   │       ├── MessagesTab.tsx         # View contact messages
+│   │       ├── AnalyticsTab.tsx        # View analytics data
+│   │       ├── AdminSkeleton.tsx       # Admin loading skeleton
+│   │       ├── Modal.tsx               # Generic modal
+│   │       ├── ModalAlert.tsx          # Modal with alert styling
+│   │       ├── ConfirmDialog.tsx       # Confirmation dialog
+│   │       ├── ErrorAlert.tsx          # Error alert component
+│   │       ├── LoadingSpinner.tsx      # Loading spinner
+│   │       ├── ToastContainer.tsx      # Toast notification container
+│   │       ├── TagInput.tsx            # Tag input field
+│   │       └── TagListField.tsx        # Tag list display field
 │   │
 │   ├── lib/                    # API clients & utilities
 │   │   ├── api.ts              # Public portfolio API client
+│   │   ├── apiClient.ts        # Base HTTP client wrapper
 │   │   ├── admin-api.ts        # Admin API client
-│   │   ├── admin-types.ts      # TypeScript interfaces
+│   │   ├── admin-types.ts      # TypeScript interfaces for admin
 │   │   ├── toast.ts            # Toast notification helper
 │   │   └── validation.ts       # Form validation utilities
 │   │
 │   ├── styles/                 # Global CSS stylesheets
-│   ├── public/                 # Static assets (favicon, images)
+│   │   ├── globals.css         # Base global styles
+│   │   ├── components.css      # Shared component styles
+│   │   ├── sections.css        # Portfolio section styles
+│   │   ├── sections-extended.css   # Extended section styles
+│   │   ├── sections-final.css      # Final section overrides
+│   │   ├── skills-modern.css       # Modern skills layout
+│   │   ├── responsive.css          # Responsive / mobile styles
+│   │   ├── chatbot.css             # Chatbot widget styles
+│   │   └── admin.css               # Admin dashboard styles
+│   │
+│   ├── public/                 # Static assets
+│   │   ├── images/             # Image assets
+│   │   │   ├── oci-badge.png   # OCI certification badge
+│   │   │   └── Zentara-logo.png    # Zentara logo
+│   │   └── lottie/             # Lottie / GIF animations
+│   │       └── AI Robot.gif    # AI robot animation
+│   │
 │   ├── .env.local              # Frontend env vars (git-ignored)
 │   ├── next.config.js          # Next.js config
 │   ├── tsconfig.json           # TypeScript config
-│   └── package.json            # npm scripts
+│   └── package.json            # npm scripts & dependencies
 │
 ├── backend/                    # ── Flask REST API ──────────────────────
 │   ├── app.py                  # Application factory (create_app)
-│   ├── wsgi.py                 # WSGI / dev entry point
+│   ├── run.py                  # Development run entry point
+│   ├── wsgi.py                 # WSGI / production entry point
 │   ├── config.py               # All config from env vars
+│   ├── cache.py                # Caching layer
+│   ├── limiter.py              # Rate limiting setup
 │   ├── requirements.txt        # Python dependencies
 │   ├── .env.example            # Safe template — commit this
 │   ├── .env                    # Real secrets — NEVER commit
 │   │
-│   ├── routes/
+│   ├── routes/                 # Flask route blueprints
 │   │   ├── api.py              # Public API endpoints
 │   │   └── admin.py            # Admin-protected endpoints
 │   │
-│   ├── models/
-│   │   ├── database.py         # SQLite ORM / data layer
+│   ├── models/                 # Data models & DB layer
+│   │   ├── database.py         # PostgreSQL data layer (psycopg2)
 │   │   ├── admin.py            # Admin model / auth
 │   │   └── portfolio_data.py   # Default seed data
 │   │
+│   ├── static/                 # Flask static file serving
+│   │   └── uploads/            # User-uploaded files
+│   │
 │   └── venv/                   # Virtual environment (git-ignored)
 │
-├── documentation/              # API reference & architecture docs
+├── documentation/              # Project docs
+│   ├── API_Reference.md        # Full API endpoint reference
+│   ├── Portfolio_Projects_Description.md   # Project descriptions
+│   └── Project_Architecture.md # Architecture overview
+│
 ├── .gitignore
 ├── README.md
+├── render.yaml                 # Render.com deployment config
+├── SETUP_GUIDE.md              # Detailed setup instructions
+├── GITHUB_GUIDE.md             # GitHub workflow guide
 └── run-project.md              # Quick run guide
 ```
 
@@ -103,6 +184,12 @@ pip install -r requirements.txt
 cp .env.example .env               # then edit .env with your secrets
 cd ..
 ```
+
+> **Database:** PostgreSQL required. Create a local DB first:
+> ```bash
+> psql -U postgres -c "CREATE DATABASE portfolio_dev;"
+> ```
+> Then set `DATABASE_URL=postgresql://postgres:your_password@localhost:5432/portfolio_dev` in `backend/.env`
 
 ### 4. Start Both Servers
 
@@ -193,6 +280,7 @@ const projects = await portfolioAPI.getProjects(/* featured= */ true);
 
 | Variable              | Description                     | Required |
 |-----------------------|---------------------------------|----------|
+| `DATABASE_URL`        | PostgreSQL connection string    | ✅       |
 | `SECRET_KEY`          | Flask session secret            | ✅       |
 | `JWT_SECRET_KEY`      | JWT signing key                 | ✅       |
 | `FLASK_ENV`           | `development` or `production`   | ✅       |
@@ -239,7 +327,7 @@ Run these from the `frontend/` folder:
 | Auth            | PyJWT                   |
 | Email           | Flask-Mail              |
 | CORS            | Flask-CORS              |
-| Database        | SQLite                  |
+| Database        | PostgreSQL (psycopg2)   |
 | Server          | Gunicorn (production)   |
 
 ---

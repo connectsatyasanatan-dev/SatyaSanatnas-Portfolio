@@ -16,7 +16,9 @@ def health_check():
     """Health check — verifies DB connectivity"""
     try:
         conn = db.get_connection()
-        conn.execute("SELECT 1")
+        cur = conn.cursor()
+        cur.execute("SELECT 1")
+        cur.close()
         conn.close()
         db_status = "connected"
     except Exception as e:
