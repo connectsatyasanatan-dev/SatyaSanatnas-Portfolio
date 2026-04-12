@@ -1,4 +1,4 @@
-from models.database import db
+from models.database import db, get_connection
 from flask_mail import Message
 from cache import get_cached, set_cache, invalidate_cache
 import requests
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def health_check():
     """Health check — verifies DB connectivity"""
     try:
-        conn = db.get_connection()
+        conn = get_connection()
         cur = conn.cursor()
         cur.execute("SELECT 1")
         cur.close()
@@ -229,7 +229,7 @@ def get_stats():
 
     # Public visitor count from analytics table
     try:
-        conn = db.get_connection()
+        conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(DISTINCT visitor_id) FROM analytics")
         row = cursor.fetchone()
