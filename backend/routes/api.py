@@ -232,7 +232,9 @@ def get_stats():
         conn = db.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(DISTINCT visitor_id) FROM analytics")
-        unique_visitors = cursor.fetchone()[0]
+        row = cursor.fetchone()
+        unique_visitors = row[0] if row else 0
+        cursor.close()
         conn.close()
     except Exception:
         unique_visitors = 0
