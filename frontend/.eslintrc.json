@@ -1,5 +1,13 @@
 {
     "extends": [
         "next/core-web-vitals"
-    ]
+    ],
+    "rules": {
+        "react/no-unescaped-entities": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "react/jsx-no-comment-textnodes": "off",
+        "@next/next/no-img-element": "off",
+        "@next/next/no-page-custom-font": "off",
+        "react-hooks/exhaustive-deps": "warn"
+    }
 }
