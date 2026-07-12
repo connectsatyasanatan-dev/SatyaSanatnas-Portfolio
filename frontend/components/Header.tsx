@@ -84,21 +84,38 @@ const Header = () => {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-    // Toggle class on app-container which can then control the sidebar visibility
-    const toggleSidebar = () => {
-        const isOpen = !isMenuOpen
-        setIsMenuOpen(isOpen)
+    // Sync menu state with app-body class to handle swipe gestures and overlay clicks properly
+    useEffect(() => {
+        const checkSidebarState = () => {
+            const appBody = document.querySelector('.app-body')
+            setIsMenuOpen(!!appBody?.classList.contains('mobile-sidebar-open'))
+        }
+
+        // Check initially in case it's already open
+        checkSidebarState()
+
         const appBody = document.querySelector('.app-body')
         if (appBody) {
-            if (isOpen) {
-                appBody.classList.add('mobile-sidebar-open')
-                console.log('Sidebar opened - class added')
-            } else {
+            const observer = new MutationObserver(checkSidebarState)
+            observer.observe(appBody, { attributes: true, attributeFilter: ['class'] })
+            return () => observer.disconnect()
+        }
+    }, [])
+
+    const toggleSidebar = (e?: React.MouseEvent) => {
+        if (e) {
+            e.stopPropagation()
+            e.nativeEvent.stopImmediatePropagation()
+        }
+        
+        const appBody = document.querySelector('.app-body')
+        if (appBody) {
+            const isCurrentlyOpen = appBody.classList.contains('mobile-sidebar-open')
+            if (isCurrentlyOpen) {
                 appBody.classList.remove('mobile-sidebar-open')
-                console.log('Sidebar closed - class removed')
+            } else {
+                appBody.classList.add('mobile-sidebar-open')
             }
-        } else {
-            console.error('app-body not found')
         }
     }
 
@@ -110,8 +127,14 @@ const Header = () => {
             if (appBody?.classList.contains('mobile-sidebar-open')) {
                 // Check if click is on overlay (not sidebar)
                 const sidebar = document.querySelector('.resizable-sidebar-container')
-                if (sidebar && !sidebar.contains(target)) {
-                    setIsMenuOpen(false)
+                // Don't close if clicking the toggle button itself
+                const toggleBtn = document.querySelector('.mobile-menu-btn')
+                if (
+                    sidebar && 
+                    !sidebar.contains(target) && 
+                    toggleBtn && 
+                    !toggleBtn.contains(target)
+                ) {
                     appBody.classList.remove('mobile-sidebar-open')
                 }
             }

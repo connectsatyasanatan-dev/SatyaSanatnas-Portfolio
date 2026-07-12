@@ -109,7 +109,7 @@ const Sidebar = ({ activeSection }: SidebarProps) => {
                     <div className="icon-wrapper" title="Account">
                         <User size={24} />
                     </div>
-                    <div className="icon-wrapper" title="Settings">
+                    <div className="icon-wrapper Settings-icon" title="Settings">
                         <Settings size={24} />
                     </div>
                 </div>

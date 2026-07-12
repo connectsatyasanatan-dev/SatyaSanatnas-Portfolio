@@ -820,3 +820,9 @@ textarea:focus {
     border: 1px solid #ccc !important;
   }
 }
+
+@media (max-width: 1023px) {
+  .sidebar-icons .Settings-icon {
+    margin-bottom: 38px !important;
+  }
+}
