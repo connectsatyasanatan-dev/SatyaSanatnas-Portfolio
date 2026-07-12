@@ -6,6 +6,7 @@ import '../styles/sections.css'
 import '../styles/sections-extended.css'
 import '../styles/sections-final.css'
 import '../styles/skills-modern.css'
+import '../styles/responsive.css'
 
 const inter = Inter({ subsets: ['latin'] })
 

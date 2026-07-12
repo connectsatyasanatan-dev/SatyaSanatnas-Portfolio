@@ -92,11 +92,34 @@ const Header = () => {
         if (appBody) {
             if (isOpen) {
                 appBody.classList.add('mobile-sidebar-open')
+                console.log('Sidebar opened - class added')
             } else {
                 appBody.classList.remove('mobile-sidebar-open')
+                console.log('Sidebar closed - class removed')
             }
+        } else {
+            console.error('app-body not found')
         }
     }
+
+    // Close sidebar when clicking overlay
+    useEffect(() => {
+        const handleOverlayClick = (e: MouseEvent) => {
+            const target = e.target as HTMLElement
+            const appBody = document.querySelector('.app-body')
+            if (appBody?.classList.contains('mobile-sidebar-open')) {
+                // Check if click is on overlay (not sidebar)
+                const sidebar = document.querySelector('.resizable-sidebar-container')
+                if (sidebar && !sidebar.contains(target)) {
+                    setIsMenuOpen(false)
+                    appBody.classList.remove('mobile-sidebar-open')
+                }
+            }
+        }
+
+        document.addEventListener('click', handleOverlayClick)
+        return () => document.removeEventListener('click', handleOverlayClick)
+    }, [])
 
     return (
         <header id="portfolio-header">

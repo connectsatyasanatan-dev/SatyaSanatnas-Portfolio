@@ -68,7 +68,10 @@ function scrollToSection(sectionId: string) {
     }
 
     // Close mobile sidebar after navigation
-    document.querySelector('.app-body')?.classList.remove('mobile-sidebar-open')
+    const appBody = document.querySelector('.app-body')
+    if (appBody) {
+        appBody.classList.remove('mobile-sidebar-open')
+    }
 }
 
 interface SidebarProps {

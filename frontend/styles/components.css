@@ -6,11 +6,12 @@
   white-space: nowrap;
   border-bottom: 1px solid var(--border-color);
   background-color: var(--sidebar-bg);
-  padding: 6px 12px;
-  font-size: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
   z-index: 100;
   position: relative;
-  min-height: 44px;
+  height: 48px;
+  min-height: 48px;
   flex-shrink: 0;
 }
 
@@ -30,25 +31,32 @@
   display: flex !important;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: rgba(6, 249, 249, 0.05);
-  border: 1px solid var(--primary);
+  width: 32px;
+  height: 32px;
+  background: rgba(6, 249, 249, 0.1);
+  border: 1px solid rgba(6, 249, 249, 0.3);
   color: var(--primary);
   cursor: pointer;
   margin-right: 8px;
-  border-radius: 10px;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 6px;
+  transition: all 0.2s ease;
   flex-shrink: 0;
-  box-shadow: 0 0 8px rgba(6, 249, 249, 0.3);
+  padding: 0;
+}
+
+#portfolio-header .mobile-menu-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 #portfolio-header .mobile-menu-btn:hover {
-  background-color: rgba(6, 249, 249, 0.15);
-  color: white;
-  border-color: white;
-  box-shadow: 0 0 15px rgba(6, 249, 249, 0.5);
-  transform: scale(1.05);
+  background-color: rgba(6, 249, 249, 0.2);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+#portfolio-header .mobile-menu-btn:active {
+  transform: translateY(0);
 }
 
 
@@ -62,7 +70,8 @@
 
 
 #portfolio-header .header-title {
-  color: #daa522; /* goldenrod */
+  color: #daa522;
+  /* goldenrod */
   text-shadow: 0 0 10px rgba(218, 165, 32, 0.4);
   margin: 0;
   white-space: nowrap;
@@ -80,7 +89,8 @@
 }
 
 #portfolio-header .header-nav {
-  display: none; /* Hidden by default, shown on larger screens */
+  display: none;
+  /* Hidden by default, shown on larger screens */
   align-items: center;
   gap: var(--space-4);
   margin-left: var(--space-4);
@@ -185,7 +195,6 @@
     display: none !important;
   }
 
-
   #portfolio-header .header-title-container {
     max-width: 220px;
   }
@@ -193,9 +202,15 @@
   #portfolio-header .run-build-btn span.btn-text-short {
     display: none;
   }
-  
+
   #portfolio-header .run-build-btn span.btn-text-full {
     display: inline;
+  }
+}
+
+@media (max-width: 1023px) {
+  #portfolio-header .mobile-menu-btn {
+    display: flex !important;
   }
 }
 
@@ -203,7 +218,7 @@
   #portfolio-header {
     padding: 8px 16px;
   }
-  
+
   #portfolio-header .header-left {
     gap: 16px;
   }
@@ -211,34 +226,34 @@
   #portfolio-header .header-title-container {
     max-width: 320px;
   }
-  
+
   #portfolio-header .header-title {
     font-size: 16px;
   }
-  
+
   #portfolio-header .run-build-btn {
     display: flex;
     padding: 4px 12px;
   }
-  
+
   #portfolio-header .run-build-btn .play-icon {
     width: 16px;
     height: 16px;
   }
-  
+
   #portfolio-header .header-right {
     gap: 12px;
   }
-  
+
   #portfolio-header .header-buttons {
     gap: 8px;
   }
-  
+
   #portfolio-header .header-btn {
     width: 32px;
     height: 32px;
   }
-  
+
   #portfolio-header .header-btn svg {
     width: 20px;
     height: 20px;
@@ -254,13 +269,13 @@
     max-width: none;
     min-width: 240px;
   }
-  
+
   #portfolio-header .header-nav {
     display: flex;
     gap: 8px;
     margin-left: 8px;
   }
-  
+
   #portfolio-header .header-nav a {
     font-size: 12px;
   }
@@ -271,11 +286,11 @@
     gap: 16px;
     margin-left: 16px;
   }
-  
+
   #portfolio-header .header-nav a {
     font-size: 14px;
   }
-  
+
   #portfolio-header .run-build-btn .play-icon {
     width: 16px;
     height: 16px;
@@ -284,10 +299,33 @@
 
 /* Resizable Sidebar Container */
 .resizable-sidebar-container {
-  display: none;
+  display: flex;
   flex-direction: row;
   height: 100%;
   flex-shrink: 0;
+}
+
+/* Show sidebar on all screen sizes */
+@media (min-width: 1024px) {
+  .resizable-sidebar-container {
+    display: flex;
+    position: relative;
+  }
+}
+
+/* Mobile: sidebar is fixed and hidden by default */
+@media (max-width: 1023px) {
+  .resizable-sidebar-container {
+    display: flex !important;
+    position: fixed !important;
+    top: 48px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 280px !important;
+    z-index: 1000 !important;
+    background-color: var(--sidebar-bg) !important;
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5) !important;
+  }
 }
 
 /* Sidebar Component Styles */
@@ -314,13 +352,13 @@
 }
 
 .sidebar-icons {
-  width: 60px;
+  width: 48px;
   background-color: var(--sidebar-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px 0;
-  gap: clamp(10px, 2vh, 15px);
+  padding: 12px 0;
+  gap: 8px;
   border-right: 1px solid var(--border-color);
   height: 100%;
 }
@@ -331,27 +369,24 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  height: 28px;
+  height: 40px;
   position: relative;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
 }
 
 .sidebar-icons .icon-wrapper svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   color: var(--text-dim);
   transition: all 0.2s ease;
 }
 
 #portfolio-sidebar .sidebar-icons .icon-wrapper:hover svg {
   color: white;
-  transform: scale(1.1);
 }
-
 
 #portfolio-sidebar .sidebar-icons .icon-wrapper.active svg {
   color: var(--primary);
-  filter: drop-shadow(0 0 5px rgba(6, 249, 249, 0.8));
 }
 
 #portfolio-sidebar .sidebar-icons .icon-wrapper.active::before {
@@ -360,21 +395,20 @@
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 3px;
-  height: clamp(24px, 40%, 32px);
+  width: 2px;
+  height: 24px;
   background: var(--primary);
-  border-radius: 0 4px 4px 0;
-  box-shadow: 0 0 10px var(--primary);
+  border-radius: 0 2px 2px 0;
 }
 
 
 
 #portfolio-sidebar .sidebar-icons .icons-bottom {
   margin-top: auto;
-  padding-bottom: 8px;
+  padding-bottom: 12px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 8px;
   align-items: center;
 }
 
@@ -390,18 +424,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 12px;
+  padding: 8px 12px;
   background-color: var(--sidebar-bg);
 }
 
 #portfolio-sidebar .explorer-header svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   cursor: pointer;
   transition: color 0.2s;
 }
@@ -413,7 +447,7 @@
 #portfolio-sidebar .file-tree {
   display: flex;
   flex-direction: column;
-  font-size: 14px;
+  font-size: 13px;
   font-family: 'JetBrains Mono', monospace;
   user-select: none;
   flex: 1;
@@ -424,33 +458,34 @@
 #portfolio-sidebar .file-tree .folder-root {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
+  gap: 6px;
+  padding: 6px 12px;
   color: white;
   cursor: pointer;
   background-color: rgba(39, 58, 58, 0.2);
 }
 
 #portfolio-sidebar .file-tree .folder-root svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   color: var(--text-dim);
+  flex-shrink: 0;
 }
 
 #portfolio-sidebar .file-tree .folder-root .folder-name {
-  font-weight: bold;
-  font-size: 12px;
+  font-weight: 600;
+  font-size: 13px;
 }
 
 #portfolio-sidebar .file-tree .file-item {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 16px;
+  gap: 6px;
+  padding: 4px 12px;
   color: var(--text-dim);
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 #portfolio-sidebar .file-tree .file-item:hover {
@@ -459,31 +494,30 @@
 }
 
 #portfolio-sidebar .file-tree .file-item svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 #portfolio-sidebar .file-tree .file-item.active {
-  background-color: rgba(39, 58, 58, 0.5);
+  background-color: rgba(39, 58, 58, 0.6);
   color: white;
-  border-radius: 0 4px 4px 0;
-  border-left: 2px solid var(--primary);
 }
 
 #portfolio-sidebar .file-tree .folder-contents {
   display: flex;
   flex-direction: column;
-  padding-left: 16px;
+  padding-left: 12px;
   border-left: 1px solid var(--border-color);
-  margin-left: 20px;
+  margin-left: 18px;
 }
 
 #portfolio-sidebar .file-tree .nested-folder {
   display: flex;
   flex-direction: column;
-  padding-left: 24px;
+  padding-left: 12px;
   border-left: 1px solid var(--border-color);
-  margin-left: 20px;
+  margin-left: 18px;
 }
 
 /* Responsive Sidebar */
@@ -491,26 +525,31 @@
   .resizable-sidebar-container {
     display: flex;
   }
-  
+
   #portfolio-sidebar .sidebar-icons {
     gap: 24px;
   }
-  
+
   #portfolio-sidebar .sidebar-icons svg {
     width: 24px;
     height: 24px;
   }
-  
+
   #portfolio-sidebar .file-tree .folder-name {
     font-size: 14px;
   }
-  
+
   #portfolio-sidebar .file-tree .file-item {
     font-size: 14px;
   }
 }
 
 /* TabBar Component Styles */
+#portfolio-tabbar {
+  flex-shrink: 0;
+  z-index: 10;
+}
+
 #portfolio-tabbar .tab-container {
   display: flex;
   align-items: center;
@@ -518,6 +557,7 @@
   border-bottom: 1px solid var(--border-color);
   overflow-x: auto;
   z-index: 10;
+  min-height: 40px;
 }
 
 #portfolio-tabbar .tab-container::-webkit-scrollbar {
@@ -578,13 +618,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 8px;
+  padding: 6px 12px;
   font-size: 12px;
   font-family: 'JetBrains Mono', monospace;
   color: var(--text-dim);
   border-bottom: 1px solid var(--border-color);
   background-color: var(--editor-bg);
   z-index: 10;
+  min-height: 32px;
+  flex-shrink: 0;
 }
 
 #portfolio-tabbar .breadcrumb-path {
@@ -645,21 +687,21 @@
     padding: 10px 16px;
     font-size: 14px;
   }
-  
+
   #portfolio-tabbar .tab-item .tab-icon {
     font-size: 16px;
   }
-  
+
   #portfolio-tabbar .tab-item .tab-close {
     width: 14px;
     height: 14px;
     margin-left: 8px;
   }
-  
+
   #portfolio-tabbar .breadcrumb {
     padding: 6px 16px;
   }
-  
+
   #portfolio-tabbar .breadcrumb-info {
     display: flex;
   }
@@ -703,6 +745,7 @@ body.resizing * {
 .resizable-sidebar-container.resizing * {
   user-select: none;
 }
+
 /* Custom scrollbar for sidebar file tree */
 #portfolio-sidebar .file-tree::-webkit-scrollbar {
   width: 6px;
@@ -742,51 +785,46 @@ body.resizing * {
 
 /* Mobile sidebar adjustments */
 @media (max-width: 1023px) {
-  html, body {
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-  }
-  
-  .app-container {
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-  }
 
+  /* Sidebar positioning handled by inline styles in ResizableSidebar component */
   .resizable-sidebar-container {
-    position: fixed;
-    top: 44px; /* header height */
-    left: 0;
-    bottom: 0;
-    z-index: 1000;
-    background-color: var(--sidebar-bg);
-    transform: translateX(-100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
     display: flex !important;
-    width: 280px !important;
-  }
-
-  .mobile-sidebar-open .resizable-sidebar-container {
-    transform: translateX(0);
   }
 
   /* Overlay when sidebar is open */
-  .mobile-sidebar-open::after {
+  .app-body.mobile-sidebar-open::after {
     content: '';
     position: fixed;
     inset: 0;
-    top: 44px;
-    background: rgba(0, 0, 0, 0.4);
+    top: 48px;
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(2px);
     z-index: 900;
   }
 
   #portfolio-sidebar {
     width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  #portfolio-sidebar .sidebar-icons {
+    width: 44px;
+  }
+
+  #portfolio-sidebar .sidebar-icons .icon-wrapper svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Hide resize handle on mobile */
+  .sidebar-resize-handle {
+    display: none !important;
   }
 }
+
 /* Resume Modal Styles */
 .resume-modal-overlay {
   position: fixed;
@@ -865,7 +903,7 @@ body.resizing * {
   text-align: center;
 }
 
-.resume-modal-header .zoom-controls button, 
+.resume-modal-header .zoom-controls button,
 .resume-modal-header .action-btn {
   background: transparent;
   border: none;
@@ -985,10 +1023,12 @@ body.resizing * {
     height: 95vh;
     border-radius: 16px;
   }
-  .resume-modal-header .zoom-controls, 
+
+  .resume-modal-header .zoom-controls,
   .resume-modal-header .action-btn {
     display: none;
   }
+
   .resume-modal-header .download-btn-modern span {
     display: none;
   }
@@ -1018,6 +1058,7 @@ body.resizing * {
 #portfolio-tabbar .tab-container:hover::-webkit-scrollbar {
   height: 3px;
 }
+
 #portfolio-tabbar .tab-container:hover::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: 2px;
@@ -1039,7 +1080,7 @@ body.resizing * {
   width: 56px;
   height: 56px;
   border-radius: 14px;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -1051,7 +1092,7 @@ body.resizing * {
 .empty-state-title {
   font-size: 14px;
   font-weight: 600;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
   font-family: 'JetBrains Mono', monospace;
 }
 
@@ -1068,8 +1109,8 @@ body.resizing * {
   gap: 6px;
   margin-top: 4px;
   padding: 7px 16px;
-  background: rgba(6,249,249,0.08);
-  border: 1px solid rgba(6,249,249,0.25);
+  background: rgba(6, 249, 249, 0.08);
+  border: 1px solid rgba(6, 249, 249, 0.25);
   border-radius: 6px;
   color: var(--primary);
   font-size: 12px;
@@ -1079,7 +1120,7 @@ body.resizing * {
 }
 
 .empty-state-retry:hover {
-  background: rgba(6,249,249,0.15);
+  background: rgba(6, 249, 249, 0.15);
   border-color: var(--primary);
 }
 

@@ -5,23 +5,32 @@
 
 /* ── 480px and below (small phones) ─────────────────────── */
 @media (max-width: 480px) {
+
    /* ── Layout ── */
    .main-content {
-      padding: 10px 8px;
-   }
-
-   .resizable-sidebar-container {
-      display: none !important;
+      padding: 12px 10px;
    }
 
    /* ── Header ── */
+   #portfolio-header {
+      height: 44px;
+      min-height: 44px;
+      padding: 6px 10px;
+   }
+
    #portfolio-header .header-right {
       display: none;
    }
 
    #portfolio-header .mobile-menu-btn {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
+      margin-right: 8px;
+   }
+
+   #portfolio-header .mobile-menu-btn svg {
+      width: 18px;
+      height: 18px;
    }
 
    #portfolio-header .header-title-container {
@@ -29,14 +38,23 @@
    }
 
    /* ── TabBar ── */
+   #portfolio-tabbar .tab-container {
+      min-height: 36px;
+   }
+
    #portfolio-tabbar .tab-item {
-      padding: 5px 6px;
-      font-size: 10px;
-      gap: 3px;
+      padding: 6px 8px;
+      font-size: 11px;
+      gap: 4px;
    }
 
    #portfolio-tabbar .tab-item .tab-name {
       display: none;
+   }
+
+   #portfolio-tabbar .breadcrumb {
+      padding: 4px 8px;
+      min-height: 28px;
    }
 
    /* ── Hero ── */
@@ -494,11 +512,6 @@
 /* ── max-width: 768px (shared mobile/tablet rules) ───────── */
 @media (max-width: 768px) {
 
-   /* Sidebar hidden */
-   .resizable-sidebar-container {
-      display: none !important;
-   }
-
    /* Main content */
    .main-content {
       padding: 14px 12px;
@@ -685,10 +698,6 @@
       padding: 24px 20px;
    }
 
-   .resizable-sidebar-container {
-      display: none !important;
-   }
-
    #hero-section .hero-stats {
       grid-template-columns: repeat(4, 1fr);
    }
@@ -742,8 +751,19 @@
 /* ── max-width: 1024px (sidebar hidden) ─────────────────── */
 @media (max-width: 1024px) {
 
+   #portfolio-sidebar .sidebar-icons {
+      width: 48px;
+      padding: 12px 0;
+      gap: 8px;
+   }
+
    #portfolio-sidebar .sidebar-icons .icons-bottom {
-      padding-bottom: 38px;
+      padding-bottom: 12px;
+      gap: 8px;
+   }
+
+   .sidebar-icons .icon-wrapper {
+      height: 40px;
    }
 
    .sidebar-icons .icon-wrapper svg {
@@ -766,6 +786,20 @@
 
    .main-content {
       padding: var(--space-8);
+   }
+
+   #portfolio-sidebar .sidebar-icons {
+      width: 48px;
+      gap: 12px;
+   }
+
+   #portfolio-sidebar .sidebar-icons .icon-wrapper {
+      height: 40px;
+   }
+
+   #portfolio-sidebar .sidebar-icons svg {
+      width: 22px;
+      height: 22px;
    }
 
    #hero-section .execute-btn .btn-text-full {
@@ -956,5 +990,42 @@
    .main-content {
       padding: 0;
       overflow: visible;
+   }
+}
+
+/* ── Mobile Sidebar — hamburger menu ────────────────────── */
+@media (max-width: 1023px) {
+
+   /* Sidebar is always rendered but positioned off-screen */
+   .resizable-sidebar-container {
+      display: flex !important;
+   }
+
+   /* Overlay behind sidebar when open */
+   .app-body.mobile-sidebar-open::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      top: 48px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 900;
+   }
+
+   #portfolio-sidebar {
+      width: 280px !important;
+      min-width: 280px !important;
+      max-width: 280px !important;
+      display: flex !important;
+      flex-direction: column !important;
+   }
+
+   #portfolio-sidebar .sidebar-icons {
+      width: 44px;
+   }
+
+   #portfolio-sidebar .sidebar-icons .icon-wrapper svg {
+      width: 18px;
+      height: 18px;
    }
 }

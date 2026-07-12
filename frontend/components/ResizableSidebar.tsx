@@ -20,11 +20,45 @@ const ResizableSidebar = ({
     const [isResizing, setIsResizing] = useState(false)
     const [isHovering, setIsHovering] = useState(false)
     const [isCollapsed, setIsCollapsed] = useState(false)
+    const [isMobile, setIsMobile] = useState(false)
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
     const sidebarRef = useRef<HTMLDivElement>(null)
     const resizeHandleRef = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const touchStartX = useRef<number>(0)
     const touchStartY = useRef<number>(0)
+
+    // Detect mobile on mount and resize
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024)
+        }
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
+
+    // Listen for mobile sidebar open/close
+    useEffect(() => {
+        if (!isMobile) return
+
+        const checkSidebarState = () => {
+            const appBody = document.querySelector('.app-body')
+            const isOpen = appBody?.classList.contains('mobile-sidebar-open')
+            setIsMobileSidebarOpen(!!isOpen)
+        }
+
+        // Check immediately
+        checkSidebarState()
+
+        // Use MutationObserver to watch for class changes
+        const appBody = document.querySelector('.app-body')
+        if (appBody) {
+            const observer = new MutationObserver(checkSidebarState)
+            observer.observe(appBody, { attributes: true, attributeFilter: ['class'] })
+            return () => observer.disconnect()
+        }
+    }, [isMobile])
 
     const startResizing = useCallback((e: React.MouseEvent) => {
         e.preventDefault()
@@ -144,9 +178,22 @@ const ResizableSidebar = ({
         <div
             ref={containerRef}
             className="resizable-sidebar-container"
+            style={isMobile ? {
+                position: 'fixed',
+                top: '48px',
+                left: '0',
+                bottom: '0',
+                width: '280px',
+                zIndex: 1000,
+                backgroundColor: 'var(--sidebar-bg)',
+                boxShadow: '20px 0 50px rgba(0, 0, 0, 0.5)',
+                transform: isMobileSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+                transition: 'transform 0.3s ease',
+                display: 'flex'
+            } : undefined}
         >
             {/* Collapsed sidebar toggle button */}
-            {isCollapsed && (
+            {isCollapsed && !isMobile && (
                 <div
                     className="sidebar-toggle-collapsed"
                     onClick={() => setIsCollapsed(false)}
@@ -183,7 +230,16 @@ const ResizableSidebar = ({
             <aside
                 ref={sidebarRef}
                 id="portfolio-sidebar"
-                style={{
+                style={isMobile ? {
+                    width: '280px',
+                    minWidth: '280px',
+                    maxWidth: '280px',
+                    height: '100%',
+                    flexShrink: 0,
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column'
+                } : {
                     width: isCollapsed ? '0px' : `${sidebarWidth}px`,
                     minWidth: isCollapsed ? '0px' : `${minWidth}px`,
                     maxWidth: `${maxWidth}px`,
@@ -193,11 +249,11 @@ const ResizableSidebar = ({
                     flexShrink: 0
                 }}
             >
-                {!isCollapsed && <Sidebar activeSection={activeSection} />}
+                {(!isCollapsed || isMobile) && <Sidebar activeSection={activeSection} />}
             </aside>
 
-            {/* Resize handle */}
-            {!isCollapsed && (
+            {/* Resize handle - only show on desktop */}
+            {!isCollapsed && !isMobile && (
                 <div
                     ref={resizeHandleRef}
                     className="sidebar-resize-handle"
