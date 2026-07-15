@@ -42,6 +42,7 @@ services:
 
     environment:
       FLASK_ENV: ${FLASK_ENV}
+      SECRET_KEY: ${SECRET_KEY}
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       MAIL_USERNAME: ${MAIL_USERNAME}
