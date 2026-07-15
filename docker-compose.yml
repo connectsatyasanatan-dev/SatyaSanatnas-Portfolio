@@ -1,0 +1,86 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: portfolio-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - portfolio-network
+
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: portfolio-backend
+
+    restart: unless-stopped
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    environment:
+      FLASK_ENV: ${FLASK_ENV}
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      CLOUDINARY_URL: ${CLOUDINARY_URL}
+
+    ports:
+      - "5000:5000"
+
+    networks:
+      - portfolio-network
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: portfolio-frontend
+
+    restart: unless-stopped
+
+    depends_on:
+      - backend
+
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+
+    ports:
+      - "3000:3000"
+
+    networks:
+      - portfolio-network
+
+
+volumes:
+  postgres_data:
+
+
+networks:
+  portfolio-network:
+    driver: bridge
