@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+export const dynamic = 'force-dynamic';
 
 // ── Portfolio data types ──────────────────────────────────
 interface PortfolioData {
@@ -312,6 +312,7 @@ export async function POST(request: NextRequest) {
     // Try Groq AI first
     if (apiKey && apiKey !== 'your_groq_api_key_here') {
         try {
+            const groq = new Groq({ apiKey });
             const systemPrompt = buildSystemPrompt(portfolioData, sentiment, greeting);
             const recentHistory = history.slice(-6).map(m => ({
                 role: m.role as 'user' | 'assistant',
